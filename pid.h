@@ -49,47 +49,44 @@
     0159-Fuel guide absolute pressure
 */
 
-// TODO: Implement all of these eventually.
-// See https://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_1_PID_03 for more info
-
 static QString DEFAULT = "ATD",
-        RESET = "ATZ",
-        INFO = "ATI",
-        VOLTAGE = "ATRV",
-        PROTOCOL = "ATDP",
-        PROTOCOL_AUTO = "ATSP0",
-        PROTOCOL_SEARCH_ORDER= "ATSS",
-        ECHO_OFF = "ATE0",
-        ECHO_ON = "ATE1",
-        LINEFEED_OFF = "ATL0",
-        LINEFEED_ON = "ATL1",
-        HEADERS_OFF = "ATH0",
-        HEADERS_ON = "ATH1",
-        SPACES_OFF = "ATS0",
-        SPACES_ON = "ATS1",
-        ADAPTIF_TIMING_OFF = "ATAT0",
-        ADAPTIF_TIMING_AUTO1 = "ATAT1",
-        ADAPTIF_TIMING_AUTO2 = "ATAT2",
-        TIMEOUT_01 = "ATST01",
-        ENGINE_COOLANT_TEMP = "0105",  //A-40
-        ENGINE_RPM = "010C",  //((A*256)+B)/4
-        ENGINE_LOAD = "0104",  // A*100/255
-        VEHICLE_SPEED = "010D",  //A
-        INTAKE_AIR_TEMP = "010F",  //A-40
-        MAN_ABSOLUTE_PRESSURE = "010B", // A  Manifold Absolute Pressure
-        MAF_AIR_FLOW = "0110", //MAF air flow rate 0 - 655.35	grams/sec ((256*A)+B) / 100  [g/s]
-        ENGINE_OIL_TEMP = "015C",  //A-40
-        FUEL_PRESSURE = "010A",  // A*3
-        FUEL_RAIL_LOW_PRESSURE = "0122", // ((A*256)+B)*0.079
-        FUEL_RAIL_HIGH_PRESSURE = "0123", // ((A*256)+B) * 10
-        INTAKE_MAN_PRESSURE = "010B", //Intake manifold absolute pressure 0 - 255 kPa
-        CONT_MODULE_VOLT = "0142",  //((A*256)+B)/1000
-        AMBIENT_AIR_TEMP = "0146",  //A-40
-        CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
-        STATUS_DTC = "0101", //Status since DTC Cleared
-        THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
-        OBD_STANDARDS = "011C", //OBD standards this vehicle
-        PIDS_SUPPORTED = "0120"; //PIDs supported
+RESET = "ATZ",
+INFO = "ATI",
+VOLTAGE = "ATRV",
+PROTOCOL = "ATDP",
+PROTOCOL_AUTO = "ATSP0",
+PROTOCOL_SEARCH_ORDER= "ATSS",
+ECHO_OFF = "ATE0",
+ECHO_ON = "ATE1",
+LINEFEED_OFF = "ATL0",
+LINEFEED_ON = "ATL1",
+HEADERS_OFF = "ATH0",
+HEADERS_ON = "ATH1",
+SPACES_OFF = "ATS0",
+SPACES_ON = "ATS1",
+ADAPTIF_TIMING_OFF = "ATAT0",
+ADAPTIF_TIMING_AUTO1 = "ATAT1",
+ADAPTIF_TIMING_AUTO2 = "ATAT2",
+TIMEOUT_01 = "ATST01",
+ENGINE_COOLANT_TEMP = "0105",  //A-40
+ENGINE_RPM = "010C",  //((A*256)+B)/4
+ENGINE_LOAD = "0104",  // A*100/255
+VEHICLE_SPEED = "010D",  //A
+INTAKE_AIR_TEMP = "010F",  //A-40
+MAN_ABSOLUTE_PRESSURE = "010B", // A  Manifold Absolute Pressure
+MAF_AIR_FLOW = "0110", //MAF air flow rate 0 - 655.35	grams/sec ((256*A)+B) / 100  [g/s]
+ENGINE_OIL_TEMP = "015C",  //A-40
+FUEL_PRESSURE = "010A",  // A*3
+FUEL_RAIL_LOW_PRESSURE = "0122", // ((A*256)+B)*0.079
+FUEL_RAIL_HIGH_PRESSURE = "0123", // ((A*256)+B) * 10
+INTAKE_MAN_PRESSURE = "010B", //Intake manifold absolute pressure 0 - 255 kPa
+CONT_MODULE_VOLT = "0142",  //((A*256)+B)/1000
+AMBIENT_AIR_TEMP = "0146",  //A-40
+CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
+STATUS_DTC = "0101", //Status since DTC Cleared
+THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
+OBD_STANDARDS = "011C", //OBD standards this vehicle
+PIDS_SUPPORTED = "0120"; //PIDs supported
 
 static QStringList initializeCommands{DEFAULT, RESET, ADAPTIF_TIMING_AUTO1, ECHO_OFF, LINEFEED_OFF,
             SPACES_OFF, HEADERS_OFF, PROTOCOL_SEARCH_ORDER, PROTOCOL_AUTO, ECHO_OFF, INFO, PROTOCOL};
@@ -99,9 +96,9 @@ static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPE
             FUEL_PRESSURE, FUEL_RAIL_LOW_PRESSURE, FUEL_RAIL_HIGH_PRESSURE};
 
 static QStringList PIDS {
-            "01", "02", "03", "04", "05", "06", "07", "08",
-            "09", "0A", "0B", "0C", "0D", "0E", "0F", "10",
-            "11", "12", "13", "14", "15", "16", "17", "18",
-            "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
+    "01", "02", "03", "04", "05", "06", "07", "08",
+    "09", "0A", "0B", "0C", "0D", "0E", "0F", "10",
+    "11", "12", "13", "14", "15", "16", "17", "18",
+    "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
 
 #endif // PID_H
