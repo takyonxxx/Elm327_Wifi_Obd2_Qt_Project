@@ -19,10 +19,9 @@ public:
 private:
     NetworkManager *m_networkManager;
     int commandOrder{0};
-    bool m_Scan{false};
 
     void send(QString &);
-    void analysData(const QString &dataReceived);
+    void analysData(const QString &);
 
 private slots:
     void on_pushExit_clicked();    
@@ -32,7 +31,7 @@ signals:
     void on_close_scan();
 
 protected:
-    void closeEvent (QCloseEvent *event) override;
+    void closeEvent (QCloseEvent *) override;
 
 
 private:

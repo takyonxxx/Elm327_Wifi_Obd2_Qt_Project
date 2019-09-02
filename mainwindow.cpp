@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "pid.h"
-#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,15 +20,17 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::wifiDisconnected, this, &MainWindow::disconnected);
         connect(m_networkManager, &NetworkManager::dataReceived, this, &MainWindow::dataReceived);
         connect(m_networkManager, &NetworkManager::dataHexReceived, this, &MainWindow::dataHexReceived);
+        connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
 
-    ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
     ui->pushConnect->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color:#074666;");
     ui->pushSend->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushClear->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushDiagnostic->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushScan->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushGauge->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
     ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666");
     ui->labelPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666;");
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setText("ATI");
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
+    ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
 }
 
@@ -59,7 +61,7 @@ void MainWindow::send(QString &string)
 
 void MainWindow::dataReceived(QString &data)
 {
-    if(m_Scan)return;
+    if(m_ConsoleEnable)return;
 
     if(!m_HexEnabled && !data.isEmpty())
     ui->textTerminal->append("<- " + data);
@@ -89,6 +91,11 @@ void MainWindow::dataReceived(QString &data)
     }
 }
 
+void MainWindow::stateChanged(QString &state)
+{
+    ui->textTerminal->append(state);
+}
+
 void MainWindow::dataHexReceived(QString &data)
 {
     if(m_HexEnabled && !data.isEmpty())
@@ -104,6 +111,7 @@ void MainWindow::connected()
 {
     ui->pushSend->setEnabled(true);
     ui->pushScan->setEnabled(true);
+    ui->pushGauge->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
 
     ui->textTerminal->append("Connected to ELM327");
@@ -117,6 +125,7 @@ void MainWindow::disconnected()
 {
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
+    ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
 
     ui->textTerminal->append("Disconnected from ELM327");
@@ -263,7 +272,7 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::on_close_dialog_triggered()
 {
-    m_Scan = false;
+    m_ConsoleEnable = false;
     qDebug() << "on_close_dialog_triggered";
 }
 
@@ -277,10 +286,22 @@ void MainWindow::on_pushScan_clicked()
     QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
     obdScan->show();
-    m_Scan = true;
+    m_ConsoleEnable = true;
 }
 
 void MainWindow::on_checkHex_stateChanged(int arg1)
 {
     m_HexEnabled = arg1;
+}
+
+void MainWindow::on_pushGauge_clicked()
+{
+    ObdGauge *obdGauge = new ObdGauge;
+    obdGauge->setWindowTitle("Obd Scan");
+    obdGauge->setGeometry(this->rect());
+    obdGauge->move(this->x(), this->y());
+    QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
+
+    obdGauge->show();
+    m_ConsoleEnable = true;
 }

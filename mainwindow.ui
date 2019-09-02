@@ -116,7 +116,14 @@
         <item>
          <widget class="QPushButton" name="pushDiagnostic">
           <property name="text">
-           <string>Diagnostic / Clear</string>
+           <string>Clear Fault</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushGauge">
+          <property name="text">
+           <string>Gauge</string>
           </property>
          </widget>
         </item>

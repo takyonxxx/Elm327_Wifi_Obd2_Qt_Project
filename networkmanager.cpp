@@ -61,28 +61,30 @@ QString NetworkManager::statetoString(QAbstractSocket::SocketState socketState)
     QString statestring;
     switch(socketState)
     {
-    case QAbstractSocket::UnconnectedState : statestring="the socket is not connected";
+    case QAbstractSocket::UnconnectedState : statestring="The socket is not connected";
         break;
-    case QAbstractSocket::HostLookupState : statestring="the socket is performing a host name lookup";
+    case QAbstractSocket::HostLookupState : statestring="The socket is performing a host name lookup";
         break;
-    case QAbstractSocket::ConnectingState : statestring="the socket has started establishing a connection";
+    case QAbstractSocket::ConnectingState : statestring="The socket has started establishing a connection";
         break;
-    case QAbstractSocket::ConnectedState : statestring="a connection is established";
+    case QAbstractSocket::ConnectedState : statestring="Connection is established";
         break;
-    case QAbstractSocket::BoundState : statestring="the socket is bound to an address and port";
+    case QAbstractSocket::BoundState : statestring="The socket is bound to an address and port";
         break;
-    case QAbstractSocket::ClosingState : statestring="the socket is about to close";
+    case QAbstractSocket::ClosingState : statestring="The socket is about to close";
         break;
-    case QAbstractSocket::ListeningState : statestring="listening state";
+    case QAbstractSocket::ListeningState : statestring="Listening state";
         break;
-    default: statestring="unknown state";
+    default: statestring="Unknown state";
+        break;
     }
     return statestring;
 }
 
 void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
 {
-    qDebug() << "State change to " + statetoString(socketState) + " at " + QDateTime::currentDateTime().toString("hh:mm:ss dd.MM.yyyy");
+    QString state(statetoString(socketState).toStdString().c_str());
+    emit stateChanged(state);
 }
 
 void NetworkManager::readed()

@@ -17,6 +17,7 @@ public:
 public: signals:
     void dataReceived(QString &);
     void dataHexReceived(QString &);
+    void stateChanged(QString &);
     void errorAccrued(QString &);
     void wifiConnected();
     void wifiDisconnected();

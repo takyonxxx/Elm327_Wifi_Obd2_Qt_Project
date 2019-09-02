@@ -23,12 +23,6 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
     ui->labelCoolant->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelOilTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelOilTemp->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
-
-    ui->labelAmbientAirTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelAmbientAirTemp->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
-
     ui->labelIntakeAirTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
     ui->labelIntakeAirTemp->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
@@ -37,12 +31,6 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");    
-
-    ui->labelFuelPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelFuelPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
-
-    ui->labelFuelRailLowPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelFuelRailLowPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
     ui->labelFuelRailHighPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
@@ -56,7 +44,6 @@ ObdScan::ObdScan(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
         if(m_networkManager->isConnected())
         {
-            m_Scan = true;
             send(runtimeCommands[commandOrder]);
             commandOrder++;
         }
@@ -71,28 +58,24 @@ ObdScan::~ObdScan()
 void ObdScan::closeEvent (QCloseEvent *event)
 {
     Q_UNUSED(event);
-    m_Scan = false;
     emit on_close_scan();
 }
 
 void ObdScan::on_pushExit_clicked()
 {
-    m_Scan = false;
     close();
 }
 
-void ObdScan::send(QString &string)
+void ObdScan::send(QString &data)
 {
     if(!m_networkManager->isConnected())return;
-    m_networkManager->send(string);
+    m_networkManager->send(data);
 }
 
 
-void ObdScan::dataReceived(QString &data)
-{
-    if(!m_Scan)return;
-
-    analysData(data);
+void ObdScan::dataReceived(QString &dataReceived)
+{   
+    analysData(dataReceived);
 
     if(commandOrder < initializeCommands.size())
     {
@@ -152,12 +135,10 @@ void ObdScan::analysData(const QString &dataReceived)
         case 92://PID(05): Oil Temperature
             // A-40
             value = A - 40;
-            ui->labelOilTemp->setText(QString::number(value, 'f', 0) + " C°");
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]
-            value = A - 40;
-            ui->labelAmbientAirTemp->setText(QString::number(value, 'f', 0) + " C°");
+            value = A - 40;           
             break;
         case 15://PID(0F): Intake Air Temperature
             // A - 40
@@ -176,13 +157,11 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 10://PID(0A): Fuel Pressure
             // A * 3
-            value = A * 3;
-            ui->labelFuelPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            value = A * 3;            
             break;
         case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
             // ((A*256)+B)*0.079
-            value = ((A * 256) + B) * 0.079;
-            ui->labelFuelRailLowPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            value = ((A * 256) + B) * 0.079;            
             break;
         case 35://PID(23) Fuel guide pressure
             // ((A*256)+B) * 10

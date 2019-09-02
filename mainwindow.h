@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDesktopWidget>
 #include "networkmanager.h"
 #include "obdscan.h"
+#include "obdgauge.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +26,7 @@ private:
     NetworkManager *m_networkManager;
     int commandOrder{0};    
     bool m_initialized{false};
-    bool m_Scan{false};
+    bool m_ConsoleEnable{false};
     bool m_HexEnabled{false};
     bool m_clearCodeRequest{false};    
 
@@ -32,6 +34,7 @@ private slots:
     void connected();
     void disconnected();
     void dataReceived(QString &);
+    void stateChanged(QString &state);
     void dataHexReceived(QString &);
     void errorAccrued(QString &);
     void on_close_dialog_triggered();
@@ -43,6 +46,8 @@ private slots:
     void on_pushScan_clicked();
 
     void on_checkHex_stateChanged(int arg1);
+
+    void on_pushGauge_clicked();
 
 private:
     Ui::MainWindow *ui;   

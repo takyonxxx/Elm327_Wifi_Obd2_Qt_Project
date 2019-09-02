@@ -75,34 +75,6 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="labelOilTempTitle">
-          <property name="text">
-           <string>Oil Temp:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="labelOilTemp">
-          <property name="text">
-           <string>0 C°</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="labelIntakeAirTempTitle">
-          <property name="text">
-           <string>Intake Air Temp:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QLabel" name="labelIntakeAirTemp">
-          <property name="text">
-           <string>0 C°</string>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="0">
          <widget class="QLabel" name="labelCoolantTitle">
           <property name="text">
@@ -117,87 +89,59 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
+        <item row="5" column="0">
+         <widget class="QLabel" name="labelIntakeAirTempTitle">
+          <property name="text">
+           <string>Intake Air Temp:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="labelIntakeAirTemp">
+          <property name="text">
+           <string>0 C°</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
          <widget class="QLabel" name="labelMafAirFlowTitle">
           <property name="text">
            <string>Maf Air Flow:</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="6" column="1">
          <widget class="QLabel" name="labelMafAirFlow">
           <property name="text">
            <string>0 g/s</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="labelManifoldPressureTitle">
           <property name="text">
            <string>Manifold Pressure:</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
+        <item row="7" column="1">
          <widget class="QLabel" name="labelManifoldPressure">
           <property name="text">
            <string>0 kPa</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="labelFuelRailLowPressureTitle">
-          <property name="text">
-           <string>Fuel Rail Low:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="1">
-         <widget class="QLabel" name="labelFuelRailLowPressure">
-          <property name="text">
-           <string>0 kPa </string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0">
+        <item row="8" column="0">
          <widget class="QLabel" name="labelFuelRailHighPressureTitle">
           <property name="text">
            <string>Fuel Rail High:</string>
           </property>
          </widget>
         </item>
-        <item row="12" column="1">
+        <item row="8" column="1">
          <widget class="QLabel" name="labelFuelRailHighPressure">
           <property name="text">
            <string>0 kPa</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0">
-         <widget class="QLabel" name="labelFuelPressureTitle">
-          <property name="text">
-           <string>Fuel Pressure:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QLabel" name="labelFuelPressure">
-          <property name="text">
-           <string>0 kPa</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="labelAmbientAirTempTitle">
-          <property name="text">
-           <string>Ambient Air Temp:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLabel" name="labelAmbientAirTemp">
-          <property name="text">
-           <string>0 C°</string>
           </property>
          </widget>
         </item>

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,17 +27,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        gaugewidget.cpp \
         main.cpp \
         mainwindow.cpp \
         networkmanager.cpp \
+        obdgauge.cpp \
         obdscan.cpp
 
 HEADERS += \
+        gaugewidget.h \
         mainwindow.h \
         networkmanager.h \
+        obdgauge.h \
         obdscan.h \
         pid.h
 
 FORMS += \
         mainwindow.ui \
+        obdgauge.ui \
         obdscan.ui
+
+RESOURCES += \
+    resources.qrc
