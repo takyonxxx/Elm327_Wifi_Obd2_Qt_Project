@@ -22,8 +22,7 @@ public:
 
 private:
     void send(QString &string);
-    void analysData(const QString &);   
-    void findActiveWirelesses();
+    void analysData(const QString &);
 
     int foundCount;
     QNetworkConfiguration netcfg;

@@ -44,7 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
     refreshTimer = new QTimer();
     refreshTimer->setInterval(1000);
     connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshObd);
-    refreshTimer->start();
 }
 
 MainWindow::~MainWindow()
@@ -59,7 +58,7 @@ void MainWindow::refreshObd()
     send(ENGINE_RPM);
 }
 
-void MainWindow::findActiveWirelesses()
+/*void MainWindow::findActiveWirelesses()
 {
 
     QNetworkConfigurationManager ncm;
@@ -83,7 +82,7 @@ void MainWindow::findActiveWirelesses()
             }
         }
     }
-}
+}*/
 
 void MainWindow::send(QString &string)
 {
@@ -164,6 +163,8 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
+    refreshTimer->stop();
+
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
@@ -171,9 +172,7 @@ void MainWindow::disconnected()
 
     ui->textTerminal->append("Disconnected from ELM327");
     ui->pushConnect->setText(QString("Connect"));
-    commandOrder = 0;
-
-    refreshTimer->stop();
+    commandOrder = 0;    
 }
 
 void MainWindow::on_pushConnect_clicked()
