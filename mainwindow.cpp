@@ -40,12 +40,49 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
+
+    refreshTimer = new QTimer();
+    refreshTimer->setInterval(1000);
+    connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshObd);
+    refreshTimer->start();
 }
 
 MainWindow::~MainWindow()
 {
+    delete refreshTimer;
     delete m_networkManager;
     delete ui;
+}
+
+void MainWindow::refreshObd()
+{
+    send(ENGINE_RPM);
+}
+
+void MainWindow::findActiveWirelesses()
+{
+
+    QNetworkConfigurationManager ncm;
+    netcfgList = ncm.allConfigurations();
+    for (auto &x : netcfgList)
+    {
+        if (x.bearerType() == QNetworkConfiguration::BearerWLAN)
+        {
+            if(!x.name().isEmpty())
+            {
+                if (x.name() == "Wi-Fi") {
+                    netcfg = x;
+                    auto session = new QNetworkSession(netcfg, this);
+                    session->open();
+
+                    if (session->isOpen())
+                        qDebug() << "Wi-Fi Open Success on " + session->configuration().name() + ".\n";
+                    else
+                        qDebug() << "Wi-Fi Open Failure on " + session->configuration().name() + ".\n";
+                }
+            }
+        }
+    }
 }
 
 void MainWindow::send(QString &string)
@@ -53,18 +90,20 @@ void MainWindow::send(QString &string)
     if(!m_networkManager->isConnected())return;
 
     m_networkManager->send(string);
-    ui->textTerminal->append("-> " + string.trimmed()
-                             .simplified()
-                             .remove(QRegExp("[\\n\\t\\r]"))
-                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+
+    if(m_ConsoleEnable)
+        ui->textTerminal->append("-> " + string.trimmed()
+                                 .simplified()
+                                 .remove(QRegExp("[\\n\\t\\r]"))
+                                 .remove(QRegExp("[^a-zA-Z0-9]+")));
 }
 
 void MainWindow::dataReceived(QString &data)
 {
-    if(m_ConsoleEnable)return;
+    if(!m_ConsoleEnable)return;
 
     if(!m_HexEnabled && !data.isEmpty())
-    ui->textTerminal->append("<- " + data);
+        ui->textTerminal->append("<- " + data);
 
     if(!m_initialized && commandOrder < initializeCommands.size())
     {
@@ -99,7 +138,7 @@ void MainWindow::stateChanged(QString &state)
 void MainWindow::dataHexReceived(QString &data)
 {
     if(m_HexEnabled && !data.isEmpty())
-    ui->textTerminal->append("<- " + data);
+        ui->textTerminal->append("<- " + data);
 }
 
 void MainWindow::errorAccrued(QString & error)
@@ -119,6 +158,8 @@ void MainWindow::connected()
 
     send(initializeCommands[commandOrder]);
     commandOrder++;
+
+    refreshTimer->start();
 }
 
 void MainWindow::disconnected()
@@ -131,6 +172,8 @@ void MainWindow::disconnected()
     ui->textTerminal->append("Disconnected from ELM327");
     ui->pushConnect->setText(QString("Connect"));
     commandOrder = 0;
+
+    refreshTimer->stop();
 }
 
 void MainWindow::on_pushConnect_clicked()
@@ -272,7 +315,7 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::on_close_dialog_triggered()
 {
-    m_ConsoleEnable = false;
+    m_ConsoleEnable = true;
     qDebug() << "on_close_dialog_triggered";
 }
 
@@ -286,7 +329,7 @@ void MainWindow::on_pushScan_clicked()
     QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
     obdScan->show();
-    m_ConsoleEnable = true;
+    m_ConsoleEnable = false;
 }
 
 void MainWindow::on_checkHex_stateChanged(int arg1)
@@ -303,5 +346,5 @@ void MainWindow::on_pushGauge_clicked()
     QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
-    m_ConsoleEnable = true;
+    m_ConsoleEnable = false;
 }
