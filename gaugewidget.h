@@ -292,7 +292,7 @@ public:
     void draw(QPainter*);
     void setStep(float step);
     void setColor(const QColor& color);
-    void ValuesItem::paint_numeber(int val, QRectF  tmpRect , QPainter*painter);
+    void paint_numeber(int val, QRectF  tmpRect , QPainter*painter);
 private:
     float mStep;
     QColor mColor;
