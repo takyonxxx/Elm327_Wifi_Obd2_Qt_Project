@@ -7,6 +7,8 @@ ObdGauge::ObdGauge(QWidget *parent) :
     ui(new Ui::ObdGauge)
 {
     ui->setupUi(this);
+        
+    setWindowTitle("Elm327 Obd2");
 
     ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
