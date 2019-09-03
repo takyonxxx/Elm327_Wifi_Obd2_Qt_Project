@@ -90,19 +90,20 @@ void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
 void NetworkManager::readed()
 {
     auto received = socket->readAll();
-    QString s_received = QString::fromStdString(received.toStdString())
+    auto strData = QString::fromStdString(received.toStdString());
+
+    QString s_received = strData
             .trimmed()
             .simplified()
             .remove(QRegExp("[\\n\\t\\r]"))
             .remove(QRegExp("[^a-zA-Z0-9]+"));
 
     s_received.replace(">","");
-    s_received.replace("OK","");
 
     // Some of these look like errors that ought to be handled..
     s_received.replace("STOPPED","");
-    s_received.replace("SEARCHING","");
-    s_received.replace("NO DATA","");
+    //s_received.replace("SEARCHING","");
+    //s_received.replace("NO DATA","");
     s_received.replace("?","");
     s_received.replace(",","");
 

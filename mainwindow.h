@@ -24,11 +24,6 @@ private:
     void send(QString &string);
     void analysData(const QString &);
 
-    int foundCount;
-    QNetworkConfiguration netcfg;
-    QList<QNetworkConfiguration> netcfgList;
-    QTimer *refreshTimer;
-
     NetworkManager *m_networkManager;
     int commandOrder{0};
     bool m_initialized{false};
@@ -39,7 +34,6 @@ private:
 private slots:
     void connected();
     void disconnected();
-    void refreshObd();
     void dataReceived(QString &);
     void stateChanged(QString &state);
     void dataHexReceived(QString &);

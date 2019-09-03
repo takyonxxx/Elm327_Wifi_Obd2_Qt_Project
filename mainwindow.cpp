@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
 
-    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
     ui->pushConnect->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color:#074666;");
     ui->pushSend->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushClear->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
@@ -35,74 +35,48 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666");
     ui->labelPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666;");
     ui->checkHex->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666;");
-    ui->textSend->setText("ATI");
+    ui->textSend->setText(CHECK_DATA);
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
 
-    refreshTimer = new QTimer();
+    /*refreshTimer = new QTimer();
     refreshTimer->setInterval(1000);
-    connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshObd);
+    connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshObd);*/
 }
 
 MainWindow::~MainWindow()
 {
-    delete refreshTimer;
     delete m_networkManager;
     delete ui;
 }
 
-void MainWindow::refreshObd()
-{
-    send(ENGINE_RPM);
-}
-
-/*void MainWindow::findActiveWirelesses()
-{
-
-    QNetworkConfigurationManager ncm;
-    netcfgList = ncm.allConfigurations();
-    for (auto &x : netcfgList)
-    {
-        if (x.bearerType() == QNetworkConfiguration::BearerWLAN)
-        {
-            if(!x.name().isEmpty())
-            {
-                if (x.name() == "Wi-Fi") {
-                    netcfg = x;
-                    auto session = new QNetworkSession(netcfg, this);
-                    session->open();
-
-                    if (session->isOpen())
-                        qDebug() << "Wi-Fi Open Success on " + session->configuration().name() + ".\n";
-                    else
-                        qDebug() << "Wi-Fi Open Failure on " + session->configuration().name() + ".\n";
-                }
-            }
-        }
-    }
-}*/
-
 void MainWindow::send(QString &string)
 {
+    if(!m_ConsoleEnable)return;
     if(!m_networkManager->isConnected())return;
 
     m_networkManager->send(string);
 
-    if(m_ConsoleEnable)
-        ui->textTerminal->append("-> " + string.trimmed()
-                                 .simplified()
-                                 .remove(QRegExp("[\\n\\t\\r]"))
-                                 .remove(QRegExp("[^a-zA-Z0-9]+")));
+    ui->textTerminal->append("-> " + string.trimmed()
+                             .simplified()
+                             .remove(QRegExp("[\\n\\t\\r]"))
+                             .remove(QRegExp("[^a-zA-Z0-9]+")));
 }
 
-void MainWindow::dataReceived(QString &data)
+void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
-    if(!m_HexEnabled && !data.isEmpty())
-        ui->textTerminal->append("<- " + data);
+    if(!m_initialized && commandOrder == 0 && dataReceived.isEmpty())
+    {
+        send(RESET);
+        return;
+    }
+
+    if(!m_HexEnabled)
+        ui->textTerminal->append("<- " + dataReceived);
 
     if(!m_initialized && commandOrder < initializeCommands.size())
     {
@@ -116,9 +90,9 @@ void MainWindow::dataReceived(QString &data)
         commandOrder = 0;
     }
 
-    if(m_initialized && !data.isEmpty())
+    if(m_initialized && !dataReceived.isEmpty())
     {
-        analysData(data);
+        analysData(dataReceived);
     }
 
     if(m_clearCodeRequest)
@@ -155,24 +129,25 @@ void MainWindow::connected()
     ui->textTerminal->append("Connected to ELM327");
     ui->pushConnect->setText(QString("Disconnect"));
 
-    send(initializeCommands[commandOrder]);
-    commandOrder++;
+    commandOrder = 0;
+    m_initialized = false;
 
-    refreshTimer->start();
+    send(RESET);
 }
 
 void MainWindow::disconnected()
-{
-    refreshTimer->stop();
-
+{   
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
 
+    ui->textTerminal->clear();
     ui->textTerminal->append("Disconnected from ELM327");
     ui->pushConnect->setText(QString("Connect"));
-    commandOrder = 0;    
+
+    commandOrder = 0;
+    m_initialized = false;
 }
 
 void MainWindow::on_pushConnect_clicked()

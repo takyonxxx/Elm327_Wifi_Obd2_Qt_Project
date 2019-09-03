@@ -25,6 +25,7 @@ private:
 
     GaugeWidget * mRpmGauge;
     NeedleItem *mRpmNeedle;
+    bool mRunning{false};
 
     void send(QString &);
     void analysData(const QString &);

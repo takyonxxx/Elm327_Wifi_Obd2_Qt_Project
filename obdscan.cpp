@@ -38,12 +38,14 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
     m_networkManager = NetworkManager::getInstance();
+    commandOrder = 0;
 
     if(m_networkManager)
     {
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
         if(m_networkManager->isConnected())
         {
+            mRunning = true;
             send(runtimeCommands[commandOrder]);
             commandOrder++;
         }
@@ -58,16 +60,20 @@ ObdScan::~ObdScan()
 void ObdScan::closeEvent (QCloseEvent *event)
 {
     Q_UNUSED(event);
+    mRunning = false;
     emit on_close_scan();
 }
 
 void ObdScan::on_pushExit_clicked()
 {
+    mRunning = false;
     close();
 }
 
 void ObdScan::send(QString &data)
 {
+    if(!mRunning)return;
+
     if(!m_networkManager->isConnected())return;
     m_networkManager->send(data);
 }
@@ -75,9 +81,9 @@ void ObdScan::send(QString &data)
 
 void ObdScan::dataReceived(QString &dataReceived)
 {   
-    analysData(dataReceived);
+    if(!mRunning)return;
 
-    if(commandOrder < initializeCommands.size())
+    if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
         commandOrder++;
@@ -88,6 +94,8 @@ void ObdScan::dataReceived(QString &dataReceived)
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
     }
+
+    analysData(dataReceived);
 }
 
 void ObdScan::analysData(const QString &dataReceived)

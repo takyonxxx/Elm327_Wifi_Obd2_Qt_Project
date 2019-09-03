@@ -73,12 +73,14 @@ ObdGauge::ObdGauge(QWidget *parent) :
     ui->verticalLayout->addWidget( ui->pushExit);
 
     m_networkManager = NetworkManager::getInstance();
+    commandOrder = 0;
 
     if(m_networkManager)
     {
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdGauge::dataReceived);
         if(m_networkManager->isConnected())
         {
+            mRunning = true;
             send(gaugeCommands[commandOrder]);
             commandOrder++;
         }
@@ -93,6 +95,7 @@ ObdGauge::~ObdGauge()
 
 void ObdGauge::send(QString &data)
 {
+    if(!mRunning)return;
     if(!m_networkManager->isConnected())return;
     m_networkManager->send(data);
 }
@@ -145,28 +148,32 @@ void ObdGauge::analysData(const QString &dataReceived)
 
 void ObdGauge::dataReceived(QString &dataReceived)
 {
-    analysData(dataReceived);
+    if(!mRunning)return;
 
-    if(commandOrder < initializeCommands.size())
+    if(commandOrder < gaugeCommands.size())
     {
-        send(runtimeCommands[commandOrder]);
+        send(gaugeCommands[commandOrder]);
         commandOrder++;
     }
 
-    if(runtimeCommands.size() == commandOrder)
+    if(gaugeCommands.size() == commandOrder)
     {
         commandOrder = 0;
-        send(runtimeCommands[commandOrder]);
+        send(gaugeCommands[commandOrder]);
     }
+
+    analysData(dataReceived);
 }
 
 void ObdGauge::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
+    mRunning = false;
     emit on_close_gauge();
 }
 
 void ObdGauge::on_pushExit_clicked()
 {
-     close();
+    mRunning = false;
+    close();
 }

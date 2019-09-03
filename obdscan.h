@@ -19,6 +19,7 @@ public:
 private:
     NetworkManager *m_networkManager;
     int commandOrder{0};
+    bool mRunning{false};
 
     void send(QString &);
     void analysData(const QString &);
