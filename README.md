@@ -28,5 +28,5 @@ Fuel Pressure</br>
 
 <p align="center"><a href="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg">
 		<img src="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg" 
-		name="Image3" align="bottom" width="600" height="800" border="1"></a></p>
+		name="Image3" align="bottom" width="480" height="800" border="1"></a></p>
 
