@@ -7,6 +7,8 @@ ObdScan::ObdScan(QWidget *parent) :
     ui(new Ui::ObdScan)
 {
     ui->setupUi(this);
+        
+    setWindowTitle("Elm327 Obd2");
 
     ui->labelVoltTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
     ui->labelVolt->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
