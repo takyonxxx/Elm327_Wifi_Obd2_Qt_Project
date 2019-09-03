@@ -297,7 +297,6 @@ void MainWindow::on_close_dialog_triggered()
 void MainWindow::on_pushScan_clicked()
 {
     ObdScan *obdScan = new ObdScan;
-    obdScan->setWindowTitle("Obd Scan");
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
     QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
@@ -313,8 +312,7 @@ void MainWindow::on_checkHex_stateChanged(int arg1)
 
 void MainWindow::on_pushGauge_clicked()
 {
-    ObdGauge *obdGauge = new ObdGauge;
-    obdGauge->setWindowTitle("Obd Scan");
+    ObdGauge *obdGauge = new ObdGauge; 
     obdGauge->setGeometry(this->rect());
     obdGauge->move(this->x(), this->y());
     QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
