@@ -7,10 +7,11 @@ ObdGauge::ObdGauge(QWidget *parent) :
     ui(new Ui::ObdGauge)
 {
     ui->setupUi(this);
-        
+
     setWindowTitle("Elm327 Obd2");
 
     ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    ui->pushSim->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
     //speed
     mSpeedGauge = new GaugeWidget;
@@ -82,7 +83,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdGauge::dataReceived);
         if(m_networkManager->isConnected())
         {
-            mRunning = true;
+            mRunning = true;            
             send(gaugeCommands[commandOrder]);
             commandOrder++;
         }
@@ -94,6 +95,33 @@ ObdGauge::~ObdGauge()
     delete mSpeedGauge;
     delete ui;
 }
+
+void ObdGauge::startSim()
+{
+    m_realTime = 0;
+    m_timerId  = startTimer(0);
+    m_time.start();
+}
+
+void ObdGauge::stopSim()
+{
+    if ( m_timerId ) killTimer( m_timerId );
+}
+
+void ObdGauge::timerEvent( QTimerEvent *event )
+{
+    Q_UNUSED(event)
+
+    if(!mRunning)return;
+
+    auto timeStep = m_time.restart();
+    m_realTime = m_realTime + timeStep / 1000.0f;
+    valueGauge  =  121.0f * std::sin( m_realTime /  5.0f ) +  121.0f;
+
+    mSpeedNeedle->setCurrentValue(static_cast<float>(valueGauge));
+    mRpmNeedle->setCurrentValue(static_cast<float>(valueGauge/3));
+}
+
 
 void ObdGauge::send(QString &data)
 {
@@ -178,4 +206,24 @@ void ObdGauge::on_pushExit_clicked()
 {
     mRunning = false;
     close();
+}
+
+void ObdGauge::on_pushSim_clicked()
+{
+    if(ui->pushSim->text() == "Start Sim")
+    {
+        startSim();
+        ui->pushSim->setText("Stop Sim");
+    }
+    else
+    {
+        stopSim();
+
+        if(mRpmNeedle)
+            mRpmNeedle->setCurrentValue(static_cast<float>(0));
+        if(mSpeedNeedle)
+            mSpeedNeedle->setCurrentValue(static_cast<float>(0));
+
+        ui->pushSim->setText("Start Sim");
+    }
 }

@@ -49,6 +49,18 @@
     0159-Fuel guide absolute pressure
 */
 
+template <typename T>
+typename std::enable_if<std::is_unsigned<T>::value, int>::type
+inline constexpr signum(T x) {
+    return T(0) < x;
+}
+
+template <typename T>
+typename std::enable_if<std::is_signed<T>::value, int>::type
+inline constexpr signum(T x) {
+    return (T(0) < x) - (x < T(0));
+}
+
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
 SOFTRESET = "ATWS",

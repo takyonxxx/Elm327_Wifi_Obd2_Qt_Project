@@ -1,5 +1,6 @@
 #include "gaugewidget.h"
 #include <chrono>
+#include "pid.h"
 #include <QDebug>
 
 GaugeWidget::GaugeWidget(QWidget *parent) :
@@ -610,6 +611,8 @@ NeedleItem::NeedleItem(QObject *parent) :
 void NeedleItem::draw(QPainter *painter)
 {
 
+    computeCurrentValue();
+
     resetRect();
     QRectF tmpRect = adjustRect(position());
     painter->save();
@@ -657,7 +660,7 @@ void NeedleItem::computeCurrentValue()
 {
     using namespace std::chrono;
 
-    if (!(std::abs(mCurrentValue - mTargetValue) > 0.01f))
+    if (!(std::abs(mCurrentValue - mTargetValue) > 0.001f))
     {
         return;
     }
@@ -668,7 +671,8 @@ void NeedleItem::computeCurrentValue()
     if (-1 != mNeedleLastMoved)
     {
         float currentTime = (timeSinceEpoch - mNeedleLastMoved) / 1000.0f;
-        float direction = sgn(mNeedleVelocity);
+        float direction = signum( mNeedleVelocity);
+
         if (std::abs(mNeedleVelocity) < 90.0f)
         {
             mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
@@ -682,20 +686,25 @@ void NeedleItem::computeCurrentValue()
         mCurrentValue += mNeedleVelocity * currentTime;
         mNeedleVelocity += mNeedleAcceleration * currentTime;
 
-        if ((mTargetValue - mCurrentValue) * direction < 0.01f * direction)
+        if ((mTargetValue - mCurrentValue) * direction < 0.001f * direction)
         {
             mCurrentValue = mTargetValue;
             mNeedleVelocity = 0.0f;
             mNeedleAcceleration = 0.0f;
-            mNeedleLastMoved = -1LL;
+            mNeedleLastMoved = -1;
         }
         else
         {
             mNeedleLastMoved = timeSinceEpoch;
         }
 
-        update();
+        if (mLabel != nullptr)
+        {
+            if(mCurrentValue < 0) mCurrentValue = 0.0f;
+            mLabel->setText(QString::number(mCurrentValue, 'f', 0), false);
+        }
 
+        update();
     }
     else
     {
@@ -713,11 +722,6 @@ void NeedleItem::setCurrentValue(float value)
         mTargetValue = mMaxValue;
     else
         mTargetValue = value;
-
-    if (mLabel != nullptr)
-        mLabel->setText(QString::number(mTargetValue), false);
-
-    computeCurrentValue();
 
     update();
 }

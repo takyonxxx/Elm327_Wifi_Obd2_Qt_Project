@@ -29,10 +29,6 @@ class LabelItem;
 class GlassItem;
 class AttitudeMeter;
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
-}
-
 class QCGAUGE_DECL GaugeWidget : public QWidget
 {
     Q_OBJECT
@@ -264,11 +260,11 @@ public:
     void setNeedle(NeedleItem::NeedleType needleType);
 private:
     QPolygonF mNeedlePoly;
-    float mCurrentValue{0};
-    float mTargetValue{0};
-    float mNeedleAcceleration{0};
-    float mNeedleVelocity{0};
-    long mNeedleLastMoved{-1};
+    float mCurrentValue{0.f};
+    float mTargetValue{0.f};
+    float mNeedleAcceleration{0.f};
+    float mNeedleVelocity{0.f};
+    long long mNeedleLastMoved{-1};
     QColor mColor;
     void createDiamonNeedle(float r);
     void createTriangleNeedle(float r);
