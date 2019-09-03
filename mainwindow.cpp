@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle("Elm 327 Obd");
+    setWindowTitle("Elm327 Obd2");
 
     QRect desktopRect = QApplication::desktop()->availableGeometry(this);
     //setGeometry(desktopRect);
