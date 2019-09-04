@@ -4,10 +4,10 @@
 
 /* Details from http://en.wikipedia.org/wiki/OBD-II_PIDs */
 /*
-    0101 - show current data
-    0102 - show freeze frame data
-    0103 - show stored diagnostic trouble code.
-    0104-Calculate load valueCalculated LOAD Value
+    0101-show current data
+    0102-show freeze frame data
+    0103-show stored diagnostic trouble code.
+    0104-Calculate load value
     0105-Coolant temperatureEngine Coolant Temperature
     010A-Fuel pressure
     010B-Absolute inlet pressureIntake Manifold Absolute Pressure
@@ -102,7 +102,9 @@ CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
 STATUS_DTC = "0101", //Status since DTC Cleared
 THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
 OBD_STANDARDS = "011C", //OBD standards this vehicle
-PIDS_SUPPORTED = "0120"; //PIDs supported
+PIDS_SUPPORTED = "0120", //PIDs supported
+REQUEST_TROUBLE = "03", //Request trouble codes
+CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
 static QStringList initializeCommands{TERMINATE_SESSION, SPACES_OFF, ECHO_OFF, LINEFEED_OFF,
             HEADERS_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_01,

@@ -11,31 +11,31 @@ ObdScan::ObdScan(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     ui->labelVoltTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelVolt->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelVolt->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelRpm->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelRpm->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelLoad->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelSpeed->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelSpeed->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelCoolant->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelCoolant->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelIntakeAirTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelIntakeAirTemp->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelIntakeAirTemp->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelMafAirFlowTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelMafAirFlow->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelMafAirFlow->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");    
+    ui->labelManifoldPressure->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
-    ui->labelFuelRailHighPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
+    ui->labelFuelRailHighPressure->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
     ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 

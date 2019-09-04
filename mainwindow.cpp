@@ -40,10 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
-
-    /*refreshTimer = new QTimer();
-    refreshTimer->setInterval(1000);
-    connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshObd);*/
+    ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
+    ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
+    ui->textTerminal->append("On your device : go to Settings > Wi-Fi. ");
+    ui->textTerminal->append("Connect to the Wi-Fi signal with name similar to these examples:");
+    ui->textTerminal->append("WIFI ELM327, WiFiOBD, OBDDevice, V-Link.");
+    ui->textTerminal->append("Press Connect Button");
 }
 
 MainWindow::~MainWindow()
@@ -97,7 +99,8 @@ void MainWindow::dataReceived(QString &dataReceived)
 
     if(m_clearCodeRequest)
     {
-        QString text("0104");
+        ui->textTerminal->append("Clearing the trouble codes.");
+        QString text(CLEAR_TROUBLE);
         send(text);
         m_clearCodeRequest = false;
     }
@@ -189,7 +192,8 @@ void MainWindow::on_pushDiagnostic_clicked()
     //0x03 : show stored diagnostic trouble code.
     //0x04 : clear diagnostic trouble code.
     m_clearCodeRequest = true;
-    QString text("0103");
+    ui->textTerminal->append("The trouble codes requested.");
+    QString text(REQUEST_TROUBLE);
     send(text);
 }
 
@@ -312,11 +316,12 @@ void MainWindow::on_checkHex_stateChanged(int arg1)
 
 void MainWindow::on_pushGauge_clicked()
 {
-    ObdGauge *obdGauge = new ObdGauge; 
+    ObdGauge *obdGauge = new ObdGauge;
     obdGauge->setGeometry(this->rect());
     obdGauge->move(this->x(), this->y());
     QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
+
     m_ConsoleEnable = false;
 }

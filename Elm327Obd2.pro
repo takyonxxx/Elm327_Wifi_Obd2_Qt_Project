@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network svg
+QT       += core gui network qml
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets quickwidgets
 
 TARGET = Elm327Obd
 TEMPLATE = app
@@ -27,7 +27,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        gaugewidget.cpp \
         main.cpp \
         mainwindow.cpp \
         networkmanager.cpp \
@@ -35,7 +34,6 @@ SOURCES += \
         obdscan.cpp
 
 HEADERS += \
-        gaugewidget.h \
         mainwindow.h \
         networkmanager.h \
         obdgauge.h \

@@ -10,70 +10,24 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
-    ui->pushSim->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    engine = new QQmlApplicationEngine;
+    engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
+    QWindow *qmlWindow = qobject_cast<QWindow*>(engine->rootObjects().at(0));
+    QWidget *container = QWidget::createWindowContainer(qmlWindow);
 
-    //speed
-    mSpeedGauge = new GaugeWidget;
-    mSpeedGauge->addBackground(99);
-    BackgroundItem *bkgspeed1 = mSpeedGauge->addBackground(92);
-    bkgspeed1->clearrColors();
-    bkgspeed1->addColor(0.1,Qt::black);
-    bkgspeed1->addColor(1.0,Qt::white);
+    pushSim = new QPushButton;
+    pushExit = new QPushButton;
+    pushSim->setText("Start Sim");
+    pushExit->setText("Exit");
+    pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #055580;");
+    pushSim->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #055580;");
 
-    BackgroundItem *bkgspeed2 = mSpeedGauge->addBackground(88);
-    bkgspeed2->clearrColors();
-    bkgspeed2->addColor(0.1,Qt::black);
-    bkgspeed2->addColor(1.0,Qt::darkGray);
+    connect(pushSim, &QPushButton::clicked, this, &ObdGauge::on_pushSim_clicked);
+    connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
 
-    mSpeedGauge->addArc(55);
-    mSpeedGauge->addDegrees(65)->setValueRange(0,240);
-    mSpeedGauge->addColorBand(50);
-
-    mSpeedGauge->addValues(76)->setValueRange(0,240);
-
-    mSpeedGauge->addLabel(70)->setText("Km/h");
-    LabelItem *labspeed = mSpeedGauge->addLabel(40);
-    labspeed->setText("0");
-    mSpeedNeedle = mSpeedGauge->addNeedle(60);
-    mSpeedNeedle->setLabel(labspeed);
-    mSpeedNeedle->setColor(Qt::yellow);
-    mSpeedNeedle->setValueRange(0,240);
-    mSpeedGauge->addBackground(7);
-    mSpeedGauge->addGlass(88);
-
-    //rpm
-    mRpmGauge = new GaugeWidget;
-    mRpmGauge->addBackground(99);
-    BackgroundItem *bkgrpm1 = mRpmGauge->addBackground(92);
-    bkgrpm1->clearrColors();
-    bkgrpm1->addColor(0.1,Qt::black);
-    bkgrpm1->addColor(1.0,Qt::white);
-
-    BackgroundItem *bkgrpm2 = mRpmGauge->addBackground(88);
-    bkgrpm2->clearrColors();
-    bkgrpm2->addColor(0.1,Qt::black);
-    bkgrpm2->addColor(1.0,Qt::darkGray);
-
-    mRpmGauge->addArc(55);
-    mRpmGauge->addDegrees(65)->setValueRange(0,80);
-    mRpmGauge->addColorBand(50);
-
-    mRpmGauge->addValues(76)->setValueRange(0,80);
-
-    mRpmGauge->addLabel(70)->setText("rpm x 100");
-    LabelItem *labrpm = mRpmGauge->addLabel(40);
-    labrpm->setText("0");
-    mRpmNeedle = mRpmGauge->addNeedle(60);
-    mRpmNeedle->setLabel(labrpm);
-    mRpmNeedle->setColor(Qt::yellow);
-    mRpmNeedle->setValueRange(0,80);
-    mRpmGauge->addBackground(7);
-    mRpmGauge->addGlass(88);
-
-    ui->verticalLayout->addWidget(mSpeedGauge);
-    ui->verticalLayout->addWidget(mRpmGauge);
-    ui->verticalLayout->addWidget( ui->pushExit);
+    ui->verticalLayout->addWidget(container);
+    //ui->verticalLayout->addWidget(pushSim);
+    ui->verticalLayout->addWidget(pushExit);
 
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
@@ -83,7 +37,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdGauge::dataReceived);
         if(m_networkManager->isConnected())
         {
-            mRunning = true;            
+            mRunning = true;
             send(gaugeCommands[commandOrder]);
             commandOrder++;
         }
@@ -92,7 +46,6 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
 ObdGauge::~ObdGauge()
 {
-    delete mSpeedGauge;
     delete ui;
 }
 
@@ -108,18 +61,33 @@ void ObdGauge::stopSim()
     if ( m_timerId ) killTimer( m_timerId );
 }
 
+void ObdGauge::setSpeed(int speed)
+{
+    QObject *rootObject = engine->rootObjects().first();
+    if(rootObject != nullptr)
+    {
+        QMetaObject::invokeMethod(rootObject, "setSpeed", Q_ARG(QVariant, speed));
+    }
+}
+
+void ObdGauge::setRpm(int rpm)
+{
+    QObject *rootObject = engine->rootObjects().first();
+    if(rootObject != nullptr)
+    {
+        QMetaObject::invokeMethod(rootObject, "setRpm", Q_ARG(QVariant, rpm));
+    }
+}
+
 void ObdGauge::timerEvent( QTimerEvent *event )
 {
     Q_UNUSED(event)
 
-    if(!mRunning)return;
-
     auto timeStep = m_time.restart();
     m_realTime = m_realTime + timeStep / 1000.0f;
     valueGauge  =  121.0f * std::sin( m_realTime /  5.0f ) +  121.0f;
-
-    mSpeedNeedle->setCurrentValue(static_cast<float>(valueGauge));
-    mRpmNeedle->setCurrentValue(static_cast<float>(valueGauge/3));
+    setSpeed(static_cast<int>(valueGauge));
+    setRpm(static_cast<int>(valueGauge/3));
 }
 
 
@@ -155,8 +123,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
             value = ((A * 256) + B) / 4;
-            if(mRpmNeedle)
-                mRpmNeedle->setCurrentValue(static_cast<float>(value / 100));
+            setRpm(static_cast<int>(value / 100));
             break;
         case 4://PID(04): Engine Load
             // A*100/255
@@ -165,8 +132,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 13://PID(0D): KM Speed
             // A
             value = A;
-            if(mSpeedNeedle)
-                mSpeedNeedle->setCurrentValue(static_cast<float>(value));
+            setSpeed(static_cast<int>(value));
             break;
         default:
             //A
@@ -210,20 +176,16 @@ void ObdGauge::on_pushExit_clicked()
 
 void ObdGauge::on_pushSim_clicked()
 {
-    if(ui->pushSim->text() == "Start Sim")
+    if(pushSim->text() == "Start Sim")
     {
         startSim();
-        ui->pushSim->setText("Stop Sim");
+        pushSim->setText("Stop Sim");
     }
     else
     {
         stopSim();
-
-        if(mRpmNeedle)
-            mRpmNeedle->setCurrentValue(static_cast<float>(0));
-        if(mSpeedNeedle)
-            mSpeedNeedle->setCurrentValue(static_cast<float>(0));
-
-        ui->pushSim->setText("Start Sim");
+        setSpeed(static_cast<int>(0));
+        setRpm(static_cast<int>(0));
+        pushSim->setText("Start Sim");
     }
 }

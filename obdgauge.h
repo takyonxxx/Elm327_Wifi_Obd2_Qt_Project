@@ -2,8 +2,10 @@
 #define OBDGAUGE_H
 
 #include <QMainWindow>
+#include <QQmlApplicationEngine>
+#include <QQuickView>
+#include <QPushButton>
 #include "networkmanager.h"
-#include "gaugewidget.h"
 
 namespace Ui {
 class ObdGauge;
@@ -19,29 +21,27 @@ public:
 
 private:
     NetworkManager *m_networkManager;
+    QQmlApplicationEngine *engine;
     int commandOrder{0};
-    GaugeWidget * mSpeedGauge;
-    NeedleItem *mSpeedNeedle;
 
     int m_timerId{};
     float m_realTime{};
     QTime m_time{};
     int valueGauge{0};
-
-    GaugeWidget * mRpmGauge;
-    NeedleItem *mRpmNeedle;
     bool mRunning{false};
+    QPushButton *pushSim;
+    QPushButton *pushExit;
 
     void send(QString &);
     void analysData(const QString &);
     void startSim();
     void stopSim();
+    void setSpeed(int);
+    void setRpm(int);
 
 private slots:
     void dataReceived(QString &);
-
     void on_pushExit_clicked();
-
     void on_pushSim_clicked();
 
 signals:
