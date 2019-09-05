@@ -10,34 +10,39 @@ ObdScan::ObdScan(QWidget *parent) :
         
     setWindowTitle("Elm327 Obd2");
 
-    ui->labelVoltTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.jpg); border: none;");
+
+    ui->labelVoltTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelVolt->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelRpm->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelLoad->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelSpeed->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelCoolant->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelIntakeAirTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelIntakeAirTempTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelIntakeAirTemp->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelMafAirFlowTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelMafAirFlowTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelMafAirFlow->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 6px;");
+    ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px;");
     ui->labelFuelRailHighPressure->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 6px;");
 
-    ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: yellow; background-color: #900C3F;  padding: 6px;");
+
+    ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    ui->pushExit->setMaximumHeight(100);
 
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
@@ -48,8 +53,7 @@ ObdScan::ObdScan(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(runtimeCommands[commandOrder]);
-            commandOrder++;
+            send(CHECK_DATA);
         }
     }
 }
@@ -136,6 +140,7 @@ void ObdScan::analysData(const QString &dataReceived)
             // A
             value = A;
             ui->labelSpeed->setText(QString::number(value, 'f', 0) + " km/h");
+            mSpeed = value;
             break;
         case 5://PID(05): Coolant Temperature
             // A-40
@@ -164,6 +169,15 @@ void ObdScan::analysData(const QString &dataReceived)
              // ((256*A)+B) / 100  [g/s]
             value = ((256 * A) + B) / 100;;
             ui->labelMafAirFlow->setText(QString::number(value, 'f', 0) + " g/s");
+            if(!mDedectFuelPressure && mSpeed != 0)
+            {
+                auto fuelRate = (3600 * value)/(9069.90 * mSpeed);
+                auto KmPL = (mSpeed * 1/ 3600) * (1/value * 14.6 * 710);
+
+                ui->labelFuelConsumption->setText(QString::number(fuelRate, 'f', 1) + " L/100 km\n"
+                                                  + QString::number(KmPL, 'f', 0) + " Km/L");
+            }
+            //
             break;
         case 10://PID(0A): Fuel Pressure
             // A * 3
@@ -177,6 +191,12 @@ void ObdScan::analysData(const QString &dataReceived)
             // ((A*256)+B) * 10
             value = ((A*256)+B) * 10;
             ui->labelFuelRailHighPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            break;
+        case 94://PID(5E) Fuel rate
+            // ((A*256)+B) / 20
+            if(!mDedectFuelPressure) mDedectFuelPressure = true;
+            value = ((A*256)+B) / 20;
+            ui->labelFuelConsumption->setText(QString::number(value, 'f', 1) + " L/h");
             break;
         default:
             //A

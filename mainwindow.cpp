@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     QRect desktopRect = QApplication::desktop()->availableGeometry(this);
-    //setGeometry(desktopRect);
+    setGeometry(desktopRect);
 
     m_networkManager = NetworkManager::getInstance();
 
@@ -25,16 +25,18 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
-    ui->pushConnect->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color:#074666;");
-    ui->pushSend->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushClear->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushDiagnostic->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushScan->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushGauge->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #8F3A3A;");
-    ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666");
-    ui->labelPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666;");
-    ui->checkHex->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666;");
+    ui->pushConnect->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;");
+    ui->pushSend->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushDiagnostic->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushScan->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushGauge->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666");
+    ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
+    ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
+    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
+    ui->textSend->setMinimumHeight(100);
     ui->textSend->setText(CHECK_DATA);
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
@@ -46,12 +48,57 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textTerminal->append("Connect to the Wi-Fi signal with name similar to these examples:");
     ui->textTerminal->append("WIFI ELM327, WiFiOBD, OBDDevice, V-Link.");
     ui->textTerminal->append("Press Connect Button");
+
+    foreach (QScreen *screen, QGuiApplication::screens())
+    {
+        screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
+                                         Qt::PortraitOrientation |
+                                         Qt::InvertedLandscapeOrientation |
+                                         Qt::InvertedPortraitOrientation);
+
+        QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
+    }
+
+#ifdef Q_OS_ANDROID
+    //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
+    keep_screen_on(true);
+#endif
 }
 
 MainWindow::~MainWindow()
 {
     delete m_networkManager;
     delete ui;
+}
+
+#ifdef Q_OS_ANDROID
+bool MainWindow::setScreenOrientation(int orientation)
+{
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+
+    if(activity.isValid())
+    {
+        activity.callMethod<void>("setRequestedOrientation", "(I)V", orientation);
+        return true;
+    }
+    return false;
+}
+#endif
+
+void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
+{
+    qDebug() << "Orientation:" << orientation;
+
+    switch (orientation) {
+    case Qt::ScreenOrientation::PortraitOrientation:
+
+        break;
+    case Qt::ScreenOrientation::LandscapeOrientation:
+
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::send(QString &string)

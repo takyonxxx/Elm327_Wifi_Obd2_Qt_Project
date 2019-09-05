@@ -20,6 +20,8 @@ private:
     NetworkManager *m_networkManager;
     int commandOrder{0};
     bool mRunning{false};
+    bool mDedectFuelPressure{false};
+    int mSpeed{0};
 
     void send(QString &);
     void analysData(const QString &);

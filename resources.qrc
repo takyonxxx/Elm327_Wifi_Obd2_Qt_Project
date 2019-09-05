@@ -2,13 +2,7 @@
     <qresource prefix="/">
         <file>icons/app_ico.ico</file>
         <file>icons/obd.jpg</file>
-        <file>SpeedGauge.qml</file>
-        <file>GaugeScreen.qml</file>
-        <file>img/background.png</file>
-        <file>img/background.svg</file>
-        <file>img/needle.svg</file>
-        <file>img/tickmark.svg</file>
         <file>img/carbon.jpg</file>
-        <file>RpmGauge.qml</file>
+        <file>img/carbon-fiber.jpg</file>
     </qresource>
 </RCC>

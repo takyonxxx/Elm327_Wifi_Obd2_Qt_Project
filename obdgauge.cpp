@@ -10,10 +10,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    engine = new QQmlApplicationEngine;
-    engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
-    QWindow *qmlWindow = qobject_cast<QWindow*>(engine->rootObjects().at(0));
-    QWidget *container = QWidget::createWindowContainer(qmlWindow);
+    this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.jpg); border: none;");
 
     pushSim = new QPushButton;
     pushExit = new QPushButton;
@@ -24,13 +21,37 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     connect(pushSim, &QPushButton::clicked, this, &ObdGauge::on_pushSim_clicked);
     connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
+    pushExit->setMaximumHeight(100);
 
-    ui->verticalLayout->addWidget(container);
+    initGauges();
+
     //ui->verticalLayout->addWidget(pushSim);
-    ui->verticalLayout->addWidget(pushExit);
 
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
+
+    foreach (QScreen *screen, QGuiApplication::screens())
+    {
+        if(screen->orientation() == Qt::LandscapeOrientation)
+        {
+            ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+            ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 1);
+            ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 2);
+        }
+        else if(screen->orientation() == Qt::PortraitOrientation)
+        {
+            ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+            ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
+            ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
+        }
+
+        screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
+                                         Qt::PortraitOrientation |
+                                         Qt::InvertedLandscapeOrientation |
+                                         Qt::InvertedPortraitOrientation);
+
+        QObject::connect(screen, &QScreen::orientationChanged, this, &ObdGauge::orientationChanged);
+    }
 
     if(m_networkManager)
     {
@@ -38,8 +59,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(gaugeCommands[commandOrder]);
-            commandOrder++;
+            send(CHECK_DATA);
         }
     }
 }
@@ -47,6 +67,114 @@ ObdGauge::ObdGauge(QWidget *parent) :
 ObdGauge::~ObdGauge()
 {
     delete ui;
+}
+
+void ObdGauge::initGauges()
+{
+    //speed
+    mSpeedGauge = new QcGaugeWidget;
+    mSpeedGauge->addBackground(99);
+    QcBackgroundItem *bkgSpeed1 = mSpeedGauge->addBackground(92);
+    bkgSpeed1->clearrColors();
+    bkgSpeed1->addColor(0.1,Qt::black);
+    bkgSpeed1->addColor(1.0,Qt::white);
+
+    QcBackgroundItem *bkgSpeed2 = mSpeedGauge->addBackground(88);
+    bkgSpeed2->clearrColors();
+    bkgSpeed2->addColor(0.1,Qt::black);
+    bkgSpeed2->addColor(1.0,Qt::darkGray);
+
+    mSpeedGauge->addArc(55);
+    auto degrees = mSpeedGauge->addDegrees(65);
+    degrees->setStep(20);
+    degrees->setValueRange(0,220);
+    auto colorBandSpeed = mSpeedGauge->addColorBand(50);
+
+    QList<QPair<QColor, float> > colors;
+
+    QColor tmpColor;
+    tmpColor.setAlphaF(0.1);
+    QPair<QColor,float> pair;
+
+    pair.first = Qt::darkGreen;
+    pair.second = 37;
+    colors.append(pair);
+
+    pair.first = Qt::yellow;
+    pair.second = 55;
+    colors.append(pair);
+
+    pair.first = Qt::red;
+    pair.second = 100;
+    colors.append(pair);
+
+    colorBandSpeed->setColors(colors);
+
+    auto values = mSpeedGauge->addValues(76);
+    values->setStep(20);
+    values->setValueRange(0,220);
+
+    mSpeedGauge->addLabel(70)->setText("Km/h");
+    QcLabelItem *labSpeed = mSpeedGauge->addLabel(40);
+    labSpeed->setText("0");
+    mSpeedNeedle = mSpeedGauge->addNeedle(60);
+    mSpeedNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
+    mSpeedNeedle->setLabel(labSpeed);
+    mSpeedNeedle->setColor(Qt::white);
+    mSpeedNeedle->setValueRange(0,220);
+    mSpeedGauge->addBackground(7);
+    mSpeedGauge->addGlass(88);
+
+    //rpm
+    mRpmGauge = new QcGaugeWidget;
+    mRpmGauge->addBackground(99);
+    QcBackgroundItem *bkgRpm1 = mRpmGauge->addBackground(92);
+    bkgRpm1->clearrColors();
+    bkgRpm1->addColor(0.1,Qt::black);
+    bkgRpm1->addColor(1.0,Qt::white);
+
+    QcBackgroundItem *bkgRpm2 = mRpmGauge->addBackground(88);
+    bkgRpm2->clearrColors();
+    bkgRpm2->addColor(0.1,Qt::black);
+    bkgRpm2->addColor(1.0,Qt::darkGray);
+
+    mRpmGauge->addArc(55);
+    mRpmGauge->addDegrees(65)->setValueRange(0,80);
+    auto colorBandRpm = mRpmGauge->addColorBand(50);
+    colors.clear();
+
+    pair.first = Qt::darkGreen;
+    pair.second = 44;
+    colors.append(pair);
+
+    pair.first = Qt::yellow;
+    pair.second = 75;
+    colors.append(pair);
+
+    pair.first = Qt::red;
+    pair.second = 100;
+    colors.append(pair);
+
+    colorBandRpm->setColors(colors);
+
+    mRpmGauge->addValues(76)->setValueRange(0,80);
+
+    mRpmGauge->addLabel(70)->setText("RpmX100");
+    QcLabelItem *labRpm = mRpmGauge->addLabel(40);
+    labRpm->setText("0");
+    mRpmNeedle = mRpmGauge->addNeedle(60);
+    mRpmNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
+    mRpmNeedle->setLabel(labRpm);
+    mRpmNeedle->setColor(Qt::white);
+    mRpmNeedle->setValueRange(0,80);
+    mRpmGauge->addBackground(7);
+    mRpmGauge->addGlass(88);
+
+    /*engine = new QQmlApplicationEngine;
+    engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
+    QWindow *qmlWindow = qobject_cast<QWindow*>(engine->rootObjects().at(0));
+    QWidget *container = QWidget::createWindowContainer(qmlWindow);
+    ui->verticalLayout->addWidget(container);*/
 }
 
 void ObdGauge::startSim()
@@ -63,20 +191,22 @@ void ObdGauge::stopSim()
 
 void ObdGauge::setSpeed(int speed)
 {
-    QObject *rootObject = engine->rootObjects().first();
+    mSpeedNeedle->setCurrentValue(speed);
+    /*QObject *rootObject = engine->rootObjects().first();
     if(rootObject != nullptr)
     {
         QMetaObject::invokeMethod(rootObject, "setSpeed", Q_ARG(QVariant, speed));
-    }
+    }*/
 }
 
 void ObdGauge::setRpm(int rpm)
 {
-    QObject *rootObject = engine->rootObjects().first();
+    mRpmNeedle->setCurrentValue(rpm);
+    /*QObject *rootObject = engine->rootObjects().first();
     if(rootObject != nullptr)
     {
         QMetaObject::invokeMethod(rootObject, "setRpm", Q_ARG(QVariant, rpm));
-    }
+    }*/
 }
 
 void ObdGauge::timerEvent( QTimerEvent *event )
@@ -187,5 +317,25 @@ void ObdGauge::on_pushSim_clicked()
         setSpeed(static_cast<int>(0));
         setRpm(static_cast<int>(0));
         pushSim->setText("Start Sim");
+    }
+}
+
+void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
+{
+    qDebug() << "Orientation:" << orientation;
+
+    switch (orientation) {
+    case Qt::ScreenOrientation::PortraitOrientation:
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+        ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
+        ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
+        break;
+    case Qt::ScreenOrientation::LandscapeOrientation:
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+        ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 1);
+        ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 2);
+        break;
+    default:
+        break;
     }
 }

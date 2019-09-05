@@ -6,9 +6,15 @@
 
 QT       += core gui network qml
 
+android {
+    message("* Using settings for Android.")
+    QT += androidextras
+}
+
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets quickwidgets
 
-TARGET = Elm327Obd
+TARGET = Elm327Obd2
 TEMPLATE = app
 
 win32:RC_ICONS += $$PWD\icons\app_ico.ico
@@ -31,14 +37,16 @@ SOURCES += \
         mainwindow.cpp \
         networkmanager.cpp \
         obdgauge.cpp \
-        obdscan.cpp
+        obdscan.cpp \
+    qcgaugewidget.cpp
 
 HEADERS += \
         mainwindow.h \
         networkmanager.h \
         obdgauge.h \
         obdscan.h \
-        pid.h
+        pid.h \
+    qcgaugewidget.h
 
 FORMS += \
         mainwindow.ui \
@@ -47,3 +55,14 @@ FORMS += \
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

@@ -23,7 +23,7 @@
          <number>6</number>
         </property>
         <property name="verticalSpacing">
-         <number>12</number>
+         <number>24</number>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="labelVoltTitle">
@@ -152,6 +152,16 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelFuelConsumption">
+        <property name="text">
+         <string>0.0 L/h</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushExit">

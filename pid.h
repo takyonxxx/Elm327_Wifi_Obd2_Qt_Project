@@ -1,6 +1,7 @@
 #ifndef PID_H
 #define PID_H
 #include <QtCore>
+#include <QScreen>
 
 /* Details from http://en.wikipedia.org/wiki/OBD-II_PIDs */
 /*
@@ -103,15 +104,16 @@ STATUS_DTC = "0101", //Status since DTC Cleared
 THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
 OBD_STANDARDS = "011C", //OBD standards this vehicle
 PIDS_SUPPORTED = "0120", //PIDs supported
+FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
 static QStringList initializeCommands{TERMINATE_SESSION, SPACES_OFF, ECHO_OFF, LINEFEED_OFF,
             HEADERS_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_01,
-            PROTOCOL_SEARCH_ORDER, PROTOCOL_AUTO1, PROTOCOL_AUTO2, GET_PROTOCOL, INFO, CHECK_DATA};
+            PROTOCOL_SEARCH_ORDER, PROTOCOL_AUTO1, PROTOCOL_AUTO2, GET_PROTOCOL, INFO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
-            INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RAIL_HIGH_PRESSURE};
+            INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RAIL_HIGH_PRESSURE, FUEL_RATE};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 
@@ -120,5 +122,6 @@ static QStringList PIDS {
     "09", "0A", "0B", "0C", "0D", "0E", "0F", "10",
     "11", "12", "13", "14", "15", "16", "17", "18",
     "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
+
 
 #endif // PID_H
