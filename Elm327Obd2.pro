@@ -4,15 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network qml
+QT       += core gui network
 
-android {
-    message("* Using settings for Android.")
-    QT += androidextras
-}
-
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets quickwidgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Elm327Obd2
 TEMPLATE = app
@@ -38,7 +32,7 @@ SOURCES += \
         networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
-    qcgaugewidget.cpp
+        qcgaugewidget.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +40,7 @@ HEADERS += \
         obdgauge.h \
         obdscan.h \
         pid.h \
-    qcgaugewidget.h
+        qcgaugewidget.h
 
 FORMS += \
         mainwindow.ui \
@@ -56,13 +50,19 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
-DISTFILES += \
-    android/AndroidManifest.xml \
-    android/gradle/wrapper/gradle-wrapper.jar \
-    android/gradlew \
-    android/res/values/libs.xml \
-    android/build.gradle \
-    android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+android {
+    message("* Using settings for Android.")
+    QT += androidextras
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    DISTFILES += \
+        android/AndroidManifest.xml \
+        android/gradle/wrapper/gradle-wrapper.jar \
+        android/gradlew \
+        android/res/values/libs.xml \
+        android/build.gradle \
+        android/gradle/wrapper/gradle-wrapper.properties \
+        android/gradlew.bat
+
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+}
+

@@ -4,5 +4,6 @@
         <file>icons/obd.jpg</file>
         <file>img/carbon.jpg</file>
         <file>img/carbon-fiber.jpg</file>
+        <file>img/carbon-fiber.png</file>
     </qresource>
 </RCC>

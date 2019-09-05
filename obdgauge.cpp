@@ -10,7 +10,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.jpg); border: none;");
+    this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
 
     pushSim = new QPushButton;
     pushExit = new QPushButton;
