@@ -16,12 +16,11 @@ ObdGauge::ObdGauge(QWidget *parent) :
     pushExit = new QPushButton;
     pushSim->setText("Start Sim");
     pushExit->setText("Exit");
-    pushExit->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #055580;");
-    pushSim->setStyleSheet("font-size: 12pt; font-weight: bold; color: white;background-color: #055580;");
+    pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #055580;");
+    pushSim->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #055580;");
 
     connect(pushSim, &QPushButton::clicked, this, &ObdGauge::on_pushSim_clicked);
     connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
-    pushExit->setMaximumHeight(100);
 
     initGauges();
 
@@ -159,7 +158,7 @@ void ObdGauge::initGauges()
 
     mRpmGauge->addValues(76)->setValueRange(0,80);
 
-    mRpmGauge->addLabel(70)->setText("RpmX100");
+    mRpmGauge->addLabel(70)->setText("X100");
     QcLabelItem *labRpm = mRpmGauge->addLabel(40);
     labRpm->setText("0");
     mRpmNeedle = mRpmGauge->addNeedle(60);
@@ -275,6 +274,12 @@ void ObdGauge::analysData(const QString &dataReceived)
 void ObdGauge::dataReceived(QString &dataReceived)
 {
     if(!mRunning)return;
+
+    if(dataReceived.isEmpty() || dataReceived.toUpper().contains("NODATA") || dataReceived.toUpper().contains("UNABLETOCONNECT"))
+    {
+        send(CHECK_DATA);
+        return;
+    }
 
     if(commandOrder < gaugeCommands.size())
     {

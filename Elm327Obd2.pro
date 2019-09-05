@@ -13,6 +13,13 @@ TEMPLATE = app
 
 win32:RC_ICONS += $$PWD\icons\app_ico.ico
 
+ios {
+    message("* Using settings for Ios.")
+    QMAKE_INFO_PLIST = ios/Info.plist
+    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
+    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+}
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the

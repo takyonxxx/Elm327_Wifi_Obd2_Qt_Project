@@ -402,7 +402,7 @@ void QcLabelItem::draw(QPainter *painter)
     resetRect();
     QRectF tmpRect = adjustRect(position());
     float r = getRadius(rect());
-    QFont font("Meiryo UI", r/30.0, QFont::Bold);
+    QFont font("Meiryo UI", r/8.0, QFont::Bold);
     painter->setFont(font);
     painter->setPen(QPen(mColor));
 
@@ -791,7 +791,7 @@ void QcValuesItem::draw(QPainter*painter)
     QRectF  tmpRect = resetRect();
     float r = getRadius(adjustRect(99));
     QFont font("Meiryo UI",0, QFont::Bold);
-    font.setPointSizeF(0.03*r);
+    font.setPointSizeF(0.1*r);
 
     painter->setFont(font);
     painter->setPen(mColor);

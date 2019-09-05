@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
 
-    ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
     ui->pushConnect->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;");
     ui->pushSend->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
@@ -36,11 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
-    ui->textSend->setMinimumHeight(100);
+    ui->textSend->setMaximumHeight(30);
     ui->textSend->setText(CHECK_DATA);
     ui->pushSend->setEnabled(false);
-    ui->pushScan->setEnabled(false);
-    ui->pushGauge->setEnabled(false);
+    //ui->pushScan->setEnabled(false);
+    //ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
     ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
@@ -118,25 +118,25 @@ void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
-    if(!m_initialized && commandOrder == 0 && dataReceived.isEmpty())
-    {
-        send(RESET);
-        return;
-    }
-
     if(!m_HexEnabled)
         ui->textTerminal->append("<- " + dataReceived);
 
-    if(!m_initialized && commandOrder < initializeCommands.size())
+    if(dataReceived.isEmpty() || dataReceived.toUpper().contains("NODATA") || dataReceived.toUpper().contains("UNABLETOCONNECT"))
     {
-        send(initializeCommands[commandOrder]);
-        commandOrder++;
+        send(CHECK_DATA);
+        return;
     }
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         m_initialized = true;
         commandOrder = 0;
+    }
+
+    if(!m_initialized && commandOrder < initializeCommands.size())
+    {
+        send(initializeCommands[commandOrder]);
+        commandOrder++;
     }
 
     if(m_initialized && !dataReceived.isEmpty())
