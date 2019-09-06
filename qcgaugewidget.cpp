@@ -1,38 +1,5 @@
-/***************************************************************************
-**                                                                        **
-**  QcGauge, for instrumentation, and real time data measurement          **
-**  visualization widget for Qt.                                          **
-**  Copyright (C) 2015 Hadj Tahar Berrima                                 **
-**                                                                        **
-**  This program is free software: you can redistribute it and/or modify  **
-**  it under the terms of the GNU Lesser General Public License as        **
-**  published by the Free Software Foundation, either version 3 of the    **
-**  License, or (at your option) any later version.                       **
-**                                                                        **
-**  This program is distributed in the hope that it will be useful,       **
-**  but WITHOUT ANY WARRANTY; without even the implied warranty of        **
-**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         **
-**  GNU Lesser General Public License for more details.                   **
-**                                                                        **
-**  You should have received a copy of the GNU Lesser General Public      **
-**  License along with this program.                                      **
-**  If not, see http://www.gnu.org/licenses/.                             **
-**                                                                        **
-****************************************************************************
-**           Author:  Hadj Tahar Berrima                                  **
-**           Website: http://pytricity.com/                               **
-**           Contact: berrima_tahar@yahoo.com                             **
-**           Date:    1 dec 2014                                          **
-**           Version:  1.0                                                **
-****************************************************************************/
-
-
-
 #include "qcgaugewidget.h"
-
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+#include "pid.h"
 
 QcGaugeWidget::QcGaugeWidget(QWidget *parent) :
     QWidget(parent)
@@ -124,7 +91,7 @@ void QcGaugeWidget::addItem(QcItem *item,float position)
 
 int QcGaugeWidget::removeItem(QcItem *item)
 {
-   return mItems.removeAll(item);
+    return mItems.removeAll(item);
 }
 
 QList<QcItem *> QcGaugeWidget::items()
@@ -339,11 +306,11 @@ void QcBackgroundItem::addColor(float position, const QColor &color)
 {
     if(position<0||position>1)
         return;
-      QPair<float,QColor> pair;
-      pair.first = position;
-      pair.second = color;
-      mColors.append(pair);
-      update();
+    QPair<float,QColor> pair;
+    pair.first = position;
+    pair.second = color;
+    mColors.append(pair);
+    update();
 }
 
 void QcBackgroundItem::clearrColors()
@@ -402,7 +369,13 @@ void QcLabelItem::draw(QPainter *painter)
     resetRect();
     QRectF tmpRect = adjustRect(position());
     float r = getRadius(rect());
+
+#ifdef Q_OS_ANDROID
+    QFont font("Meiryo UI", r/28.0, QFont::Bold);
+#else
     QFont font("Meiryo UI", r/8.0, QFont::Bold);
+#endif
+
     painter->setFont(font);
     painter->setPen(QPen(mColor));
 
@@ -658,26 +631,64 @@ void QcNeedleItem::draw(QPainter *painter)
     painter->restore();
 }
 
+long long currentTimeMillis()
+{
+    namespace sc = std::chrono;
+    auto time = sc::system_clock::now(); // get the current time
+    auto since_epoch = time.time_since_epoch(); // get the duration since epoch
+    auto millis = sc::duration_cast<sc::milliseconds>(since_epoch);
+    return millis.count();
+}
+
+void QcNeedleItem::computeCurrentValue()
+{
+        if (!(std::abs(mCurrentValue - mTargetValue) > 0.01f)) {
+            return;
+        }
+
+        if (-1 != mNeedleLastMoved) {
+            float time = (currentTimeMillis() - mNeedleLastMoved) / 1000.0f;
+            float direction = signum(mNeedleVelocity);
+            if (std::abs(mNeedleVelocity) < 90.0f) {
+                mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
+            } else {
+                mNeedleAcceleration = 0.0f;
+            }
+
+            mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
+            mCurrentValue += mNeedleVelocity * time;
+            mNeedleVelocity += mNeedleAcceleration * time;
+
+            if ((mTargetValue - mCurrentValue) * direction < 0.01f * direction) {
+                mCurrentValue = mTargetValue;
+                mNeedleVelocity = 0.0f;
+                mNeedleAcceleration = 0.0f;
+                mNeedleLastMoved = -1L;
+            } else {
+                mNeedleLastMoved = currentTimeMillis();
+            }
+
+            if(mLabel!=0)
+                mLabel->setText(QString::number(static_cast<int>(mCurrentValue)),false);
+
+            update();
+
+        } else {
+            mNeedleLastMoved = currentTimeMillis();
+            computeCurrentValue();
+        }
+    }
+
 void QcNeedleItem::setCurrentValue(float value)
 {
-       if(value<mMinValue)
-        mCurrentValue = mMinValue;
+    if(value<mMinValue)
+        mTargetValue = mMinValue;
     else if(value>mMaxValue)
-        mCurrentValue = mMaxValue;
+        mTargetValue = mMaxValue;
     else
-        mCurrentValue = value;
+        mTargetValue = value;
 
-    if(mLabel!=0)
-        mLabel->setText(QString::number(mCurrentValue),false);
-
-/// This pull request is not working properly
-//    if(mLabel!=0){
-//        QString currentValue;
-//        mLabel->setText( currentValue ,false);
-//        mLabel->setText(currentValue.sprintf(mFormat.toStdString().c_str(), mCurrentValue),false);
-//        Q_UNUSED(currentValue);
-//    }
-    update();
+    computeCurrentValue();
 }
 
 float QcNeedleItem::currentValue()
@@ -791,7 +802,12 @@ void QcValuesItem::draw(QPainter*painter)
     QRectF  tmpRect = resetRect();
     float r = getRadius(adjustRect(99));
     QFont font("Meiryo UI",0, QFont::Bold);
+
+#ifdef Q_OS_ANDROID
+    font.setPointSizeF(0.03*r);
+#else
     font.setPointSizeF(0.1*r);
+#endif
 
     painter->setFont(font);
     painter->setPen(mColor);

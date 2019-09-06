@@ -10,7 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     QRect desktopRect = QApplication::desktop()->availableGeometry(this);
-    setGeometry(desktopRect);
+
+    if(osName() != "windows")
+        setGeometry(desktopRect);
 
     m_networkManager = NetworkManager::getInstance();
 
@@ -24,7 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
 
-    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+    if(osName() == "windows")
+        ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
+    else
+        ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+
     ui->pushConnect->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;");
     ui->pushSend->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
@@ -36,7 +42,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
+
+#ifdef Q_OS_ANDROID
+    ui->textSend->setMinimumHeight(100);
+#else
     ui->textSend->setMaximumHeight(30);
+#endif
+
     ui->textSend->setText(CHECK_DATA);
     ui->pushSend->setEnabled(false);
     //ui->pushScan->setEnabled(false);
@@ -112,45 +124,6 @@ void MainWindow::send(QString &string)
                              .simplified()
                              .remove(QRegExp("[\\n\\t\\r]"))
                              .remove(QRegExp("[^a-zA-Z0-9]+")));
-}
-
-void MainWindow::dataReceived(QString &dataReceived)
-{
-    if(!m_ConsoleEnable)return;
-
-    if(!m_HexEnabled)
-        ui->textTerminal->append("<- " + dataReceived);
-
-    if(dataReceived.isEmpty() || dataReceived.toUpper().contains("NODATA") || dataReceived.toUpper().contains("UNABLETOCONNECT"))
-    {
-        send(CHECK_DATA);
-        return;
-    }
-
-    if(!m_initialized && initializeCommands.size() == commandOrder)
-    {
-        m_initialized = true;
-        commandOrder = 0;
-    }
-
-    if(!m_initialized && commandOrder < initializeCommands.size())
-    {
-        send(initializeCommands[commandOrder]);
-        commandOrder++;
-    }
-
-    if(m_initialized && !dataReceived.isEmpty())
-    {
-        analysData(dataReceived);
-    }
-
-    if(m_clearCodeRequest)
-    {
-        ui->textTerminal->append("Clearing the trouble codes.");
-        QString text(CLEAR_TROUBLE);
-        send(text);
-        m_clearCodeRequest = false;
-    }
 }
 
 void MainWindow::stateChanged(QString &state)
@@ -242,6 +215,41 @@ void MainWindow::on_pushDiagnostic_clicked()
     ui->textTerminal->append("The trouble codes requested.");
     QString text(REQUEST_TROUBLE);
     send(text);
+}
+
+void MainWindow::on_close_dialog_triggered()
+{
+    m_ConsoleEnable = true;
+    qDebug() << "on_close_dialog_triggered";
+}
+
+
+void MainWindow::on_pushScan_clicked()
+{
+    ObdScan *obdScan = new ObdScan;
+    obdScan->setGeometry(this->rect());
+    obdScan->move(this->x(), this->y());
+    QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
+
+    obdScan->show();
+    m_ConsoleEnable = false;
+}
+
+void MainWindow::on_checkHex_stateChanged(int arg1)
+{
+    m_HexEnabled = arg1;
+}
+
+void MainWindow::on_pushGauge_clicked()
+{
+    ObdGauge *obdGauge = new ObdGauge;
+    obdGauge->setGeometry(this->rect());
+    obdGauge->move(this->x(), this->y());
+    QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
+
+    obdGauge->show();
+
+    m_ConsoleEnable = false;
 }
 
 void MainWindow::analysData(const QString &dataReceived)
@@ -338,37 +346,35 @@ void MainWindow::analysData(const QString &dataReceived)
     }
 }
 
-void MainWindow::on_close_dialog_triggered()
+void MainWindow::dataReceived(QString &dataReceived)
 {
-    m_ConsoleEnable = true;
-    qDebug() << "on_close_dialog_triggered";
-}
+    if(!m_ConsoleEnable)return;
 
+    if(!m_HexEnabled)
+        ui->textTerminal->append("<- " + dataReceived);
 
-void MainWindow::on_pushScan_clicked()
-{
-    ObdScan *obdScan = new ObdScan;
-    obdScan->setGeometry(this->rect());
-    obdScan->move(this->x(), this->y());
-    QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
+    if(!m_initialized && initializeCommands.size() == commandOrder)
+    {
+        m_initialized = true;
+        commandOrder = 0;
+    }
 
-    obdScan->show();
-    m_ConsoleEnable = false;
-}
+    if(!m_initialized && commandOrder < initializeCommands.size())
+    {
+        send(initializeCommands[commandOrder]);
+        commandOrder++;
+    }
 
-void MainWindow::on_checkHex_stateChanged(int arg1)
-{
-    m_HexEnabled = arg1;
-}
+    if(m_initialized && !dataReceived.isEmpty())
+    {
+        analysData(dataReceived);
+    }
 
-void MainWindow::on_pushGauge_clicked()
-{
-    ObdGauge *obdGauge = new ObdGauge;
-    obdGauge->setGeometry(this->rect());
-    obdGauge->move(this->x(), this->y());
-    QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
-
-    obdGauge->show();
-
-    m_ConsoleEnable = false;
+    if(m_clearCodeRequest)
+    {
+        ui->textTerminal->append("Clearing the trouble codes.");
+        QString text(CLEAR_TROUBLE);
+        send(text);
+        m_clearCodeRequest = false;
+    }
 }

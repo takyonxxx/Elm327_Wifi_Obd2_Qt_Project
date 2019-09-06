@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "networkmanager.h"
+#include <QVector>
 
 namespace Ui {
 class ObdScan;
@@ -19,12 +20,17 @@ public:
 private:
     NetworkManager *m_networkManager;
     int commandOrder{0};
-    bool mRunning{false};
-    bool mDedectFuelPressure{false};
+    bool mRunning{false};    
     int mSpeed{0};
+    int mRpm{0};
+    int mLoad{0};
+    int mMAF{0};
+    qreal mFuelConsumption{0.0};
+    QVector<qreal> mAvarageFuelConsumption{};
 
     void send(QString &);
-    void analysData(const QString &);
+    void analysData(const QString &);    
+    qreal calculateAverage(QVector<qreal> &listavg) ;
 
 private slots:
     void on_pushExit_clicked();    

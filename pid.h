@@ -62,6 +62,8 @@ inline constexpr signum(T x) {
     return (T(0) < x) - (x < T(0));
 }
 
+static int EngineDisplacement = 1500;
+
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
 SOFTRESET = "ATWS",
@@ -110,7 +112,7 @@ CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) /
 
 static QStringList initializeCommands{TERMINATE_SESSION, SPACES_OFF, ECHO_OFF, LINEFEED_OFF,
             HEADERS_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_01,
-            PROTOCOL_SEARCH_ORDER, PROTOCOL_AUTO1, PROTOCOL_AUTO2, GET_PROTOCOL, INFO, CHECK_DATA};
+            PROTOCOL_SEARCH_ORDER, PROTOCOL_AUTO1, INFO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
             INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RAIL_HIGH_PRESSURE};
@@ -122,6 +124,29 @@ static QStringList PIDS {
     "09", "0A", "0B", "0C", "0D", "0E", "0F", "10",
     "11", "12", "13", "14", "15", "16", "17", "18",
     "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
+
+static QString osName()
+{
+#if defined(Q_OS_ANDROID)
+    return QLatin1String("android");
+#elif defined(Q_OS_BLACKBERRY)
+    return QLatin1String("blackberry");
+#elif defined(Q_OS_IOS)
+    return QLatin1String("ios");
+#elif defined(Q_OS_MAC)
+    return QLatin1String("osx");
+#elif defined(Q_OS_WINCE)
+    return QLatin1String("wince");
+#elif defined(Q_OS_WIN)
+    return QLatin1String("windows");
+#elif defined(Q_OS_LINUX)
+    return QLatin1String("linux");
+#elif defined(Q_OS_UNIX)
+    return QLatin1String("unix");
+#else
+    return QLatin1String("unknown");
+#endif
+}
 
 
 #endif // PID_H

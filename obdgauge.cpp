@@ -16,40 +16,49 @@ ObdGauge::ObdGauge(QWidget *parent) :
     pushExit = new QPushButton;
     pushSim->setText("Start Sim");
     pushExit->setText("Exit");
-    pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #055580;");
-    pushSim->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #055580;");
+    pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #055580;");
+    pushSim->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #055580;");
 
     connect(pushSim, &QPushButton::clicked, this, &ObdGauge::on_pushSim_clicked);
     connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
 
     initGauges();
 
-    //ui->verticalLayout->addWidget(pushSim);
-
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
 
-    foreach (QScreen *screen, QGuiApplication::screens())
+    if(osName() == "windows")
     {
-        if(screen->orientation() == Qt::LandscapeOrientation)
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+        ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
+        ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
+        ui->gridLayout_Gauges->addWidget(pushSim, 3, 0);
+    }
+    else
+    {
+        foreach (QScreen *screen, QGuiApplication::screens())
         {
-            ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 1);
-            ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 2);
-        }
-        else if(screen->orientation() == Qt::PortraitOrientation)
-        {
-            ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
-            ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
-        }
+            if(screen->orientation() == Qt::LandscapeOrientation)
+            {
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 1);
+                ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 2);
+            }
+            else if(screen->orientation() == Qt::PortraitOrientation)
+            {
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+                ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
+                ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
+                ui->gridLayout_Gauges->addWidget(pushSim, 3, 0);
+            }
 
-        screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
-                                         Qt::PortraitOrientation |
-                                         Qt::InvertedLandscapeOrientation |
-                                         Qt::InvertedPortraitOrientation);
+            screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
+                                             Qt::PortraitOrientation |
+                                             Qt::InvertedLandscapeOrientation |
+                                             Qt::InvertedPortraitOrientation);
 
-        QObject::connect(screen, &QScreen::orientationChanged, this, &ObdGauge::orientationChanged);
+            QObject::connect(screen, &QScreen::orientationChanged, this, &ObdGauge::orientationChanged);
+        }
     }
 
     if(m_networkManager)
@@ -58,7 +67,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(CHECK_DATA);
+            send(ENGINE_RPM);
         }
     }
 }
@@ -87,10 +96,9 @@ void ObdGauge::initGauges()
     auto degrees = mSpeedGauge->addDegrees(65);
     degrees->setStep(20);
     degrees->setValueRange(0,220);
+
     auto colorBandSpeed = mSpeedGauge->addColorBand(50);
-
     QList<QPair<QColor, float> > colors;
-
     QColor tmpColor;
     tmpColor.setAlphaF(0.1);
     QPair<QColor,float> pair;
@@ -106,10 +114,9 @@ void ObdGauge::initGauges()
     pair.first = Qt::red;
     pair.second = 100;
     colors.append(pair);
-
     colorBandSpeed->setColors(colors);
 
-    auto values = mSpeedGauge->addValues(76);
+    auto values = mSpeedGauge->addValues(74);
     values->setStep(20);
     values->setValueRange(0,220);
 
@@ -153,10 +160,9 @@ void ObdGauge::initGauges()
     pair.first = Qt::red;
     pair.second = 100;
     colors.append(pair);
-
     colorBandRpm->setColors(colors);
 
-    mRpmGauge->addValues(76)->setValueRange(0,80);
+    mRpmGauge->addValues(74)->setValueRange(0,80);
 
     mRpmGauge->addLabel(70)->setText("X100");
     QcLabelItem *labRpm = mRpmGauge->addLabel(40);
@@ -214,7 +220,7 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 
     auto timeStep = m_time.restart();
     m_realTime = m_realTime + timeStep / 1000.0f;
-    valueGauge  =  121.0f * std::sin( m_realTime /  5.0f ) +  121.0f;
+    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
     setSpeed(static_cast<int>(valueGauge));
     setRpm(static_cast<int>(valueGauge/3));
 }
@@ -275,23 +281,17 @@ void ObdGauge::dataReceived(QString &dataReceived)
 {
     if(!mRunning)return;
 
-    if(dataReceived.isEmpty() || dataReceived.toUpper().contains("NODATA") || dataReceived.toUpper().contains("UNABLETOCONNECT"))
+    if(gaugeCommands.size() == commandOrder)
     {
-        send(CHECK_DATA);
-        return;
+        commandOrder = 0;
+        send(gaugeCommands[commandOrder]);
     }
 
     if(commandOrder < gaugeCommands.size())
     {
         send(gaugeCommands[commandOrder]);
         commandOrder++;
-    }
-
-    if(gaugeCommands.size() == commandOrder)
-    {
-        commandOrder = 0;
-        send(gaugeCommands[commandOrder]);
-    }
+    }    
 
     analysData(dataReceived);
 }

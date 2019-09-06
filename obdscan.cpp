@@ -7,7 +7,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui(new Ui::ObdScan)
 {
     ui->setupUi(this);
-        
+
     setWindowTitle("Elm327 Obd2");
 
     ui->labelVoltTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
@@ -37,7 +37,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelFuelRailHighPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: yellow; background-color: #900C3F;  padding: 2px;");
+    ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: white; background-color: #900C3F;  padding: 2px;");
 
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
@@ -50,7 +50,8 @@ ObdScan::ObdScan(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(CHECK_DATA);
+            mAvarageFuelConsumption.clear();
+            send(ENGINE_RPM);
         }
     }
 }
@@ -86,22 +87,16 @@ void ObdScan::dataReceived(QString &dataReceived)
 {   
     if(!mRunning)return;
 
-    if(dataReceived.isEmpty() || dataReceived.toUpper().contains("NODATA") || dataReceived.toUpper().contains("UNABLETOCONNECT"))
+    if(runtimeCommands.size() == commandOrder)
     {
-        send(CHECK_DATA);
-        return;
+        commandOrder = 0;
+        send(runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
         commandOrder++;
-    }
-
-    if(runtimeCommands.size() == commandOrder)
-    {
-        commandOrder = 0;
-        send(runtimeCommands[commandOrder]);
     }
 
     analysData(dataReceived);
@@ -131,32 +126,31 @@ void ObdScan::analysData(const QString &dataReceived)
         {
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
-            value = ((A * 256) + B) / 4;
-            ui->labelRpm->setText(QString::number(value, 'f', 0) + " rpm");
+            mRpm = ((A * 256) + B) / 4;
+            ui->labelRpm->setText(QString::number(mRpm) + " rpm");
             break;
         case 4://PID(04): Engine Load
             // A*100/255
-            value = A * 100 / 255;
-            ui->labelLoad->setText(QString::number(value, 'f', 0) + " %");
+            mLoad = A * 100 / 255;
+            ui->labelLoad->setText(QString::number(mLoad) + " %");
             break;
         case 13://PID(0D): KM Speed
             // A
-            value = A;
-            ui->labelSpeed->setText(QString::number(value, 'f', 0) + " km/h");
-            mSpeed = value;
+            mSpeed = A;
+            ui->labelSpeed->setText(QString::number(mSpeed) + " km/h");
             break;
         case 5://PID(05): Coolant Temperature
             // A-40
             value = A - 40;
             ui->labelCoolant->setText(QString::number(value, 'f', 0) + " C°");
             break;
-        case 92://PID(05): Oil Temperature
+        case 92://PID(5C): Oil Temperature
             // A-40
             value = A - 40;
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]
-            value = A - 40;           
+            value = A - 40;
             break;
         case 15://PID(0F): Intake Air Temperature
             // A - 40
@@ -168,26 +162,19 @@ void ObdScan::analysData(const QString &dataReceived)
             value = A;
             ui->labelManifoldPressure->setText(QString::number(value, 'f', 0) + " kPa");
             break;
-        case 16://PID(10): Air flowAir Flow Rate
-             // ((256*A)+B) / 100  [g/s]
-            value = ((256 * A) + B) / 100;;
-            ui->labelMafAirFlow->setText(QString::number(value, 'f', 0) + " g/s");
-            if(!mDedectFuelPressure && mSpeed != 0)
-            {
-                auto fuelRate = (3600 * value)/(9069.90 * mSpeed);
-                //auto KmPL = (mSpeed * 1/ 3600) * (1/value * 14.6 * 710);
-
-                ui->labelFuelConsumption->setText(QString::number(fuelRate, 'f', 2) + " L/100 km\n");
-            }
+        case 16://PID(10): MAF air flow rate grams/sec
+            // ((256*A)+B) / 100  [g/s]
+            mMAF = ((256 * A) + B) / 100;;
+            ui->labelMafAirFlow->setText(QString::number(mMAF) + " g/s");
             //
             break;
         case 10://PID(0A): Fuel Pressure
             // A * 3
-            value = A * 3;            
+            value = A * 3;
             break;
         case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
             // ((A*256)+B)*0.079
-            value = ((A * 256) + B) * 0.079;            
+            value = ((A * 256) + B) * 0.079;
             break;
         case 35://PID(23) Fuel guide pressure
             // ((A*256)+B) * 10
@@ -196,7 +183,6 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
-            if(!mDedectFuelPressure) mDedectFuelPressure = true;
             value = ((A*256)+B) / 20;
             ui->labelFuelConsumption->setText(QString::number(value, 'f', 1) + " L/h");
             break;
@@ -205,6 +191,13 @@ void ObdScan::analysData(const QString &dataReceived)
             value = A;
             break;
         }
+
+        //mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 20;
+        mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
+        mAvarageFuelConsumption.append(mFuelConsumption);
+        ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
+                                          + " / "
+                                          + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1));
     }
     else
     {
@@ -213,5 +206,14 @@ void ObdScan::analysData(const QString &dataReceived)
             ui->labelVolt->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
         }
     }
+}
+
+qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
+{
+    qreal sum = 0.0;
+    for (qreal val : listavg) {
+        sum += val;
+    }
+    return sum / listavg.size();
 }
 
