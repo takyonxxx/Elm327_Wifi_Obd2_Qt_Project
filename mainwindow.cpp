@@ -149,13 +149,12 @@ void MainWindow::connected()
     ui->pushGauge->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
 
-    ui->textTerminal->append("Connected to ELM327");
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
     m_initialized = false;
 
-    send(RESET);
+    send(RESET); 
 }
 
 void MainWindow::disconnected()
@@ -166,7 +165,7 @@ void MainWindow::disconnected()
     ui->pushDiagnostic->setEnabled(false);
 
     ui->textTerminal->clear();
-    ui->textTerminal->append("Disconnected from ELM327");
+    ui->textTerminal->append("Disconnected");
     ui->pushConnect->setText(QString("Connect"));
 
     commandOrder = 0;
@@ -177,6 +176,7 @@ void MainWindow::on_pushConnect_clicked()
 {
     if(ui->pushConnect->text() == "Connect")
     {
+        ui->textTerminal->clear();
         QString ip = ui->ipEdit->text();
         int port = ui->portEdit->text().toInt();
         m_networkManager->connectWifi(ip, port);
@@ -351,12 +351,20 @@ void MainWindow::dataReceived(QString &dataReceived)
     if(!m_ConsoleEnable)return;
 
     if(!m_HexEnabled)
-        ui->textTerminal->append("<- " + dataReceived);
+    {
+        if(dataReceived.isEmpty())
+            ui->textTerminal->append("<- null");
+        else
+            ui->textTerminal->append("<- " + dataReceived);
+    }
+
+    if(dataReceived.toUpper().contains("SEARCHING"))return;
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         m_initialized = true;
         commandOrder = 0;
+        ui->textTerminal->append("<- initalized");
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())

@@ -87,6 +87,8 @@ void ObdScan::dataReceived(QString &dataReceived)
 {   
     if(!mRunning)return;
 
+    if(dataReceived.toUpper().contains("SEARCHING"))return;
+
     if(runtimeCommands.size() == commandOrder)
     {
         commandOrder = 0;
