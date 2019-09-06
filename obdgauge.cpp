@@ -222,7 +222,7 @@ void ObdGauge::timerEvent( QTimerEvent *event )
     m_realTime = m_realTime + timeStep / 1000.0f;
     valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
     setSpeed(static_cast<int>(valueGauge));
-    setRpm(static_cast<int>(valueGauge/3));
+    setRpm(static_cast<int>(valueGauge/2.75));
 }
 
 

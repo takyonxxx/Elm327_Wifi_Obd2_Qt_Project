@@ -594,6 +594,9 @@ void QcNeedleItem::draw(QPainter *painter)
     QRectF tmpRect = adjustRect(position());
     painter->save();
     painter->translate(tmpRect.center());
+
+    computeCurrentValue();
+
     float deg = getDegFromValue( mCurrentValue);
     painter->rotate(deg+90.0);
     painter->setBrush(QBrush(mColor));
@@ -631,53 +634,40 @@ void QcNeedleItem::draw(QPainter *painter)
     painter->restore();
 }
 
-long long currentTimeMillis()
-{
-    namespace sc = std::chrono;
-    auto time = sc::system_clock::now(); // get the current time
-    auto since_epoch = time.time_since_epoch(); // get the duration since epoch
-    auto millis = sc::duration_cast<sc::milliseconds>(since_epoch);
-    return millis.count();
-}
-
 void QcNeedleItem::computeCurrentValue()
 {
-        if (!(std::abs(mCurrentValue - mTargetValue) > 0.01f)) {
-            return;
+    if (!(std::abs(mCurrentValue - mTargetValue) > 0.01f)) { return; }
+
+    if (-1 != mNeedleLastMoved)
+    {
+        float time = (currentTimeMillis() - mNeedleLastMoved) / 1000.0f;
+        float direction = signum(mNeedleVelocity);
+        float diff = mTargetValue - mCurrentValue;
+        mNeedleAcceleration = 5.0f * diff;
+
+        mCurrentValue += mNeedleVelocity * time;
+        mNeedleVelocity += mNeedleAcceleration * time;
+
+        diff = mTargetValue - mCurrentValue;
+
+        if (direction != 0 && diff * direction < 0.1f) {
+            mCurrentValue = mTargetValue;
+            mNeedleVelocity = 0.0f;
+            mNeedleAcceleration = 0.0f;
+            mNeedleLastMoved = -1L;
         }
-
-        if (-1 != mNeedleLastMoved) {
-            float time = (currentTimeMillis() - mNeedleLastMoved) / 1000.0f;
-            float direction = signum(mNeedleVelocity);
-            if (std::abs(mNeedleVelocity) < 90.0f) {
-                mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
-            } else {
-                mNeedleAcceleration = 0.0f;
-            }
-
-            mNeedleAcceleration = 5.0f * (mTargetValue - mCurrentValue);
-            mCurrentValue += mNeedleVelocity * time;
-            mNeedleVelocity += mNeedleAcceleration * time;
-
-            if ((mTargetValue - mCurrentValue) * direction < 0.01f * direction) {
-                mCurrentValue = mTargetValue;
-                mNeedleVelocity = 0.0f;
-                mNeedleAcceleration = 0.0f;
-                mNeedleLastMoved = -1L;
-            } else {
-                mNeedleLastMoved = currentTimeMillis();
-            }
-
-            if(mLabel!=0)
-                mLabel->setText(QString::number(static_cast<int>(mCurrentValue)),false);
-
-            update();
-
-        } else {
+        else
+        {
             mNeedleLastMoved = currentTimeMillis();
-            computeCurrentValue();
         }
+
+        update();
     }
+    else {
+        mNeedleLastMoved = currentTimeMillis();
+        computeCurrentValue();
+    }
+}
 
 void QcNeedleItem::setCurrentValue(float value)
 {
@@ -688,7 +678,7 @@ void QcNeedleItem::setCurrentValue(float value)
     else
         mTargetValue = value;
 
-    computeCurrentValue();
+    update();
 }
 
 float QcNeedleItem::currentValue()

@@ -125,6 +125,15 @@ static QStringList PIDS {
     "11", "12", "13", "14", "15", "16", "17", "18",
     "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
 
+static long long currentTimeMillis()
+{
+    namespace sc = std::chrono;
+    auto time = sc::system_clock::now(); // get the current time
+    auto since_epoch = time.time_since_epoch(); // get the duration since epoch
+    auto millis = sc::duration_cast<sc::milliseconds>(since_epoch);
+    return millis.count();
+}
+
 static QString osName()
 {
 #if defined(Q_OS_ANDROID)
