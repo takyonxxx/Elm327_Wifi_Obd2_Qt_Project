@@ -194,8 +194,8 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        //mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 20;
-        mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
+        mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 20;
+        //mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
         mAvarageFuelConsumption.append(mFuelConsumption);
         ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                           + " / "
@@ -205,7 +205,7 @@ void ObdScan::analysData(const QString &dataReceived)
     {
         if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
         {
-            ui->labelVolt->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
+            ui->labelVolt->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");            
         }
     }
 }

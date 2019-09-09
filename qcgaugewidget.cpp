@@ -661,6 +661,9 @@ void QcNeedleItem::computeCurrentValue()
             mNeedleLastMoved = currentTimeMillis();
         }
 
+        if(mLabel!=0)
+            mLabel->setText(QString::number(mCurrentValue),false);
+
         update();
     }
     else {
