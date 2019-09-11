@@ -154,7 +154,7 @@ void MainWindow::connected()
     commandOrder = 0;
     m_initialized = false;
 
-    send(RESET); 
+    send(END_LINE);
 }
 
 void MainWindow::disconnected()

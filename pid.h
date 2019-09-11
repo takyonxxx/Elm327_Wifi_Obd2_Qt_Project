@@ -66,6 +66,8 @@ static int EngineDisplacement = 1500;
 
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
+END_LINE = "\r",
+SET_ALL_DEFAULT = "ATD",
 SOFTRESET = "ATWS",
 INFO = "ATI",
 MONITOR_ALL = "ATMA",
@@ -112,8 +114,7 @@ FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
-static QStringList initializeCommands{RESET, LINEFEED_OFF, ECHO_OFF, SPACES_OFF,
-            HEADERS_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL, GET_PP_SUMMARY};
+static QStringList initializeCommands{END_LINE, SET_ALL_DEFAULT, HEADERS_OFF, SPACES_OFF, ECHO_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
             INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RAIL_HIGH_PRESSURE};
