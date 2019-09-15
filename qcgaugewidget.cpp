@@ -662,7 +662,7 @@ void QcNeedleItem::computeCurrentValue()
         }
 
         if(mLabel!=0)
-            mLabel->setText(QString::number(mCurrentValue),false);
+            mLabel->setText(QString::number(mCurrentValue, 'f', 0),false);
 
         update();
     }
