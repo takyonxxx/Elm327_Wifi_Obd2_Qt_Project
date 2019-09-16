@@ -38,6 +38,10 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelFuelRailHighPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
     ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: white; background-color: #900C3F;  padding: 2px;");
+    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
+                                              + " / "
+                                              + QString::number(0, 'f', 1)
+                                              + "\n\tL/100km");
 
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
@@ -194,12 +198,13 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 20;
+        mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 2000;
         //mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
         mAvarageFuelConsumption.append(mFuelConsumption);
         ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                           + " / "
-                                          + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1));
+                                          + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
+                                          + "\n\tL/100km");
     }
     else
     {
