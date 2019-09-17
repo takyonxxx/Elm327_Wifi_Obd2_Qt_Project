@@ -198,7 +198,8 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        mFuelConsumption = 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * mLoad / 2000;
+        int calcLoad = static_cast<int>(mLoad);
+        mFuelConsumption = 0.001 * 0.004 * 4.3 * EngineDisplacement / 1000 * mRpm * 60 * calcLoad / 20;
         //mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
         mAvarageFuelConsumption.append(mFuelConsumption);
         ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
