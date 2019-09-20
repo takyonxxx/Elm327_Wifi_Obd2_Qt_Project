@@ -114,7 +114,7 @@ FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
-static QStringList initializeCommands{END_LINE, SET_ALL_DEFAULT, HEADERS_OFF, SPACES_OFF, ECHO_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO};
+static QStringList initializeCommands{SET_ALL_DEFAULT, RESET, ECHO_OFF, LINEFEED_OFF, SPACES_OFF, HEADERS_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
             INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RAIL_HIGH_PRESSURE};
