@@ -67,7 +67,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(ENGINE_RPM);
+            send(RESET);
         }
     }
 }
@@ -280,8 +280,6 @@ void ObdGauge::analysData(const QString &dataReceived)
 void ObdGauge::dataReceived(QString &dataReceived)
 {
     if(!mRunning)return;
-
-    if(dataReceived.toUpper().contains("SEARCHING"))return;
 
     if(gaugeCommands.size() == commandOrder)
     {

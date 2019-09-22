@@ -55,7 +55,7 @@ ObdScan::ObdScan(QWidget *parent) :
         {
             mRunning = true;
             mAvarageFuelConsumption.clear();
-            send(ENGINE_RPM);
+            send(RESET);
         }
     }
 }
@@ -90,8 +90,6 @@ void ObdScan::send(QString &data)
 void ObdScan::dataReceived(QString &dataReceived)
 {   
     if(!mRunning)return;
-
-    if(dataReceived.toUpper().contains("SEARCHING"))return;
 
     if(runtimeCommands.size() == commandOrder)
     {
