@@ -350,11 +350,12 @@ void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
+    if(dataReceived.toUpper().contains("SEARCHING"))
+        return;
+
     if(!m_HexEnabled)
     {
-        if(dataReceived.isEmpty())
-            ui->textTerminal->append("<- null");
-        else
+        if(!dataReceived.isEmpty())
             ui->textTerminal->append("<- " + dataReceived);
     }
 

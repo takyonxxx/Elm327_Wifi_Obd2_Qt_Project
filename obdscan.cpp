@@ -45,6 +45,9 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
+    ui->labelStatusTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;;  padding: 2px;");
+
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
 
@@ -84,12 +87,16 @@ void ObdScan::send(QString &data)
 
     if(!m_networkManager->isConnected())return;
     m_networkManager->send(data);
+    ui->labelStatus->setText(data);
 }
 
 
 void ObdScan::dataReceived(QString &dataReceived)
 {   
     if(!mRunning)return;
+
+    if(dataReceived.toUpper().contains("SEARCHING"))
+        return;
 
     if(runtimeCommands.size() == commandOrder)
     {
