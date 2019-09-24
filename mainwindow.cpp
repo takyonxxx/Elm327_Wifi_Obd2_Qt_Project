@@ -358,8 +358,6 @@ void MainWindow::dataReceived(QString &dataReceived)
             ui->textTerminal->append("<- " + dataReceived);
     }
 
-    if(dataReceived.toUpper().contains("SEARCHING"))return;
-
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         m_initialized = true;
