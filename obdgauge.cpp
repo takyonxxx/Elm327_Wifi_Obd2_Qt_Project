@@ -67,7 +67,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if(m_networkManager->isConnected())
         {
             mRunning = true;
-            send(ENGINE_RPM);
+            send(VOLTAGE);
         }
     }
 }

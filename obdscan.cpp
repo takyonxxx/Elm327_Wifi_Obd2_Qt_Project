@@ -55,7 +55,7 @@ ObdScan::ObdScan(QWidget *parent) :
         {
             mRunning = true;
             mAvarageFuelConsumption.clear();
-            send(ENGINE_RPM);
+            send(VOLTAGE);
         }
     }
 }
