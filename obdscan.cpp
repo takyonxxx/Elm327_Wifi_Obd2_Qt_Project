@@ -39,9 +39,9 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: white; background-color: #900C3F;  padding: 2px;");
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
-                                              + " / "
-                                              + QString::number(0, 'f', 1)
-                                              + "\n\tL/100km");
+                                      + " / "
+                                      + QString::number(0, 'f', 1)
+                                      + "\n\tL/100km");
 
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
@@ -204,12 +204,18 @@ void ObdScan::analysData(const QString &dataReceived)
         }
 
         int calcLoad = static_cast<int>(mLoad);
-        if(mSpeed != 0)
-            mFuelConsumption = 100 * 0.001 * 0.004 * 4.3 * 1.35 * EngineDisplacement * mRpm * 60 * calcLoad / 2000 / mSpeed;
-        else
-            mFuelConsumption = 0.001 * 0.004 * 4.3 * EngineDisplacement * mRpm * 60 * calcLoad / 2000;      
 
-        //mFuelConsumption = 100 * (((mMAF / 14.7) / 710) * 3600 / mSpeed);
+        if(mSpeed == 0)
+        {
+            mFuelConsumption = 0.001 * 0.004 * 4 * EngineDisplacement * mRpm * 60 * calcLoad / 2000;
+        }
+        else
+        {
+            //(liters of fuel per sec) = 3,7854 * (grams of air) / (air/fuel ratio) / 6.17 / 454
+            auto KPL = static_cast<unsigned short>((3,7854 * 1.609 * mSpeed * 7107L) / mMAF) / 10;
+            mFuelConsumption = 100 / KPL;
+        }
+
         mAvarageFuelConsumption.append(mFuelConsumption);
         ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                           + " / "
@@ -220,7 +226,7 @@ void ObdScan::analysData(const QString &dataReceived)
     {
         if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
         {
-            ui->labelVolt->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");            
+            ui->labelVolt->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
         }
     }
 }
