@@ -204,6 +204,9 @@ void ObdScan::analysData(const QString &dataReceived)
         }
 
         int calcLoad = static_cast<int>(mLoad);
+        auto AL = mMAF * calcLoad;              // Airflow * Load
+        auto coeff = 0.0021;                    // Fuel flow coefficient
+        auto LH = AL * coeff + 1.5167;          // Fuel flow L/h
 
         if(calcLoad == 0)
         {
@@ -211,13 +214,10 @@ void ObdScan::analysData(const QString &dataReceived)
         }
         else if(mSpeed == 0)
         {
-            mFuelConsumption = 0.001 * 0.004 * 4 * EngineDisplacement * mRpm * 60 * calcLoad / 2000;
+            mFuelConsumption = LH;
         }
         else
-        {
-            auto AL = mMAF * calcLoad;              // Airflow * Load
-            auto coeff = 0.0021;                    // Fuel flow coefficient
-            auto LH = AL * coeff + 1.5167;          // Fuel flow L/h
+        {            
             mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
         }
 
