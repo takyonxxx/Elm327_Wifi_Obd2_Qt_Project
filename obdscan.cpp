@@ -41,7 +41,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
-                                      + "\n\tL/100km");
+                                      + "\n\tl / 100km");
 
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
@@ -205,22 +205,27 @@ void ObdScan::analysData(const QString &dataReceived)
 
         int calcLoad = static_cast<int>(mLoad);
 
-        if(mSpeed == 0)
+        if(calcLoad == 0)
+        {
+            mFuelConsumption = 0;
+        }
+        else if(mSpeed == 0)
         {
             mFuelConsumption = 0.001 * 0.004 * 4 * EngineDisplacement * mRpm * 60 * calcLoad / 2000;
         }
         else
         {
-            //(liters of fuel per sec) = 3,7854 * (grams of air) / (air/fuel ratio) / 6.17 / 454
-            auto KPL = static_cast<unsigned short>((3,7854 * 1.609 * mSpeed * 7107L) / mMAF) / 10;
-            mFuelConsumption = 100 / KPL;
+            auto AL = mMAF * calcLoad;              // Airflow * Load
+            auto coeff = 0.0021;                    // Fuel flow coefficient
+            auto LH = AL * coeff + 1.5167;          // Fuel flow L/h
+            mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
         }
 
         mAvarageFuelConsumption.append(mFuelConsumption);
         ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                           + " / "
                                           + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                          + "\n\tL/100km");
+                                          + "\n\tl / 100km");
     }
     else
     {

@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666");
     ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
-    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
+    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");  
 
 #ifdef Q_OS_ANDROID
     ui->textSend->setMinimumHeight(100);
