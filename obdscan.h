@@ -25,6 +25,7 @@ private:
     int mRpm{0};
     int mLoad{0};
     int mMAF{0};
+    int mTPos{0};
     qreal mFuelConsumption{0.0};
     QVector<qreal> mAvarageFuelConsumption{};
 
@@ -35,6 +36,8 @@ private:
 private slots:
     void on_pushExit_clicked();    
     void dataReceived(QString &);
+
+    void on_pushClear_clicked();
 
 signals:
     void on_close_scan();

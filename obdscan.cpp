@@ -34,22 +34,30 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelFuelRailHighPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelFuelRailHighPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelThrottlePositionTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelThrottlePosition->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelFuelConsumption->setStyleSheet("font-size: 48pt; font-weight: bold; color: white; background-color: #900C3F;  padding: 2px;");
+    ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
+    ui->comboEngineDisplacement->setCurrentIndex(1);
+
+    ui->labelFuelConsumption->setStyleSheet("font-weight: bold; font: 48pt 'Trebuchet MS'; color: white; background-color: #900C3F;  padding: 2px;");
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
                                       + "\n\tl / 100km");
 
+    ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
 
     ui->labelStatusTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelStatus->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;;  padding: 2px;");
 
+    ui->labelFuelConsumption->setFocus();
+
     m_networkManager = NetworkManager::getInstance();
     commandOrder = 0;
+    EngineDisplacement = ui->comboEngineDisplacement->currentText().toInt();
 
     if(m_networkManager)
     {
@@ -135,62 +143,69 @@ void ObdScan::analysData(const QString &dataReceived)
 
         switch (PID)
         {
-        case 12: //PID(0C): RPM
-            //((A*256)+B)/4
-            mRpm = ((A * 256) + B) / 4;
-            ui->labelRpm->setText(QString::number(mRpm) + " rpm");
-            break;
+
         case 4://PID(04): Engine Load
             // A*100/255
             mLoad = A * 100 / 255;
             ui->labelLoad->setText(QString::number(mLoad) + " %");
-            break;
-        case 13://PID(0D): KM Speed
-            // A
-            mSpeed = A;
-            ui->labelSpeed->setText(QString::number(mSpeed) + " km/h");
             break;
         case 5://PID(05): Coolant Temperature
             // A-40
             value = A - 40;
             ui->labelCoolant->setText(QString::number(value, 'f', 0) + " C°");
             break;
-        case 92://PID(5C): Oil Temperature
-            // A-40
-            value = A - 40;
-            break;
-        case 70://PID(46) Ambient Air Temperature
-            // A-40 [DegC]
-            value = A - 40;
-            break;
-        case 15://PID(0F): Intake Air Temperature
-            // A - 40
-            value = A - 40;
-            ui->labelIntakeAirTemp->setText(QString::number(value, 'f', 0) + " C°");
+        case 10://PID(0A): Fuel Pressure
+            // A * 3
+            value = A * 3;
             break;
         case 11://PID(0B): Manifold Absolute Pressure
             // A - 40
             value = A;
             ui->labelManifoldPressure->setText(QString::number(value, 'f', 0) + " kPa");
             break;
+        case 12: //PID(0C): RPM
+            //((A*256)+B)/4
+            mRpm = ((A * 256) + B) / 4;
+            ui->labelRpm->setText(QString::number(mRpm) + " rpm");
+            break;
+        case 13://PID(0D): KM Speed
+            // A
+            mSpeed = A;
+            ui->labelSpeed->setText(QString::number(mSpeed) + " km/h");
+            break;
+        case 15://PID(0F): Intake Air Temperature
+            // A - 40
+            value = A - 40;
+            ui->labelIntakeAirTemp->setText(QString::number(value, 'f', 0) + " C°");
+            break;
         case 16://PID(10): MAF air flow rate grams/sec
             // ((256*A)+B) / 100  [g/s]
-            mMAF = ((256 * A) + B) / 100;;
+            mMAF = ((256 * A) + B) / 100;
             ui->labelMafAirFlow->setText(QString::number(mMAF) + " g/s");
             //
             break;
-        case 10://PID(0A): Fuel Pressure
-            // A * 3
-            value = A * 3;
+        case 17://PID(11): Throttle position
+            // (100 * A) / 255 %
+            mTPos = (100 * A) / 255;
+            ui->labelThrottlePosition->setText(QString::number(mTPos) + " %");
+            //
             break;
         case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
             // ((A*256)+B)*0.079
             value = ((A * 256) + B) * 0.079;
             break;
         case 35://PID(23) Fuel guide pressure
-            // ((A*256)+B) * 10
+            // ((A*256)+B) * 10 kPa
             value = ((A*256)+B) * 10;
-            ui->labelFuelRailHighPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            //ui->labelFuelRailHighPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            break;
+        case 70://PID(46) Ambient Air Temperature
+            // A-40 [DegC]
+            value = A - 40;
+            break;
+        case 92://PID(5C): Oil Temperature
+            // A-40
+            value = A - 40;
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
@@ -203,29 +218,31 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        int calcLoad = static_cast<int>(mLoad);
-        auto AL = mMAF * calcLoad;              // Airflow * Load
-        auto coeff = 0.0021;                    // Fuel flow coefficient
-        auto LH = AL * coeff + 1.5167;          // Fuel flow L/h
-
-        if(calcLoad == 0)
+        if(PID == 4 || PID == 12 || PID == 13 || PID == 17) // LOAD, RPM, SPEED, THROTTLE
         {
-            mFuelConsumption = 0;
-        }
-        else if(mSpeed == 0)
-        {
-            mFuelConsumption = LH;
-        }
-        else
-        {            
-            mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
-        }
+            auto AL = mMAF * mLoad;                                 // Airflow * Load
+            auto coeff = 0.0021;                                    // Fuel flow coefficient
+            auto LH = AL * coeff + EngineDisplacement / 1000;       // Fuel flow L/h
 
-        mAvarageFuelConsumption.append(mFuelConsumption);
-        ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
-                                          + " / "
-                                          + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                          + "\n\tl / 100km");
+            if(mLoad == 0)
+            {
+                mFuelConsumption = 0;
+            }
+            else if(mSpeed == 0 || mTPos == 0)
+            {
+                mFuelConsumption = LH / 2;
+            }
+            else
+            {
+                mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
+            }
+
+            mAvarageFuelConsumption.append(mFuelConsumption);
+            ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
+                                              + " / "
+                                              + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
+                                              + "\n\tl / 100km");
+        }
     }
     else
     {
@@ -245,3 +262,12 @@ qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
     return sum / listavg.size();
 }
 
+
+void ObdScan::on_pushClear_clicked()
+{
+    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
+                                      + " / "
+                                      + QString::number(0, 'f', 1)
+                                      + "\n\tl / 100km");
+    mAvarageFuelConsumption.clear();
+}
