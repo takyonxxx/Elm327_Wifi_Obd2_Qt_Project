@@ -271,3 +271,8 @@ void ObdScan::on_pushClear_clicked()
                                       + "\n\tl / 100km");
     mAvarageFuelConsumption.clear();
 }
+
+void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
+{
+    EngineDisplacement = arg1.toInt();
+}
