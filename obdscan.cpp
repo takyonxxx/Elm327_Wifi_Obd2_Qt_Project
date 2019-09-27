@@ -45,7 +45,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
-                                      + "\n\tl / 100km");
+                                      + "\nl / 100km");
 
     ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
@@ -241,7 +241,7 @@ void ObdScan::analysData(const QString &dataReceived)
             ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                               + " / "
                                               + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\n\tl / 100km");
+                                              + "\nl / 100km");
         }
     }
     else
@@ -268,7 +268,7 @@ void ObdScan::on_pushClear_clicked()
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
-                                      + "\n\tl / 100km");
+                                      + "\nl / 100km");
     mAvarageFuelConsumption.clear();
 }
 
