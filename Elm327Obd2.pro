@@ -36,6 +36,7 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+        methods.cpp \
         networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+        methods.h \
         networkmanager.h \
         obdgauge.h \
         obdscan.h \

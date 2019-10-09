@@ -73,6 +73,7 @@ ObdScan::ObdScan(QWidget *parent) :
 
 ObdScan::~ObdScan()
 {
+    mAvarageFuelConsumption.clear();
     delete ui;
 }
 
@@ -266,7 +267,7 @@ void ObdScan::analysData(const QString &dataReceived)
 qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
 {
     qreal sum = 0.0;
-    for (qreal val : listavg) {
+    for (auto &val : listavg) {
         sum += val;
     }
     return sum / listavg.size();
