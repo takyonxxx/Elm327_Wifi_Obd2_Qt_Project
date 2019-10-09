@@ -90,6 +90,7 @@ public:
 private:
     void send(QString &string);
     void analysData(const QString &);
+    void setPidsSupported(const QString &dataReceived);
 #ifdef Q_OS_ANDROID
     bool setScreenOrientation(int orientation);
 #endif

@@ -91,7 +91,7 @@ ADAPTIF_TIMING_AUTO1 = "ATAT1",
 ADAPTIF_TIMING_AUTO2 = "ATAT2",
 TIMEOUT_DEFAULT = "ATSTFF",
 TERMINATE_SESSION = "ATPC",
-CHECK_DATA = "0100",
+PIDS_SUPPORTED = "0100", //PIDs supported [01 - 20]
 ENGINE_COOLANT_TEMP = "0105",  //A-40
 ENGINE_RPM = "010C",  //((A*256)+B)/4
 ENGINE_LOAD = "0104",  // A*100/255
@@ -110,24 +110,19 @@ CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
 STATUS_DTC = "0101", //Status since DTC Cleared
 THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
 OBD_STANDARDS = "011C", //OBD standards this vehicle
-PIDS_SUPPORTED = "0120", //PIDs supported
 FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 PEDAL_POSITION = "015A"; //Relative accelerator pedal position 0 -100 % A*100/255
 
-static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
+static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL, PIDS_SUPPORTED};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
             INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, PEDAL_POSITION};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 
-static QStringList PIDS {
-    "01", "02", "03", "04", "05", "06", "07", "08",
-    "09", "0A", "0B", "0C", "0D", "0E", "0F", "10",
-    "11", "12", "13", "14", "15", "16", "17", "18",
-    "19", "1A", "1B", "1C", "1D", "1E", "1F", "20"};
+//static QList<QString> runtimeCommands{};
 
 static long long currentTimeMillis()
 {

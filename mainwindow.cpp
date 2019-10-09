@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setMaximumHeight(30);
 #endif
 
-    ui->textSend->setText(CHECK_DATA);
+    ui->textSend->setText(PIDS_SUPPORTED);
     ui->pushSend->setEnabled(false);
     //ui->pushScan->setEnabled(false);
     //ui->pushGauge->setEnabled(false);
@@ -252,6 +252,13 @@ void MainWindow::on_pushGauge_clicked()
     m_ConsoleEnable = false;
 }
 
+void MainWindow::setPidsSupported(const QString &dataReceived)
+{
+    runtimeCommands.clear();
+    runtimeCommands.append(VOLTAGE);
+    //todo add dupported pids to list
+}
+
 void MainWindow::analysData(const QString &dataReceived)
 {
     if(dataReceived.isEmpty())return;
@@ -363,6 +370,7 @@ void MainWindow::dataReceived(QString &dataReceived)
     {
         m_initialized = true;
         commandOrder = 0;
+        //setPidsSupported(dataReceived);
         ui->textTerminal->append("<- initalized");
     }
 
