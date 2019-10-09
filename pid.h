@@ -126,8 +126,6 @@ static QStringList runtimeCommands{VOLTAGE};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 
-//static QList<QString> runtimeCommands{};
-
 static long long currentTimeMillis()
 {
     namespace sc = std::chrono;
