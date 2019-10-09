@@ -48,6 +48,7 @@
     0153-EVAPAbsolute steam pressure
     0154-EVAPSystem steam pressure
     0159-Fuel guide absolute pressure
+    015A-Relative accelerator pedal position
 */
 
 template <typename T>
@@ -112,12 +113,13 @@ OBD_STANDARDS = "011C", //OBD standards this vehicle
 PIDS_SUPPORTED = "0120", //PIDs supported
 FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 REQUEST_TROUBLE = "03", //Request trouble codes
-CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
+CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
+PEDAL_POSITION = "015A"; //Relative accelerator pedal position 0 -100 % A*100/255
 
 static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, ENGINE_COOLANT_TEMP,
-            INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, THROTTLE_POSITION};
+            INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, PEDAL_POSITION};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 

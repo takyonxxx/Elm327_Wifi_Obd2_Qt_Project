@@ -188,7 +188,6 @@ void ObdScan::analysData(const QString &dataReceived)
             // (100 * A) / 255 %
             mTPos = (100 * A) / 255;
             ui->labelThrottlePosition->setText(QString::number(mTPos) + " %");
-            //
             break;
         case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
             // ((A*256)+B)*0.079
@@ -202,6 +201,11 @@ void ObdScan::analysData(const QString &dataReceived)
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]
             value = A - 40;
+            break;
+        case 90://PID(5A): Relative accelerator pedal position
+            // (100 * A) / 255 %
+            mTPos = (100 * A) / 255;
+            ui->labelThrottlePosition->setText(QString::number(mTPos) + " %");
             break;
         case 92://PID(5C): Oil Temperature
             // A-40
@@ -228,7 +232,7 @@ void ObdScan::analysData(const QString &dataReceived)
             {
                 mFuelConsumption = 0;
             }
-            else if(mSpeed == 0 || mTPos == 0)
+            else if(mSpeed == 0 || mTPos <= 20)
             {
                 mFuelConsumption = LH / 2;
             }
