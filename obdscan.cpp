@@ -228,7 +228,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        if(PID == 4 || PID == 12 || PID == 13 || PID == 17) // LOAD, RPM, SPEED, THROTTLE
+        if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED, THROTTLE
         {
             auto AL = mMAF * mLoad;                                 // Airflow * Load
             auto coeff = 0.0021;                                    // Fuel flow coefficient
@@ -238,7 +238,7 @@ void ObdScan::analysData(const QString &dataReceived)
             {
                 mFuelConsumption = 0;
             }
-            else if(mSpeed == 0 || mTPos <= 20)
+            else if(mSpeed == 0 || mLoad <= 25)
             {
                 mFuelConsumption = LH / 2;
             }
