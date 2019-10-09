@@ -90,7 +90,9 @@ public:
 private:
     void send(QString &string);
     void analysData(const QString &);
-    void setPidsSupported(const QString &dataReceived);
+    void setPidsSupported();
+    void appendPidsSupportedCommand(const QString &command);
+    QStringList pidsSupportedCommands{};
 #ifdef Q_OS_ANDROID
     bool setScreenOrientation(int orientation);
 #endif
@@ -100,6 +102,7 @@ private:
     bool m_ConsoleEnable{true};
     bool m_HexEnabled{false};
     bool m_clearCodeRequest{false};
+    std::vector<uint32_t> cmds{};
 
 private slots:
     void connected();

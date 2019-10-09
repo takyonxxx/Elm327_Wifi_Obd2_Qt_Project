@@ -34,8 +34,8 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelThrottlePositionTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelThrottlePosition->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelDistanceTraveledTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelDistanceTraveled->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
@@ -186,17 +186,24 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 17://PID(11): Throttle position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;
-            ui->labelThrottlePosition->setText(QString::number(mTPos) + " %");
+            mTPos = (100 * A) / 255;           
             break;
-        case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
-            // ((A*256)+B)*0.079
+        case 33://PID(21) Distance traveled with malfunction indicator lamp (MIL) on
+            // ((A*256)+B)
+            value = ((A * 256) + B);
+            break;
+        case 34://PID(22) Fuel Rail Pressure (relative to manifold vacuum)
+            // ((A*256)+B) * 0.079 kPa
             value = ((A * 256) + B) * 0.079;
             break;
-        case 35://PID(23) Fuel guide pressure
+        case 35://PID(23) Fuel Rail Gauge Pressure (diesel, or gasoline direct injection)
             // ((A*256)+B) * 10 kPa
-            value = ((A*256)+B) * 10;
-            //ui->labelFuelRailHighPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            value = ((A * 256) + B) * 10;
+            break;
+        case 49://PID(31) Distance traveled since codes cleared
+            //((A*256)+B) km
+            value = ((A*256)+B);
+            ui->labelDistanceTraveled->setText(QString::number(value) + " km");
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]
@@ -204,8 +211,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 90://PID(5A): Relative accelerator pedal position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;
-            ui->labelThrottlePosition->setText(QString::number(mTPos) + " %");
+            mTPos = (100 * A) / 255;           
             break;
         case 92://PID(5C): Oil Temperature
             // A-40

@@ -138,16 +138,16 @@
          </widget>
         </item>
         <item row="8" column="0">
-         <widget class="QLabel" name="labelThrottlePositionTitle">
+         <widget class="QLabel" name="labelDistanceTraveledTitle">
           <property name="text">
-           <string>Pedal Position:</string>
+           <string>Distance traveled:</string>
           </property>
          </widget>
         </item>
         <item row="8" column="1">
-         <widget class="QLabel" name="labelThrottlePosition">
+         <widget class="QLabel" name="labelDistanceTraveled">
           <property name="text">
-           <string>0 %</string>
+           <string>0 km</string>
           </property>
          </widget>
         </item>

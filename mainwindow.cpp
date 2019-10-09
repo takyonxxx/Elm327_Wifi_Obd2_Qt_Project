@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "pid.h"
+#include "methods.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -41,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666");
     ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
     ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
-    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");  
+    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
 
 #ifdef Q_OS_ANDROID
     ui->textSend->setMinimumHeight(100);
@@ -49,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setMaximumHeight(30);
 #endif
 
-    ui->textSend->setText(PIDS_SUPPORTED);
+    ui->textSend->setText(PIDS_SUPPORTED20);
     ui->pushSend->setEnabled(false);
     //ui->pushScan->setEnabled(false);
     //ui->pushGauge->setEnabled(false);
@@ -60,6 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textTerminal->append("Connect to the Wi-Fi signal with name similar to these examples:");
     ui->textTerminal->append("WIFI ELM327, WiFiOBD, OBDDevice, V-Link.");
     ui->textTerminal->append("Press Connect Button");
+
+    runtimeCommands.clear();
+    pidsSupportedCommands.clear();
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
@@ -252,11 +256,51 @@ void MainWindow::on_pushGauge_clicked()
     m_ConsoleEnable = false;
 }
 
-void MainWindow::setPidsSupported(const QString &dataReceived)
+void MainWindow::appendPidsSupportedCommand(const QString &dataReceived)
 {
+    if (dataReceived.startsWith("4100")
+            || dataReceived.startsWith("4120")
+            || dataReceived.startsWith("4140")
+            || dataReceived.startsWith("4160")
+            || dataReceived.startsWith("4180")
+            || dataReceived.startsWith("41A0"))
+    {
+        QString tmp = dataReceived;
+        auto cmd = tmp.remove(0, 4);
+        pidsSupportedCommands.append(cmd);
+    }
+}
+
+void MainWindow::setPidsSupported()
+{
+    cmds.clear();
     runtimeCommands.clear();
-    runtimeCommands.append(VOLTAGE);
-    //todo add dupported pids to list
+
+    for (auto &command: pidsSupportedCommands)
+    {
+        bool ok;    // hex == 255, ok == true
+        uint  dec = command.toUInt(&ok,16);
+        cmds.push_back(static_cast<uint32_t>(dec));
+
+        vector<vector<uint32_t> > _PIDs{};
+
+        for (int i = 0; i < cmds.size(); i++) {
+            _PIDs.push_back(decode_car_cmds(cmds));
+        }
+
+        for (uint32_t i = 0; i < _PIDs.size(); i++) {
+            for (uint32_t j = 0; j < _PIDs[i].size(); j++) {
+                QString hexadecimal;
+                auto val =_PIDs[i][j];
+
+                hexadecimal.setNum(val,16);
+                if(hexadecimal.length() %2)hexadecimal.insert(0,QLatin1String("0"));
+                auto supportedCommand = QString("01" + hexadecimal.toUpper());
+                if(i == 0)
+                    runtimeCommands.append(supportedCommand);
+            }
+        }
+    }
 }
 
 void MainWindow::analysData(const QString &dataReceived)
@@ -266,7 +310,6 @@ void MainWindow::analysData(const QString &dataReceived)
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
-    double value = 0;
     bool valid;
 
     QString tmpmsg{};
@@ -278,71 +321,7 @@ void MainWindow::analysData(const QString &dataReceived)
         A = tmpmsg.mid(4,2).toUInt(&valid,16);
         B = tmpmsg.mid(6,2).toUInt(&valid,16);
 
-        switch (PID)
-        {
-        case 4://PID(04): Engine Load
-            // A*100/255
-            value = A * 100 / 255;
-            break;
-        case 5://PID(05): Coolant Temperature
-            // A-40
-            value = A - 40;
-            break;
-        case 10://PID(0A): Fuel Pressure
-            // A * 3
-            value = A * 3;
-            break;
-        case 11://PID(0B) Manifold Absolute Pressure
-            // A
-            value = A;
-            break;
-        case 12: //PID(0C): RPM
-            //((A*256)+B)/4
-            value = ((A * 256) + B) / 4;
-            break;
-        case 13://PID(0D): KM
-            // A
-            value = A;
-            break;
-        case 15://PID(0F): Intake Temperature
-            // A - 40
-            value = A - 40;
-            break;
-        case 16://PID(10): Maf
-            // ((256*A)+B) / 100  [g/s]
-            value = ((256 * A) + B) / 100;
-            break;
-        case 17://PID(11)
-            //A*100/255
-            value = A * 100 / 255;
-            break;
-        case 34://PID(22) The fuel guide rail is relative to the manifold vacuum pressureFuel
-            // ((A*256)+B)*0.079
-            value = ((A * 256) + B) * 0.079;
-            break;
-        case 35://PID(23) Fuel guide pressure
-            // ((A*256)+B) * 10
-            value = ((A*256)+B) * 10;
-            break;
-        case 49://PID(31)
-            //(256*A)+B km
-            value = (A * 256) + B;
-            break;
-        case 70://PID(46) Ambient Air Temperature
-            // A-40 [DegC]
-            value = A - 40;
-            break;
-        case 92://PID(05): Oil Temperature
-            // A-40
-            value = A - 40;
-            break;
-        default:
-            //A
-            value = A;
-            break;
-        }
-
-        ui->textTerminal->append("Value: " + QString::number(value, 'f', 1).trimmed());
+        ui->textTerminal->append("Value of A: " + QString::number(A)+ " B: " + QString::number(B));
     }
     else
     {
@@ -370,17 +349,25 @@ void MainWindow::dataReceived(QString &dataReceived)
     {
         m_initialized = true;
         commandOrder = 0;
-        //setPidsSupported(dataReceived);
+        appendPidsSupportedCommand(dataReceived);
+
+        setPidsSupported();
+
+        ui->textTerminal->append("Supported Pids:");
+        for(auto &cmd: runtimeCommands)
+            ui->textTerminal->append(cmd);
+
         ui->textTerminal->append("<- initalized");
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
     {
         send(initializeCommands[commandOrder]);
+        appendPidsSupportedCommand(dataReceived);
         commandOrder++;
     }
 
-    if(m_initialized && !dataReceived.isEmpty())
+    if(m_initialized)
     {
         analysData(dataReceived);
     }
