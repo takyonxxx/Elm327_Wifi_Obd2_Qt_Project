@@ -3,52 +3,28 @@
 #include <QtCore>
 #include <QScreen>
 
-/* Details from http://en.wikipedia.org/wiki/OBD-II_PIDs */
 /*
-    0101-show current data
-    0102-show freeze frame data
-    0103-show stored diagnostic trouble code.
-    0104-Calculate load value
-    0105-Coolant temperatureEngine Coolant Temperature
-    010A-Fuel pressure
-    010B-Absolute inlet pressureIntake Manifold Absolute Pressure
-    010C-engine speedEngine RPM
-    010D-Vehicle speedVehicle Speed
-    010E-Ignition timingIgnition Timing Advance
-    010F-Intake temperatureIntake Air Temperature
-    0110-Air flowAir Flow Rate
-    0111-Throttle positionAbsolute Throttle Position
-    011F-Engine running timeTime Since Engine Start
-    0121-Mileage after fault lightDistance, Travelled, While, MIL, Is, Activated
-    0122-The fuel guide rail is relative to the manifold vacuum pressureFuel, Rail, Pressure, relative, to, manifold, vacuum
-    0123-Fuel guide pressure
-    012E-Instruction fuel vapor removal
-    012F-fuel level
-    0130-The number of empty car fault code
-    0131-Travel mileage after fault code is empty
-    0132-EVAPVapour pressure
-    0133-pressure
-    013C-Catalyst temperatureBank1Sensors1
-    013D--Catalyst temperatureBank2Sensors1
-    013E--Catalyst temperatureBank1Sensors2
-    013F--Catalyst temperatureBank2Sensors2
-    0142-Control module voltage
-    0143-Absolute load value
-    0144-Command equivalence ratio
-    0145-Relative position of throttle
-    0146-ambient temperature
-    0147-Throttle absolute positionB
-    0148-Throttle absolute positionC
-    0149-Accelerator pedal positionD
-    014A-Accelerator pedal positionE
-    014B-Accelerator pedal positionF
-    014C-Throttle ratio of instructions
-    014D-MILHow many minutes does the engine run after the light is on?
-    014E-Run time after the fault code code is empty
-    0153-EVAPAbsolute steam pressure
-    0154-EVAPSystem steam pressure
-    0159-Fuel guide absolute pressure
-    015A-Relative accelerator pedal position
+PID Description  Renault / Dacia
+00 PIDs supported [01 - 20]
+01 Monitor status since DTCs cleared. (Includes malfunction indicator lamp (MIL) status and number of DTCs.)
+05 Engine coolant temperature
+0B Intake manifold absolute pressure
+0C Engine RPM
+0D Vehicle speed
+0F Intake air temperature
+10 MAF air flow rate
+11 Throttle position (this one seems wonky as it fluctuates all over the place)
+1C OBD standards this vehicle conforms to
+20 PIDs supported [21 - 40]
+21 Distance travelled with malfunction indicator lamp (MIL) on (yes)
+23 Fuel rail Pressure (diesel, or gasoline direct inject)
+31 Distance traveled since codes cleared (yes, available, but most / “no” stealership has been reported “looking”)
+42 Control module voltage ((A*256)+B)/1000
+4D Time run with MIL on (yes) ((A*256)+B)
+4E Time since trouble codes cleared (yes, available, but most / “no” stealership has been reported “looking”)((A*256)+B)
+50 Maximum value for air flow rate from mass air flow sensor A*10
+61 Driver's demand engine - percent torque A-125
+62 Actual engine - percent torque A-125
 */
 
 template <typename T>
@@ -69,7 +45,7 @@ static QString DEFAULT = "ATD",
 RESET = "ATZ",
 END_LINE = "\r",
 SET_ALL_DEFAULT = "ATD",
-SOFTRESET = "ATWS",
+SOFT_RESET = "ATWS",
 INFO = "ATI",
 MONITOR_ALL = "ATMA",
 ALLOW_LONG_MESSAGE = "ATAL",
@@ -96,7 +72,7 @@ PIDS_SUPPORTED40 = "0120", //PIDs supported [21 - 40]
 PIDS_SUPPORTED60 = "0140", //PIDs supported [41 - 60]
 PIDS_SUPPORTED80 = "0160", //PIDs supported [61 - 80]
 PIDS_SUPPORTEDA0 = "0180", //PIDs supported [81 - A0]
-ENGINE_COOLANT_TEMP = "0105",  //A-40
+COOLANT_TEMP = "0105",  //A-40
 ENGINE_RPM = "010C",  //((A*256)+B)/4
 ENGINE_LOAD = "0104",  // A*100/255
 VEHICLE_SPEED = "010D",  //A
@@ -115,14 +91,15 @@ STATUS_DTC = "0101", //Status since DTC Cleared
 THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
 OBD_STANDARDS = "011C", //OBD standards this vehicle
 FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
+PEDAL_POSITION = "015A", //Relative accelerator pedal position 0 -100 % A*100/255
+DISTANCE_TRAVALED = "0131", //Distance traveled since codes cleared  256A+B
+ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
 REQUEST_TROUBLE = "03", //Request trouble codes
-CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
-PEDAL_POSITION = "015A"; //Relative accelerator pedal position 0 -100 % A*100/255
+CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
-static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL,
-            PIDS_SUPPORTED20, PIDS_SUPPORTED40, PIDS_SUPPORTED60, PIDS_SUPPORTED80, PIDS_SUPPORTEDA0};
+static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
 
-static QStringList runtimeCommands{VOLTAGE};
+static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, ACTUAL_TORQUE};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 

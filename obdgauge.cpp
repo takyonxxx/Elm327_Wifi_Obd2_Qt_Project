@@ -284,13 +284,12 @@ void ObdGauge::dataReceived(QString &dataReceived)
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
 
-    if(gaugeCommands.size() == commandOrder)
+    if(gaugeCommands.size() >= commandOrder)
     {
         commandOrder = 0;
         send(gaugeCommands[commandOrder]);
     }
-
-    if(commandOrder < gaugeCommands.size())
+    else
     {
         send(gaugeCommands[commandOrder]);
         commandOrder++;
@@ -329,9 +328,7 @@ void ObdGauge::on_pushSim_clicked()
 }
 
 void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
-{
-    qDebug() << "Orientation:" << orientation;
-
+{  
     switch (orientation) {
     case Qt::ScreenOrientation::PortraitOrientation:
         ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);

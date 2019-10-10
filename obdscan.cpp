@@ -34,8 +34,8 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelDistanceTraveledTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelDistanceTraveled->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelActualTorqueTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelActualTorque->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
@@ -45,7 +45,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
-                                      + "\nl / 100km");
+                                      + "\nl / h");
 
     ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
@@ -95,6 +95,7 @@ void ObdScan::send(QString &data)
     if(!mRunning)return;
 
     if(!m_networkManager->isConnected())return;
+
     m_networkManager->send(data);
     ui->labelStatus->setText(data);
 }
@@ -107,13 +108,12 @@ void ObdScan::dataReceived(QString &dataReceived)
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
 
-    if(runtimeCommands.size() == commandOrder)
+    if(runtimeCommands.size() >= commandOrder)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
     }
-
-    if(commandOrder < runtimeCommands.size())
+    else
     {
         send(runtimeCommands[commandOrder]);
         commandOrder++;
@@ -204,7 +204,6 @@ void ObdScan::analysData(const QString &dataReceived)
         case 49://PID(31) Distance traveled since codes cleared
             //((A*256)+B) km
             value = ((A*256)+B);
-            ui->labelDistanceTraveled->setText(QString::number(value) + " km");
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]
@@ -223,36 +222,30 @@ void ObdScan::analysData(const QString &dataReceived)
             value = ((A*256)+B) / 20;
             ui->labelFuelConsumption->setText(QString::number(value, 'f', 1) + " L/h");
             break;
+        case 98://PID(62) Actual engine - percent torque
+            // A-125
+            value = A-125;
+            ui->labelActualTorque->setText(QString::number(value, 'f', 0) + " %");
+            break;
         default:
             //A
             value = A;
             break;
         }
 
-        if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED, THROTTLE
+        if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
         {
             auto AL = mMAF * mLoad;                                 // Airflow * Load
             auto coeff = 0.0021;                                    // Fuel flow coefficient
             auto LH = AL * coeff + EngineDisplacement / 1000;       // Fuel flow L/h
-
-            if(mLoad == 0)
-            {
-                mFuelConsumption = 0;
-            }
-            else if(mSpeed == 0 || mLoad <= 25)
-            {
-                mFuelConsumption = LH / 2;
-            }
-            else
-            {
-                mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
-            }
+            mFuelConsumption = LH / 2;                              // Correction for renault dacia
+            //mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
 
             mAvarageFuelConsumption.append(mFuelConsumption);
             ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                               + " / "
                                               + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\nl / 100km");
+                                              + "\nl / h");
         }
     }
     else

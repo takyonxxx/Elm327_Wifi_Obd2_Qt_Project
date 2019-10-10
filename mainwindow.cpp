@@ -274,7 +274,6 @@ void MainWindow::appendPidsSupportedCommand(const QString &dataReceived)
 void MainWindow::setPidsSupported()
 {
     cmds.clear();
-    runtimeCommands.clear();
 
     for (auto &command: pidsSupportedCommands)
     {
@@ -295,9 +294,7 @@ void MainWindow::setPidsSupported()
 
                 hexadecimal.setNum(val,16);
                 if(hexadecimal.length() %2)hexadecimal.insert(0,QLatin1String("0"));
-                auto supportedCommand = QString("01" + hexadecimal.toUpper());
-                if(i == 0)
-                    runtimeCommands.append(supportedCommand);
+                auto supportedCommand = QString("01" + hexadecimal.toUpper());                
             }
         }
     }
@@ -349,21 +346,12 @@ void MainWindow::dataReceived(QString &dataReceived)
     {
         m_initialized = true;
         commandOrder = 0;
-        appendPidsSupportedCommand(dataReceived);
-
-        setPidsSupported();
-
-        ui->textTerminal->append("Supported Pids:");
-        for(auto &cmd: runtimeCommands)
-            ui->textTerminal->append(cmd);
-
         ui->textTerminal->append("<- initalized");
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
     {
-        send(initializeCommands[commandOrder]);
-        appendPidsSupportedCommand(dataReceived);
+        send(initializeCommands[commandOrder]);        
         commandOrder++;
     }
 
