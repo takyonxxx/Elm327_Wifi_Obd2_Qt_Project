@@ -7,10 +7,11 @@ ELM327 is one of a family of OBD translators from ELM Electronics. Other variant
 
 <b>ELM327 AT COMMANDS</b></br>
 
-<b>Service 03 :</b> Read diagnostic trouble codes, both generic and manufacturer-specific, and display their meaning.</br>
-<b>Service 04 :</b> Clear trouble codes and turn off the MIL</br>
 <b>Service 01 :</b> Display current sensor data</br>
-<b>PID Description  Renault / Dacia</b></br>
+<b>Service 03 :</b> Read diagnostic trouble codes, both generic and manufacturer-specific, and display their meaning.</br>
+<b>Service 04 :</b> Clear trouble codes and turn off the MIL</br></br>
+
+<b>PID Description (Service 01)  Renault / Dacia</b></br>
 00 PIDs supported [01 - 20]</br>
 01 Monitor status since DTCs cleared. </br>
 05 Engine coolant temperature</br>
