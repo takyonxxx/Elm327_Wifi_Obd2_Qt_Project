@@ -10,21 +10,27 @@ ELM327 is one of a family of OBD translators from ELM Electronics. Other variant
 Read diagnostic trouble codes, both generic and manufacturer-specific, and display their meaning (over 3000 generic code definitions in the database).</br>
 Clear trouble codes and turn off the MIL ("Malfunction Indicator Light", more commonly known as the "Check Engine Light")</br>
 Display current sensor data</br>
-Engine RPM</br>
-Calculated Load Value</br>
-Coolant Temperature</br>
-Fuel System Status</br>
-Vehicle Speed</br>
-Short Term Fuel Trim</br>
-Long Term Fuel Trim</br>
-Intake Manifold Pressure</br>
-Timing Advance</br>
-Intake Air Temperature</br>
-Air Flow Rate</br>
-Absolute Throttle Position</br>
-Oxygen sensor voltages/associated short term fuel trims</br>
-Fuel System status</br>
-Fuel Pressure</br>
+PID Description  Renault / Dacia</br>
+00 PIDs supported [01 - 20]</br>
+01 Monitor status since DTCs cleared. </br>
+05 Engine coolant temperature</br>
+0B Intake manifold absolute pressure</br>
+0C Engine RPM</br>
+0D Vehicle speed</br>
+0F Intake air temperature</br>
+10 MAF air flow rate</br>
+11 Throttle position </br>
+1C OBD standards this vehicle conforms to</br>
+20 PIDs supported [21 - 40]</br>
+21 Distance travelled with malfunction indicator lamp (MIL) on (yes)</br>
+23 Fuel rail Pressure (diesel, or gasoline direct inject)</br>
+31 Distance traveled since codes cleared </br>
+42 Control module voltage </br>
+4D Time run with MIL on (yes) </br>
+4E Time since trouble codes cleared </br>
+50 Maximum value for air flow rate from mass air flow sensor </br>
+61 Driver's demand engine - percent torque </br>
+62 Actual engine - percent torque </br>
 
 <p align="center"><a href="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg">
 		<img src="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg" 
