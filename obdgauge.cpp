@@ -284,7 +284,7 @@ void ObdGauge::dataReceived(QString &dataReceived)
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
 
-    if(gaugeCommands.size() >= commandOrder)
+    if(gaugeCommands.size() == commandOrder)
     {
         commandOrder = 0;
         send(gaugeCommands[commandOrder]);

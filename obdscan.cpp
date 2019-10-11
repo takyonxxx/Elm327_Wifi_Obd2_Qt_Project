@@ -102,13 +102,14 @@ void ObdScan::send(QString &data)
 
 
 void ObdScan::dataReceived(QString &dataReceived)
-{   
+{
+
     if(!mRunning)return;
 
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
 
-    if(runtimeCommands.size() >= commandOrder)
+    if(runtimeCommands.size() == commandOrder)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
@@ -120,6 +121,7 @@ void ObdScan::dataReceived(QString &dataReceived)
     }
 
     analysData(dataReceived);
+
 }
 
 void ObdScan::analysData(const QString &dataReceived)
