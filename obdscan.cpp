@@ -34,9 +34,6 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelManifoldPressureTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelManifoldPressure->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
 
-    ui->labelActualTorqueTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelActualTorque->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
-
     ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black; padding: 2px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
     ui->comboEngineDisplacement->setCurrentIndex(1);
@@ -227,7 +224,6 @@ void ObdScan::analysData(const QString &dataReceived)
         case 98://PID(62) Actual engine - percent torque
             // A-125
             value = A-125;
-            ui->labelActualTorque->setText(QString::number(value, 'f', 0) + " %");
             break;
         default:
             //A
