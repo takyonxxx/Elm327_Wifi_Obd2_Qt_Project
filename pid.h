@@ -83,6 +83,7 @@ ENGINE_OIL_TEMP = "015C",  //A-40
 FUEL_PRESSURE = "010A",  // A*3
 FUEL_RAIL_LOW_PRESSURE = "0122", // ((A*256)+B)*0.079
 FUEL_RAIL_HIGH_PRESSURE = "0123", // ((A*256)+B) * 10
+FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 INTAKE_MAN_PRESSURE = "010B", //Intake manifold absolute pressure 0 - 255 kPa
 CONT_MODULE_VOLT = "0142",  //((A*256)+B)/1000
 AMBIENT_AIR_TEMP = "0146",  //A-40
@@ -90,7 +91,6 @@ CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
 STATUS_DTC = "0101", //Status since DTC Cleared
 THROTTLE_POSITION = "0111", //Throttle position 0 -100 % A*100/255
 OBD_STANDARDS = "011C", //OBD standards this vehicle
-FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
 PEDAL_POSITION = "015A", //Relative accelerator pedal position 0 -100 % A*100/255
 DISTANCE_TRAVALED = "0131", //Distance traveled since codes cleared  256A+B
 ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
@@ -99,7 +99,7 @@ CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) /
 
 static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
 
-static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, ACTUAL_TORQUE};
+static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, INTAKE_AIR_TEMP, MAF_AIR_FLOW, MAN_ABSOLUTE_PRESSURE, FUEL_RATE};
 
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 

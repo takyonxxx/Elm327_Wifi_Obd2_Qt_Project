@@ -26,139 +26,125 @@
          <number>6</number>
         </property>
         <item row="0" column="0">
-         <widget class="QLabel" name="labelVoltTitle">
-          <property name="text">
-           <string>Volt: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="labelVolt">
-          <property name="text">
-           <string>0.0 V</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
          <widget class="QLabel" name="labelRpmTitle">
           <property name="text">
            <string>Rpm:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="0" column="1">
          <widget class="QLabel" name="labelRpm">
           <property name="text">
            <string>0 rpm</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="labelLoadTitle">
           <property name="text">
            <string>Engine Load:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QLabel" name="labelLoad">
           <property name="text">
            <string>0 %</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="labelSpeedTitle">
           <property name="text">
            <string>Speed:</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <widget class="QLabel" name="labelSpeed">
           <property name="text">
            <string>0 km/h</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="labelCoolantTitle">
           <property name="text">
            <string>Coolant Temp:</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="1">
          <widget class="QLabel" name="labelCoolant">
           <property name="text">
            <string>0 C°</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="labelIntakeAirTempTitle">
           <property name="text">
            <string>Intake Air Temp:</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="4" column="1">
          <widget class="QLabel" name="labelIntakeAirTemp">
           <property name="text">
            <string>0 C°</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="labelMafAirFlowTitle">
           <property name="text">
            <string>Maf Air Flow:</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="5" column="1">
          <widget class="QLabel" name="labelMafAirFlow">
           <property name="text">
            <string>0 g/s</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="labelManifoldPressureTitle">
           <property name="text">
            <string>Manifold Pressure:</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="6" column="1">
          <widget class="QLabel" name="labelManifoldPressure">
           <property name="text">
            <string>0 kPa</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="labelStatusTitle">
           <property name="text">
            <string>Command Sending:</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="7" column="1">
          <widget class="QLabel" name="labelStatus">
           <property name="text">
            <string>-</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
+        <item row="8" column="0">
          <widget class="QLabel" name="labelEngineDisplacement">
           <property name="text">
            <string>Engine Displacement:</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
+        <item row="8" column="1">
          <widget class="QComboBox" name="comboEngineDisplacement">
           <item>
            <property name="text">
@@ -208,6 +194,16 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelVoltage">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="labelFuelConsumption">

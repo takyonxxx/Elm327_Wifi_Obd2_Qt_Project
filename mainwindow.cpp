@@ -75,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
 
+    ui->pushConnect->setFocus();
+
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
     keep_screen_on(true);
