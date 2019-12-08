@@ -81,8 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
     keep_screen_on(true);
 #endif
-        
-    QApplication.focusWidget().clearFocus()    
+
 }
 
 MainWindow::~MainWindow()
