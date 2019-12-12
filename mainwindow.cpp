@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QRect desktopRect = QApplication::desktop()->availableGeometry(this);
 
-    if(osName() != "windows")
+    if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
     m_networkManager = NetworkManager::getInstance();
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushConnect->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;");
     ui->pushSend->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushDiagnostic->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
+    ui->pushDiagnostic->setStyleSheet("font-size: 46pt; font-weight: bold; color: white;background-color: #17560B;");
     ui->pushScan->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushGauge->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
     ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");

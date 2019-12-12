@@ -103,6 +103,19 @@
        <widget class="QTextBrowser" name="textTerminal"/>
       </item>
       <item>
+       <widget class="QPushButton" name="pushDiagnostic">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Clear Fault</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalSendEdit">
         <item>
          <widget class="QTextEdit" name="textSend">
@@ -149,19 +162,6 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalDiagnostic">
-        <item>
-         <widget class="QPushButton" name="pushDiagnostic">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Clear Fault</string>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QPushButton" name="pushGauge">
           <property name="maximumSize">
@@ -230,7 +230,7 @@
      <x>0</x>
      <y>0</y>
      <width>544</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
