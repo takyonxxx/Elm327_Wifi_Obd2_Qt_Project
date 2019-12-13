@@ -20,7 +20,7 @@ NetworkManager::NetworkManager()
     {
         connect(socket,&QTcpSocket::connected,this, &NetworkManager::connected);
         connect(socket,&QTcpSocket::disconnected,this,&NetworkManager::disconnected);
-        connect(socket,&QTcpSocket::readyRead,this,&NetworkManager::readed);
+        connect(socket,&QTcpSocket::readyRead,this,&NetworkManager::readyRead);
         connect(socket,&QTcpSocket::stateChanged,this,&NetworkManager::stateChange);
         connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(error(QAbstractSocket::SocketError)));
     }
@@ -28,10 +28,12 @@ NetworkManager::NetworkManager()
 
 NetworkManager::~NetworkManager()
 {
+    socket->disconnectFromHost();
+    socket->waitForDisconnected();
     delete socket;
 }
 
-void NetworkManager::send(QString &string)
+bool NetworkManager::send(QString &string)
 {
     if(socket->isOpen())
     {
@@ -41,7 +43,10 @@ void NetworkManager::send(QString &string)
         out << string.trimmed();
         out << "\r";
         socket->write(block);
+        return socket->waitForBytesWritten();
     }
+    else
+        return false;
 }
 
 void NetworkManager::connected()
@@ -87,15 +92,33 @@ void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
     emit stateChanged(state);
 }
 
-QString NetworkManager::readData()
+QString NetworkManager::readData(QString &command)
 {
-    auto received = socket->readAll();
-    auto strData = QString::fromStdString(received.toStdString());
+    customRead = true;
+    QString strData{};
+    if(send(command))
+    {
+        while (socket->bytesAvailable() > 0)
+        {
+            if (!socket->waitForReadyRead())
+            {
+                    qDebug() << "waitForReadyRead() timed out";
+                    return strData;
+            }
+
+            auto received = socket->readAll();
+            auto strData = QString::fromStdString(received.toStdString());
+        }
+    }
+    customRead = false;
     return strData;
 }
 
-void NetworkManager::readed()
-{
+void NetworkManager::readyRead()
+{   
+    if(customRead)
+        return;
+
     auto received = socket->readAll();
     auto strData = QString::fromStdString(received.toStdString());
 

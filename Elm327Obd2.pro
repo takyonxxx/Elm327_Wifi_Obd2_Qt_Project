@@ -34,6 +34,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        elm.cpp \
         main.cpp \
         mainwindow.cpp \
         methods.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
         qcgaugewidget.cpp
 
 HEADERS += \
+        elm.h \
         mainwindow.h \
         methods.h \
         networkmanager.h \

@@ -16,6 +16,7 @@
 #include <QAndroidJniObject>
 #include <QtAndroid>
 #endif
+#include "elm.h"
 
 namespace Ui {
 class MainWindow;
@@ -90,7 +91,7 @@ public:
 private:
     void send(QString &string);
     void analysData(const QString &);
-    void setPidsSupported();
+    void getPidsSupported();
     void appendPidsSupportedCommand(const QString &command);
     QStringList pidsSupportedCommands{};
 #ifdef Q_OS_ANDROID

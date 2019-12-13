@@ -167,7 +167,7 @@ void MainWindow::connected()
 }
 
 void MainWindow::disconnected()
-{   
+{
     ui->pushSend->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->pushGauge->setEnabled(false);
@@ -217,13 +217,36 @@ void MainWindow::on_pushClear_clicked()
 
 void MainWindow::on_pushDiagnostic_clicked()
 {
+    ELM elm{};
+
     ui->textTerminal->clear();
     //0x03 : show stored diagnostic trouble code.
     //0x04 : clear diagnostic trouble code.
-    m_clearCodeRequest = true;
+    /*m_clearCodeRequest = true;
     ui->textTerminal->append("The trouble codes requested.");
     QString text(REQUEST_TROUBLE);
-    send(text);
+    send(text);*/
+
+    auto vin = elm.get_vin();
+    auto ecu = elm.get_ecu();
+    auto voltage = elm.get_voltage();
+    auto protocol = elm.get_protocol();
+
+    ui->textTerminal->append("vin: " + vin);
+    ui->textTerminal->append("ecu: " + ecu);
+    ui->textTerminal->append("voltage: " + voltage);
+    ui->textTerminal->append("protocol: " + protocol);
+
+
+    QString dtc = elm.get_dtc();
+    ui->textTerminal->append("DTCs: " + dtc);
+
+    bool is_cleared = elm.clear_dtc();
+    if(is_cleared) {
+        ui->textTerminal->append("DTCs cleared.");
+    } else {
+        ui->textTerminal->append("Oops, DTCs not cleared.");
+    }
 }
 
 void MainWindow::on_close_dialog_triggered()
@@ -276,33 +299,11 @@ void MainWindow::appendPidsSupportedCommand(const QString &dataReceived)
     }
 }
 
-void MainWindow::setPidsSupported()
+void MainWindow::getPidsSupported()
 {
-    cmds.clear();
-
-    for (auto &command: pidsSupportedCommands)
-    {
-        bool ok;    // hex == 255, ok == true
-        uint  dec = command.toUInt(&ok,16);
-        cmds.push_back(static_cast<uint32_t>(dec));
-
-        vector<vector<uint32_t> > _PIDs{};
-
-        for (int i = 0; i < cmds.size(); i++) {
-            _PIDs.push_back(decode_car_cmds(cmds));
-        }
-
-        for (uint32_t i = 0; i < _PIDs.size(); i++) {
-            for (uint32_t j = 0; j < _PIDs[i].size(); j++) {
-                QString hexadecimal;
-                auto val =_PIDs[i][j];
-
-                hexadecimal.setNum(val,16);
-                if(hexadecimal.length() %2)hexadecimal.insert(0,QLatin1String("0"));
-                auto supportedCommand = QString("01" + hexadecimal.toUpper());                
-            }
-        }
-    }
+    ELM elm{};
+    QString supportedPIDs = elm.get_available_pids();
+    ui->textTerminal->append("PIDs supported: " + supportedPIDs);
 }
 
 void MainWindow::analysData(const QString &dataReceived)
@@ -338,25 +339,24 @@ void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
+    if(!dataReceived.isEmpty())
+        ui->textTerminal->append("<- " + dataReceived);
+
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
-
-    if(!m_HexEnabled)
-    {
-        if(!dataReceived.isEmpty())
-            ui->textTerminal->append("<- " + dataReceived);
-    }
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         m_initialized = true;
         commandOrder = 0;
         ui->textTerminal->append("<- initalized");
+
+        getPidsSupported();
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
     {
-        send(initializeCommands[commandOrder]);        
+        send(initializeCommands[commandOrder]);
         commandOrder++;
     }
 

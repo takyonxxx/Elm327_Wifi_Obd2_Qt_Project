@@ -25,24 +25,23 @@ public: signals:
 private slots:
     void connected();
     void disconnected();
-    void readed();
+    void readyRead();
     void error(QAbstractSocket::SocketError);
     void stateChange(QAbstractSocket::SocketState);
 
-
 public:
-    void send(QString &string);
+    bool send(QString &string);
     void connectWifi(const QString &, int );
     void disconnectWifi();
     bool isConnected();
-    QString readData();
+    QString readData(QString &);
 
 private:
     QString statetoString(QAbstractSocket::SocketState);
-
     static NetworkManager* theInstance_;
     QTcpSocket *socket{nullptr};
     bool m_connected{false};
+    bool customRead {false};
 };
 
 #endif // NETWORKMANAGER_H
