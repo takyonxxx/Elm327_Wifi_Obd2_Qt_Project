@@ -87,6 +87,13 @@ void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
     emit stateChanged(state);
 }
 
+QString NetworkManager::readData()
+{
+    auto received = socket->readAll();
+    auto strData = QString::fromStdString(received.toStdString());
+    return strData;
+}
+
 void NetworkManager::readed()
 {
     auto received = socket->readAll();

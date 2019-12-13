@@ -36,9 +36,7 @@ private:
 private slots:
     void on_pushExit_clicked();    
     void dataReceived(QString &);
-
     void on_pushClear_clicked();
-
     void on_comboEngineDisplacement_currentIndexChanged(const QString &arg1);
 
 signals:

@@ -35,6 +35,7 @@ public:
     void connectWifi(const QString &, int );
     void disconnectWifi();
     bool isConnected();
+    QString readData();
 
 private:
     QString statetoString(QAbstractSocket::SocketState);
