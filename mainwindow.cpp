@@ -32,17 +32,19 @@ MainWindow::MainWindow(QWidget *parent) :
     else
         ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color:#074666;");
-    ui->pushSend->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushClear->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushDiagnostic->setStyleSheet("font-size: 46pt; font-weight: bold; color: white;background-color: #17560B;");
-    ui->pushScan->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushGauge->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushExit->setStyleSheet("font-size: 16pt; font-weight: bold; color: white;background-color: #8F3A3A;");
-    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666");
-    ui->labelPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
-    ui->checkHex->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666;");
-    ui->textSend->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; background-color: #E7E0CD;");
+    ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 2px;");
+    ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 2px;");
+    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px;");
+    ui->pushDiagnostic->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px;");
+    ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
+    ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
+    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 2px;");
+    ui->labelIp->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->labelPort->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->portEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->checkHex->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
 
 #ifdef Q_OS_ANDROID
     ui->textSend->setMinimumHeight(100);

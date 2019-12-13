@@ -8,36 +8,30 @@ ObdScan::ObdScan(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setWindowTitle("Elm327 Obd2");
+    setWindowTitle("Elm327 Obd2");   
 
-    ui->labelVoltage->setStyleSheet("font-size: 56pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelRpmTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelRpm->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
 
-    ui->labelRpmTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelRpm->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelLoadTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelLoad->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD;background-color: #043652;  padding: 2px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelLoad->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelSpeedTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelSpeed->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
 
-    ui->labelSpeedTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelSpeed->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelCoolantTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelCoolant->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
 
-    ui->labelCoolantTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelCoolant->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 36pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
+    ui->comboEngineDisplacement->setCurrentIndex(2);
 
-    ui->labelIntakeAirTempTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelIntakeAirTemp->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 36t; font-weight: bold; color: #D7DBDD; background-color:#074666;;  padding: 2px;");
 
-    ui->labelMafAirFlowTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelMafAirFlow->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
+    ui->labelVoltage->setStyleSheet("font-size: 64pt; font-weight: bold; color: #D1F2EB; background-color: #043652;  padding: 2px;");
 
-    ui->labelManifoldPressureTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelManifoldPressure->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #900C3F;  padding: 2px;");
-
-    ui->labelEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
-    ui->comboEngineDisplacement->setCurrentIndex(1);
-
-    ui->labelFuelConsumption->setStyleSheet("font: 56pt 'Trebuchet MS'; font-weight: bold; color: white; background-color: #900C3F;  padding: 2px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 56pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB; background-color: #043652;  padding: 2px;");
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
@@ -45,11 +39,9 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
 
-    ui->pushClear->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #074666;");
-    ui->pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #8F3A3A;");
+    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #074666;padding: 2px;");
+    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A;padding: 2px;");
 
-    ui->labelStatusTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelStatus->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#074666;;  padding: 2px;");
 
     ui->labelFuelConsumption->setFocus();
 
@@ -161,8 +153,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 11://PID(0B): Manifold Absolute Pressure
             // A - 40
-            value = A;
-            ui->labelManifoldPressure->setText(QString::number(value, 'f', 0) + " kPa");
+            value = A;           
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
@@ -176,14 +167,11 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 15://PID(0F): Intake Air Temperature
             // A - 40
-            value = A - 40;
-            ui->labelIntakeAirTemp->setText(QString::number(value, 'f', 0) + " C°");
+            value = A - 40;           
             break;
         case 16://PID(10): MAF air flow rate grams/sec
             // ((256*A)+B) / 100  [g/s]
             mMAF = ((256 * A) + B) / 100;
-            ui->labelMafAirFlow->setText(QString::number(mMAF) + " g/s");
-            //
             break;
         case 17://PID(11): Throttle position
             // (100 * A) / 255 %
@@ -275,7 +263,7 @@ void ObdScan::on_pushClear_clicked()
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
-                                      + "\nl / 100km");
+                                      + "\nl / h");
     mAvarageFuelConsumption.clear();
 }
 
