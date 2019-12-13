@@ -219,12 +219,12 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
-            mFuelConsumption = ((A*256)+B) / 20;
+            /*mFuelConsumption = ((A*256)+B) / 20;
             mAvarageFuelConsumption.append(mFuelConsumption);
             ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                               + " / "
                                               + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\nl / h");
+                                              + "\nl / h");*/
             break;
         case 98://PID(62) Actual engine - percent torque
             // A-125
@@ -236,7 +236,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         }
 
-        /*if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
+        if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
         {
             auto AL = mMAF * mLoad;                                 // Airflow * Load
             auto coeff = 0.0021;                                    // Fuel flow coefficient
@@ -249,7 +249,7 @@ void ObdScan::analysData(const QString &dataReceived)
                                               + " / "
                                               + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
                                               + "\nl / h");
-        }*/
+        }
     }
     else
     {
