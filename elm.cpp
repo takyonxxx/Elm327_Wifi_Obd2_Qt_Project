@@ -88,6 +88,8 @@ void ELM::update_available_pidset(qint8 set)
     // Get first set of pids
     std::string seq1 = AT(cmd1).toStdString();
 
+    if(QString(seq1.c_str()).isEmpty())
+        return;
 
     // trim to continuous 32bit hex string
     std::string part1 = seq1.substr(6,8);

@@ -217,36 +217,13 @@ void MainWindow::on_pushClear_clicked()
 
 void MainWindow::on_pushDiagnostic_clicked()
 {
-    ELM elm{};
-
     ui->textTerminal->clear();
     //0x03 : show stored diagnostic trouble code.
     //0x04 : clear diagnostic trouble code.
-    /*m_clearCodeRequest = true;
+    m_clearCodeRequest = true;
     ui->textTerminal->append("The trouble codes requested.");
     QString text(REQUEST_TROUBLE);
-    send(text);*/
-
-    auto vin = elm.get_vin();
-    auto ecu = elm.get_ecu();
-    auto voltage = elm.get_voltage();
-    auto protocol = elm.get_protocol();
-
-    ui->textTerminal->append("vin: " + vin);
-    ui->textTerminal->append("ecu: " + ecu);
-    ui->textTerminal->append("voltage: " + voltage);
-    ui->textTerminal->append("protocol: " + protocol);
-
-
-    QString dtc = elm.get_dtc();
-    ui->textTerminal->append("DTCs: " + dtc);
-
-    bool is_cleared = elm.clear_dtc();
-    if(is_cleared) {
-        ui->textTerminal->append("DTCs cleared.");
-    } else {
-        ui->textTerminal->append("Oops, DTCs not cleared.");
-    }
+    send(text);
 }
 
 void MainWindow::on_close_dialog_triggered()
@@ -339,8 +316,8 @@ void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
-    if(!dataReceived.isEmpty())
-        ui->textTerminal->append("<- " + dataReceived);
+    /*if(!dataReceived.isEmpty())
+        ui->textTerminal->append("<- " + dataReceived);*/
 
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
@@ -350,8 +327,6 @@ void MainWindow::dataReceived(QString &dataReceived)
         m_initialized = true;
         commandOrder = 0;
         ui->textTerminal->append("<- initalized");
-
-        getPidsSupported();
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
