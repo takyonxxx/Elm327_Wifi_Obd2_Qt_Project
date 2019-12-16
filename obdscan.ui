@@ -84,7 +84,7 @@
         <item row="4" column="0">
          <widget class="QLabel" name="labelStatusTitle">
           <property name="text">
-           <string>Command Sending:</string>
+           <string>Command:</string>
           </property>
          </widget>
         </item>
@@ -98,7 +98,7 @@
         <item row="5" column="0">
          <widget class="QLabel" name="labelEngineDisplacement">
           <property name="text">
-           <string>Engine Displacement:</string>
+           <string>Displacement:</string>
           </property>
          </widget>
         </item>

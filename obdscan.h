@@ -20,13 +20,14 @@ public:
 private:
     NetworkManager *m_networkManager;
     int commandOrder{0};
-    bool mRunning{false};    
+    bool mRunning{false};
+    bool getFuelPid{false};
     int mSpeed{0};
     int mRpm{0};
     int mLoad{0};
     int mMAF{0};
     int mTPos{0};
-    qreal mFuelConsumption{0.0};
+    qreal mFuelConsumption{0.0};    
     QVector<qreal> mAvarageFuelConsumption{};
 
     void send(QString &);

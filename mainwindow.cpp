@@ -290,16 +290,21 @@ void MainWindow::analysData(const QString &dataReceived)
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
-    bool valid;
+    ELM elm{};
 
-    QString tmpmsg{};
+    std::vector<QString> vec;
+    auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(dataReceived.startsWith(QString("41")))
+    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive))
     {
-        tmpmsg = dataReceived.mid(0, dataReceived.length());
-        PID = tmpmsg.mid(2,2).toUInt(&valid,16);
-        A = tmpmsg.mid(4,2).toUInt(&valid,16);
-        B = tmpmsg.mid(6,2).toUInt(&valid,16);
+        PID =std::stoi(resp[3].toStdString(),nullptr,16);
+        std::vector<QString> vec;
+        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        if(vec.size()>=2)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = std::stoi(vec[1].toStdString(),nullptr,16);
+        }
 
         ui->textTerminal->append("Value of A: " + QString::number(A)+ " B: " + QString::number(B));
     }
@@ -310,14 +315,45 @@ void MainWindow::analysData(const QString &dataReceived)
             ui->textTerminal->append("Volt: " + dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
         }
     }
+
+    if(m_clearCodeRequest)
+    {
+
+        //number of dtc & mil
+        if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive) && !resp[3].compare("01",Qt::CaseInsensitive))
+        {
+            vec.insert(vec.begin(),resp.begin()+4, resp.end());
+            std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);
+            ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + dtcNumber.second);
+        }
+        //dtc codes
+        if(resp.size()>2 && !resp[1].compare("43",Qt::CaseInsensitive))
+        {
+           vec.insert(vec.begin(),resp.begin()+1, resp.end());
+           std::vector<QString> dtcCodes( elm.decodeDTC(vec));
+           if(dtcCodes.size()>0)
+           {
+               for(auto &code : dtcCodes)
+               {
+
+                   ui->textTerminal->append(code);
+               }
+           }
+        }
+
+        ui->textTerminal->append("Clearing the trouble codes.");
+        QString text(CLEAR_TROUBLE);
+        send(text);
+        m_clearCodeRequest = false;
+    }
 }
 
 void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
 
-    /*if(!dataReceived.isEmpty())
-        ui->textTerminal->append("<- " + dataReceived);*/
+    if(!dataReceived.isEmpty())
+        ui->textTerminal->append("<- " + dataReceived);
 
     if(dataReceived.toUpper().contains("SEARCHING"))
         return;
@@ -338,13 +374,5 @@ void MainWindow::dataReceived(QString &dataReceived)
     if(m_initialized)
     {
         analysData(dataReceived);
-    }
-
-    if(m_clearCodeRequest)
-    {
-        ui->textTerminal->append("Clearing the trouble codes.");
-        QString text(CLEAR_TROUBLE);
-        send(text);
-        m_clearCodeRequest = false;
     }
 }

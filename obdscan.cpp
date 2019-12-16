@@ -1,6 +1,7 @@
 #include "obdscan.h"
 #include "ui_obdscan.h"
 #include "pid.h"
+#include "elm.h"
 
 ObdScan::ObdScan(QWidget *parent) :
     QMainWindow(parent),
@@ -8,7 +9,7 @@ ObdScan::ObdScan(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setWindowTitle("Elm327 Obd2");   
+    setWindowTitle("Elm327 Obd2");
 
     ui->labelRpmTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelRpm->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
@@ -27,7 +28,7 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->comboEngineDisplacement->setCurrentIndex(2);
 
     ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelStatus->setStyleSheet("font-size: 36t; font-weight: bold; color: #D7DBDD; background-color:#074666;;  padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color:#074666;;  padding: 2px;");
 
     ui->labelVoltage->setStyleSheet("font-size: 64pt; font-weight: bold; color: #D1F2EB; background-color: #043652;  padding: 2px;");
 
@@ -122,17 +123,21 @@ void ObdScan::analysData(const QString &dataReceived)
     unsigned B = 0;
     unsigned PID = 0;
     double value = 0;
-    bool valid;
+    ELM elm{};
 
-    QString tmpmsg{};
+    std::vector<QString> vec;
+    auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(dataReceived.startsWith(QString("41")))
+    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive))
     {
-        tmpmsg = dataReceived.mid(0, dataReceived.length());
-
-        PID = tmpmsg.mid(2,2).toUInt(&valid,16);
-        A = tmpmsg.mid(4,2).toUInt(&valid,16);
-        B = tmpmsg.mid(6,2).toUInt(&valid,16);
+        PID =std::stoi(resp[3].toStdString(),nullptr,16);
+        std::vector<QString> vec;
+        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        if(vec.size()>=2)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = std::stoi(vec[1].toStdString(),nullptr,16);
+        }
 
         switch (PID)
         {
@@ -153,7 +158,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 11://PID(0B): Manifold Absolute Pressure
             // A - 40
-            value = A;           
+            value = A;
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
@@ -167,7 +172,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 15://PID(0F): Intake Air Temperature
             // A - 40
-            value = A - 40;           
+            value = A - 40;
             break;
         case 16://PID(10): MAF air flow rate grams/sec
             // ((256*A)+B) / 100  [g/s]
@@ -175,7 +180,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 17://PID(11): Throttle position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;           
+            mTPos = (100 * A) / 255;
             break;
         case 33://PID(21) Distance traveled with malfunction indicator lamp (MIL) on
             // ((A*256)+B)
@@ -199,7 +204,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 90://PID(5A): Relative accelerator pedal position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;           
+            mTPos = (100 * A) / 255;
             break;
         case 92://PID(5C): Oil Temperature
             // A-40
@@ -207,12 +212,13 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
-            /*mFuelConsumption = ((A*256)+B) / 20;
+            getFuelPid = true;
+            mFuelConsumption = ((A*256)+B) / 20;
             mAvarageFuelConsumption.append(mFuelConsumption);
             ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
                                               + " / "
                                               + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\nl / h");*/
+                                              + "\nl / h");
             break;
         case 98://PID(62) Actual engine - percent torque
             // A-125
@@ -226,17 +232,20 @@ void ObdScan::analysData(const QString &dataReceived)
 
         if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
         {
-            auto AL = mMAF * mLoad;                                 // Airflow * Load
-            auto coeff = 0.0021;                                    // Fuel flow coefficient
-            auto LH = AL * coeff + EngineDisplacement / 1000;       // Fuel flow L/h
-            mFuelConsumption = LH / 2;                              // Correction for renault dacia
-            //mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
+            if(!getFuelPid)
+            {
+                auto AL = mMAF * mLoad;                                 // Airflow * Load
+                auto coeff = 0.0021;                                    // Fuel flow coefficient
+                auto LH = AL * coeff + EngineDisplacement / 1000;       // Fuel flow L/h
+                mFuelConsumption = LH;
+                //mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
 
-            mAvarageFuelConsumption.append(mFuelConsumption);
-            ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
-                                              + " / "
-                                              + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\nl / h");
+                mAvarageFuelConsumption.append(mFuelConsumption);
+                ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
+                                                  + " / "
+                                                  + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
+                                                  + "\nl / h");
+            }
         }
     }
     else
