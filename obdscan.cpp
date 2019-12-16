@@ -248,12 +248,10 @@ void ObdScan::analysData(const QString &dataReceived)
             }
         }
     }
-    else
+
+    if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
     {
-        if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
-        {
-            ui->labelVoltage->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
-        }
+        ui->labelVoltage->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
     }
 }
 

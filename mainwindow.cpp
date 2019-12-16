@@ -307,40 +307,31 @@ void MainWindow::analysData(const QString &dataReceived)
         }
 
         ui->textTerminal->append("Value of A: " + QString::number(A)+ " B: " + QString::number(B));
-    }
-    else
+    }  
+
+    //number of dtc & mil
+    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive) && !resp[3].compare("01",Qt::CaseInsensitive))
     {
-        if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
-        {
-            ui->textTerminal->append("Volt: " + dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
-        }
+        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);
+        ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + dtcNumber.second);
+    }
+    //dtc codes
+    if(resp.size()>2 && !resp[1].compare("43",Qt::CaseInsensitive))
+    {
+       vec.insert(vec.begin(),resp.begin()+1, resp.end());
+       std::vector<QString> dtcCodes( elm.decodeDTC(vec));
+       if(dtcCodes.size()>0)
+       {
+           for(auto &code : dtcCodes)
+           {
+               ui->textTerminal->append(code);
+           }
+       }
     }
 
     if(m_clearCodeRequest)
     {
-
-        //number of dtc & mil
-        if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive) && !resp[3].compare("01",Qt::CaseInsensitive))
-        {
-            vec.insert(vec.begin(),resp.begin()+4, resp.end());
-            std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);
-            ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + dtcNumber.second);
-        }
-        //dtc codes
-        if(resp.size()>2 && !resp[1].compare("43",Qt::CaseInsensitive))
-        {
-           vec.insert(vec.begin(),resp.begin()+1, resp.end());
-           std::vector<QString> dtcCodes( elm.decodeDTC(vec));
-           if(dtcCodes.size()>0)
-           {
-               for(auto &code : dtcCodes)
-               {
-
-                   ui->textTerminal->append(code);
-               }
-           }
-        }
-
         ui->textTerminal->append("Clearing the trouble codes.");
         QString text(CLEAR_TROUBLE);
         send(text);
