@@ -128,11 +128,11 @@ void ObdScan::analysData(const QString &dataReceived)
     std::vector<QString> vec;
     auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
-        PID =std::stoi(resp[3].toStdString(),nullptr,16);
+        PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
-        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        vec.insert(vec.begin(),resp.begin()+2, resp.end());
         if(vec.size()>=2)
         {
             A = std::stoi(vec[0].toStdString(),nullptr,16);

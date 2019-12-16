@@ -101,7 +101,6 @@ private:
     int commandOrder{0};
     bool m_initialized{false};
     bool m_ConsoleEnable{true};
-    bool m_HexEnabled{false};
     bool m_clearCodeRequest{false};
     std::vector<uint32_t> cmds{};
 
@@ -110,7 +109,7 @@ private slots:
     void disconnected();
     void dataReceived(QString &);
     void stateChanged(QString &state);
-    void dataHexReceived(QString &);
+    void dataByteReceived(QString &);
     void errorAccrued(QString &);
     void on_close_dialog_triggered();
     void on_pushConnect_clicked();
@@ -119,7 +118,6 @@ private slots:
     void on_pushClear_clicked();
     void on_pushDiagnostic_clicked();
     void on_pushScan_clicked();
-    void on_checkHex_stateChanged(int arg1);
     void on_pushGauge_clicked();
     void orientationChanged(Qt::ScreenOrientation orientation);
 

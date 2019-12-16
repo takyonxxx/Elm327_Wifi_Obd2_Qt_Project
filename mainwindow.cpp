@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::wifiConnected, this, &MainWindow::connected);
         connect(m_networkManager, &NetworkManager::wifiDisconnected, this, &MainWindow::disconnected);
         connect(m_networkManager, &NetworkManager::dataReceived, this, &MainWindow::dataReceived);
-        connect(m_networkManager, &NetworkManager::dataHexReceived, this, &MainWindow::dataHexReceived);
+        connect(m_networkManager, &NetworkManager::dataBytesReceived, this, &MainWindow::dataByteReceived);
         connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
@@ -43,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
     ui->labelPort->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
     ui->portEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->checkHex->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
     ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
 
 #ifdef Q_OS_ANDROID
@@ -140,10 +139,9 @@ void MainWindow::stateChanged(QString &state)
     ui->textTerminal->append(state);
 }
 
-void MainWindow::dataHexReceived(QString &data)
+void MainWindow::dataByteReceived(QString &data)
 {
-    if(m_HexEnabled && !data.isEmpty())
-        ui->textTerminal->append("<- " + data);
+    ui->textTerminal->append("<- " + data);
 }
 
 void MainWindow::errorAccrued(QString & error)
@@ -244,10 +242,6 @@ void MainWindow::on_pushScan_clicked()
     m_ConsoleEnable = false;
 }
 
-void MainWindow::on_checkHex_stateChanged(int arg1)
-{
-    m_HexEnabled = arg1;
-}
 
 void MainWindow::on_pushGauge_clicked()
 {
@@ -292,14 +286,19 @@ void MainWindow::analysData(const QString &dataReceived)
     unsigned PID = 0;
     ELM elm{};
 
+    ui->textTerminal->append("<- " + dataReceived);
+
+    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
+        return;
+
     std::vector<QString> vec;
     auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
-        PID =std::stoi(resp[3].toStdString(),nullptr,16);
+        PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
-        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        vec.insert(vec.begin(),resp.begin()+2, resp.end());
         if(vec.size()>=2)
         {
             A = std::stoi(vec[0].toStdString(),nullptr,16);
@@ -310,14 +309,14 @@ void MainWindow::analysData(const QString &dataReceived)
     }  
 
     //number of dtc & mil
-    if(resp.size()>2 && !resp[2].compare("41",Qt::CaseInsensitive) && !resp[3].compare("01",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive) && !resp[1].compare("01",Qt::CaseInsensitive))
     {
-        vec.insert(vec.begin(),resp.begin()+4, resp.end());
+        vec.insert(vec.begin(),resp.begin()+2, resp.end());
         std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);
         ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + dtcNumber.second);
     }
     //dtc codes
-    if(resp.size()>2 && !resp[1].compare("43",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
     {
        vec.insert(vec.begin(),resp.begin()+1, resp.end());
        std::vector<QString> dtcCodes( elm.decodeDTC(vec));
@@ -342,12 +341,6 @@ void MainWindow::analysData(const QString &dataReceived)
 void MainWindow::dataReceived(QString &dataReceived)
 {
     if(!m_ConsoleEnable)return;
-
-    if(!dataReceived.isEmpty())
-        ui->textTerminal->append("<- " + dataReceived);
-
-    if(dataReceived.toUpper().contains("SEARCHING"))
-        return;
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {

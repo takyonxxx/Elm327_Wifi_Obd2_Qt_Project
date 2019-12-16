@@ -16,7 +16,7 @@ public:
 
 public: signals:
     void dataReceived(QString &);
-    void dataHexReceived(QString &);
+    void dataBytesReceived(QString &);
     void stateChanged(QString &);
     void errorAccrued(QString &);
     void wifiConnected();
@@ -35,13 +35,17 @@ public:
     void disconnectWifi();
     bool isConnected();
     QString readData(QString &);
+    bool customRead {false};
+
+protected:
+    bool m_headerRead{false};
+    unsigned int m_size_of_data_to_read;
 
 private:
     QString statetoString(QAbstractSocket::SocketState);
     static NetworkManager* theInstance_;
     QTcpSocket *socket{nullptr};
     bool m_connected{false};
-    bool customRead {false};
 };
 
 #endif // NETWORKMANAGER_H

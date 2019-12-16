@@ -39,9 +39,8 @@ bool NetworkManager::send(QString &string)
     {
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
-
         out << string.trimmed();
-        out << "\r";
+        out << "\r\r";
         socket->write(block);
         return socket->waitForBytesWritten();
     }
@@ -132,15 +131,16 @@ void NetworkManager::readyRead()
 
     // Some of these look like errors that ought to be handled..
     s_received.replace("STOPPED","");
-    //s_received.replace("SEARCHING","");
-    //s_received.replace("NO DATA","");
+    s_received.replace("SEARCHING","");
+    s_received.replace("NO DATA","");
+    //s_received.replace("UNABLETOCONNECT","");
+    s_received.replace("OK","");
     s_received.replace("?","");
     s_received.replace(",","");
 
     emit dataReceived(s_received);
 
-    QString s_hex_received = received.toHex();
-    emit dataHexReceived(s_hex_received);
+    emit dataBytesReceived(strData);
 }
 
 void NetworkManager::error(QAbstractSocket::SocketError serr)
@@ -154,7 +154,7 @@ void NetworkManager::connectWifi(const QString &ip, int port)
     if(!socket)return;
 
     socket->connectToHost(ip, port);
-    socket->waitForConnected(1000);
+    socket->waitForConnected(3000);
 }
 
 void NetworkManager::disconnectWifi()

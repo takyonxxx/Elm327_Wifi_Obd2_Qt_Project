@@ -97,8 +97,7 @@ ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
 REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 
-//static QStringList initializeCommands{VOLTAGE, LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
-static QStringList initializeCommands{VOLTAGE, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
+static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, MAF_AIR_FLOW};
 
