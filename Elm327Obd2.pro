@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network 
+QT += core gui
+QT += bluetooth serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,6 +35,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        bluetoothmanager.cpp \
         elm.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -41,9 +43,11 @@ SOURCES += \
         networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
-        qcgaugewidget.cpp
+        qcgaugewidget.cpp \
+        serialmanager.cpp
 
 HEADERS += \
+        bluetoothmanager.h \
         elm.h \
         mainwindow.h \
         methods.h \
@@ -51,7 +55,8 @@ HEADERS += \
         obdgauge.h \
         obdscan.h \
         pid.h \
-        qcgaugewidget.h
+        qcgaugewidget.h \
+        serialmanager.h
 
 FORMS += \
         mainwindow.ui \

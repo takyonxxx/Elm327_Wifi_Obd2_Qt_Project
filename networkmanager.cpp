@@ -33,21 +33,6 @@ NetworkManager::~NetworkManager()
     delete socket;
 }
 
-bool NetworkManager::send(QString &string)
-{
-    if(socket->isOpen())
-    {
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out << string.trimmed();
-        out << "\r\r";
-        socket->write(block);
-        return socket->waitForBytesWritten();
-    }
-    else
-        return false;
-}
-
 void NetworkManager::connected()
 {    
     m_connected = true;
@@ -101,8 +86,8 @@ QString NetworkManager::readData(QString &command)
         {
             if (!socket->waitForReadyRead())
             {
-                    qDebug() << "waitForReadyRead() timed out";
-                    return strData;
+                qDebug() << "waitForReadyRead() timed out";
+                return strData;
             }
 
             auto received = socket->readAll();
@@ -111,6 +96,32 @@ QString NetworkManager::readData(QString &command)
     }
     customRead = false;
     return strData;
+}
+
+
+bool NetworkManager::send(const QString &string)
+{
+    if(socket->isOpen())
+    {
+        QByteArray dataToSend = string.toUtf8();
+
+        if (string.isEmpty())
+        {
+            // If toWrite is empty then just send a CR char.
+            dataToSend += ('\r');
+        }
+        else
+        {
+            // Check for CR at end.
+            if (dataToSend[dataToSend.size()] != '\r')
+                dataToSend += '\r';
+        }
+
+        socket->write(dataToSend);
+        return socket->waitForBytesWritten();
+    }
+    else
+        return false;
 }
 
 void NetworkManager::readyRead()
@@ -133,14 +144,13 @@ void NetworkManager::readyRead()
     s_received.replace("STOPPED","");
     s_received.replace("SEARCHING","");
     s_received.replace("NO DATA","");
-    //s_received.replace("UNABLETOCONNECT","");
     s_received.replace("OK","");
     s_received.replace("?","");
     s_received.replace(",","");
 
     emit dataReceived(s_received);
 
-    emit dataBytesReceived(strData);
+    //emit dataBytesReceived(strData);
 }
 
 void NetworkManager::error(QAbstractSocket::SocketError serr)

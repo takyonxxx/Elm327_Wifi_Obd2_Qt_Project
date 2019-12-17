@@ -30,7 +30,7 @@ private slots:
     void stateChange(QAbstractSocket::SocketState);
 
 public:
-    bool send(QString &string);
+    bool send(const QString &);
     void connectWifi(const QString &, int );
     void disconnectWifi();
     bool isConnected();

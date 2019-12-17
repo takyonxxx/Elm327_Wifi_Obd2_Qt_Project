@@ -15,18 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    m_networkManager = NetworkManager::getInstance();
-
-    if(m_networkManager)
-    {
-        connect(m_networkManager, &NetworkManager::wifiConnected, this, &MainWindow::connected);
-        connect(m_networkManager, &NetworkManager::wifiDisconnected, this, &MainWindow::disconnected);
-        connect(m_networkManager, &NetworkManager::dataReceived, this, &MainWindow::dataReceived);
-        connect(m_networkManager, &NetworkManager::dataBytesReceived, this, &MainWindow::dataByteReceived);
-        connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
-        connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
-    }
-
     if(osName() == "windows")
         ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
     else
@@ -44,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelPort->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
     ui->portEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
     ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
+    ui->radioBle->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
+    ui->radioWifi->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
+    ui->comboBleList->setStyleSheet("font-size: 14pt; font-weight: bold; color:black; padding: 2px;");
 
 #ifdef Q_OS_ANDROID
     ui->textSend->setMinimumHeight(100);
@@ -64,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textTerminal->append("Press Connect Button");
 
     runtimeCommands.clear();
-    pidsSupportedCommands.clear();
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
@@ -76,18 +66,43 @@ MainWindow::MainWindow(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
 
-    ui->pushConnect->setFocus();
 
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
     keep_screen_on(true);
 #endif
 
+    m_bluetoothManager = BluetoothManager::getInstance();
+
+    if(m_bluetoothManager)
+    {
+        connect(m_bluetoothManager, &BluetoothManager::bleConnected, this, &MainWindow::connected);
+        connect(m_bluetoothManager, &BluetoothManager::bleDisconnected, this, &MainWindow::disconnected);
+        connect(m_bluetoothManager, &BluetoothManager::addDeviceToList, this, &MainWindow::addDeviceToList);
+        connect(m_bluetoothManager, &BluetoothManager::stateChanged, this, &MainWindow::stateChanged);
+        connect(m_bluetoothManager, &BluetoothManager::dataReceived, this, &MainWindow::dataReceived);
+    }
+
+    m_networkManager = NetworkManager::getInstance();
+
+    if(m_networkManager)
+    {
+        connect(m_networkManager, &NetworkManager::wifiConnected, this, &MainWindow::connected);
+        connect(m_networkManager, &NetworkManager::wifiDisconnected, this, &MainWindow::disconnected);
+        connect(m_networkManager, &NetworkManager::dataReceived, this, &MainWindow::dataReceived);
+        connect(m_networkManager, &NetworkManager::dataBytesReceived, this, &MainWindow::dataByteReceived);
+        connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
+        connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
+    }
+    ui->radioWifi->setChecked(true);
+
+    ui->pushConnect->setFocus();
 }
 
 MainWindow::~MainWindow()
 {
     delete m_networkManager;
+    delete m_bluetoothManager;
     delete ui;
 }
 
@@ -121,17 +136,11 @@ void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
     }
 }
 
-void MainWindow::send(QString &string)
+void MainWindow::addDeviceToList(const QBluetoothAddress& address, const QString& name)
 {
-    if(!m_ConsoleEnable)return;
-    if(!m_networkManager->isConnected())return;
+    QString label = QString("%1 %2").arg(address.toString()).arg(name);
 
-    m_networkManager->send(string);
-
-    ui->textTerminal->append("-> " + string.trimmed()
-                             .simplified()
-                             .remove(QRegExp("[\\n\\t\\r]"))
-                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+    ui->comboBleList->addItem(label);
 }
 
 void MainWindow::stateChanged(QString &state)
@@ -149,34 +158,25 @@ void MainWindow::errorAccrued(QString & error)
     ui->textTerminal->append("Error: " + error );
 }
 
-void MainWindow::connected()
+
+void MainWindow::connectWifi()
 {
-    ui->pushSend->setEnabled(true);
-    ui->pushScan->setEnabled(true);
-    ui->pushGauge->setEnabled(true);
-    ui->pushDiagnostic->setEnabled(true);
-
-    ui->pushConnect->setText(QString("Disconnect"));
-
-    commandOrder = 0;
-    m_initialized = false;
-
-    send(RESET);
+    if(m_networkManager)
+    {
+        QString ip = ui->ipEdit->text();
+        int port = ui->portEdit->text().toInt();
+        ui->textTerminal->append("Trying to connect Wifi " + ip + " : " + port);
+        m_networkManager->connectWifi(ip, port);
+    }
 }
 
-void MainWindow::disconnected()
+void MainWindow::connectBle(const QBluetoothAddress &address)
 {
-    ui->pushSend->setEnabled(false);
-    ui->pushScan->setEnabled(false);
-    ui->pushGauge->setEnabled(false);
-    ui->pushDiagnostic->setEnabled(false);
-
-    ui->textTerminal->clear();
-    ui->textTerminal->append("Disconnected");
-    ui->pushConnect->setText(QString("Connect"));
-
-    commandOrder = 0;
-    m_initialized = false;
+    if(m_bluetoothManager)
+    {
+        ui->textTerminal->append("Trying to connect Bluetooth");
+        m_bluetoothManager->connectBle(address);
+    }
 }
 
 void MainWindow::on_pushConnect_clicked()
@@ -184,13 +184,26 @@ void MainWindow::on_pushConnect_clicked()
     if(ui->pushConnect->text() == "Connect")
     {
         ui->textTerminal->clear();
-        QString ip = ui->ipEdit->text();
-        int port = ui->portEdit->text().toInt();
-        m_networkManager->connectWifi(ip, port);
+        if(ui->radioBle->isChecked())
+        {
+            auto text = ui->comboBleList->currentText();
+            if(text.isEmpty())
+                return;
+
+            auto strAddress = text.split(" ").at(0);
+            const QBluetoothAddress bAddress(strAddress);
+            connectBle(bAddress);
+        }
+        else if(ui->radioWifi->isChecked())
+           connectWifi();
     }
     else
     {
-        m_networkManager->disconnectWifi();
+        if(m_networkManager->isConnected())
+            m_networkManager->disconnectWifi();
+
+        if(m_bluetoothManager->isConnected())
+            m_bluetoothManager->disconnectBle();
     }
 }
 
@@ -227,7 +240,6 @@ void MainWindow::on_pushDiagnostic_clicked()
 void MainWindow::on_close_dialog_triggered()
 {
     m_ConsoleEnable = true;
-    qDebug() << "on_close_dialog_triggered";
 }
 
 
@@ -255,30 +267,46 @@ void MainWindow::on_pushGauge_clicked()
     m_ConsoleEnable = false;
 }
 
-void MainWindow::appendPidsSupportedCommand(const QString &dataReceived)
-{
-    if (dataReceived.startsWith("4100")
-            || dataReceived.startsWith("4120")
-            || dataReceived.startsWith("4140")
-            || dataReceived.startsWith("4160")
-            || dataReceived.startsWith("4180")
-            || dataReceived.startsWith("41A0"))
-    {
-        QString tmp = dataReceived;
-        auto cmd = tmp.remove(0, 4);
-        pidsSupportedCommands.append(cmd);
-    }
-}
-
 void MainWindow::getPidsSupported()
 {
     ELM elm{};
     QString supportedPIDs = elm.get_available_pids();
+    pidsSupportedCommands.append(supportedPIDs);
     ui->textTerminal->append("PIDs supported: " + supportedPIDs);
 }
 
-void MainWindow::analysData(const QString &dataReceived)
+void MainWindow::connected()
 {
+    ui->pushSend->setEnabled(true);
+    ui->pushScan->setEnabled(true);
+    ui->pushGauge->setEnabled(true);
+    ui->pushDiagnostic->setEnabled(true);
+
+    ui->pushConnect->setText(QString("Disconnect"));
+
+    commandOrder = 0;
+    m_initialized = false;
+
+    send(RESET);
+}
+
+void MainWindow::disconnected()
+{
+    ui->pushSend->setEnabled(false);
+    ui->pushScan->setEnabled(false);
+    ui->pushGauge->setEnabled(false);
+    ui->pushDiagnostic->setEnabled(false);
+
+    ui->textTerminal->clear();
+    ui->textTerminal->append("Disconnected");
+    ui->pushConnect->setText(QString("Connect"));
+
+    commandOrder = 0;
+    m_initialized = false;
+}
+
+void MainWindow::analysData(const QString &dataReceived)
+{    
     if(dataReceived.isEmpty())return;
 
     unsigned A = 0;
@@ -294,19 +322,25 @@ void MainWindow::analysData(const QString &dataReceived)
     std::vector<QString> vec;
     auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>0 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
         PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
+
         vec.insert(vec.begin(),resp.begin()+2, resp.end());
         if(vec.size()>=2)
         {
             A = std::stoi(vec[0].toStdString(),nullptr,16);
             B = std::stoi(vec[1].toStdString(),nullptr,16);
         }
+        else if(vec.size()>=1)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = 0;
+        }
 
-        ui->textTerminal->append("Value of A: " + QString::number(A)+ " B: " + QString::number(B));
-    }  
+        ui->textTerminal->append("Pid: " + QString::number(PID) + "  A: " + QString::number(A)+ "  B: " + QString::number(B));
+    }
 
     //number of dtc & mil
     if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive) && !resp[1].compare("01",Qt::CaseInsensitive))
@@ -318,15 +352,20 @@ void MainWindow::analysData(const QString &dataReceived)
     //dtc codes
     if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
     {
-       vec.insert(vec.begin(),resp.begin()+1, resp.end());
-       std::vector<QString> dtcCodes( elm.decodeDTC(vec));
-       if(dtcCodes.size()>0)
-       {
-           for(auto &code : dtcCodes)
-           {
-               ui->textTerminal->append(code);
-           }
-       }
+        vec.insert(vec.begin(),resp.begin()+1, resp.end());
+        std::vector<QString> dtcCodes( elm.decodeDTC(vec));
+        if(dtcCodes.size()>0)
+        {
+            for(auto &code : dtcCodes)
+            {
+                ui->textTerminal->append(code);
+            }
+        }
+    }
+
+    if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
+    {
+        ui->textTerminal->append(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
     }
 
     if(m_clearCodeRequest)
@@ -358,5 +397,56 @@ void MainWindow::dataReceived(QString &dataReceived)
     if(m_initialized)
     {
         analysData(dataReceived);
+    }
+}
+
+void MainWindow::send(const QString &data)
+{
+    if(!m_ConsoleEnable)return;
+
+    if(m_bluetoothManager->isConnected())
+    {
+        m_bluetoothManager->send(data);
+    }
+
+    if(m_networkManager->isConnected())
+    {
+        m_networkManager->send(data);
+    }
+
+    ui->textTerminal->append("-> " + data.trimmed()
+                             .simplified()
+                             .remove(QRegExp("[\\n\\t\\r]"))
+                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+}
+
+void MainWindow::on_radioBle_clicked(bool checked)
+{
+    if(checked)
+    {
+        if(m_networkManager)
+        {
+            if(m_networkManager->isConnected())
+                m_networkManager->disconnectWifi();
+        }
+
+        if(m_bluetoothManager)
+        {
+             ui->comboBleList->clear();
+             m_bluetoothManager->scan();
+        }
+    }
+}
+
+void MainWindow::on_radioWifi_clicked(bool checked)
+{
+    if(checked)
+    {
+        ui->comboBleList->clear();
+        if(m_bluetoothManager)
+        {
+            if(m_bluetoothManager->isConnected())
+                m_bluetoothManager->disconnectBle();
+        }
     }
 }

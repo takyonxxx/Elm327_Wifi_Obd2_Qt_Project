@@ -100,7 +100,6 @@ CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) /
 static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, SPACES_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO};
 
 static QStringList runtimeCommands{VOLTAGE, ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, MAF_AIR_FLOW};
-
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 
 static long long currentTimeMillis()

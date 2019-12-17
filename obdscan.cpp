@@ -12,27 +12,27 @@ ObdScan::ObdScan(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     ui->labelRpmTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelRpm->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
+    ui->labelRpm->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #236D5F;  padding: 2px;");
 
     ui->labelLoadTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelLoad->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD;background-color: #043652;  padding: 2px;");
+    ui->labelLoad->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD;background-color: #236D5F;  padding: 2px;");
 
     ui->labelSpeedTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelSpeed->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
+    ui->labelSpeed->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #236D5F;  padding: 2px;");
 
     ui->labelCoolantTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelCoolant->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #043652;  padding: 2px;");
+    ui->labelCoolant->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color: #236D5F;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 36pt; font-weight: bold; color: black;background-color: lightgray;  padding: 2px;");
-    ui->comboEngineDisplacement->setCurrentIndex(2);
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 32pt; font-weight: bold; color: darkgray; background-color: 236D5F;  padding: 2px;");
+    ui->comboEngineDisplacement->setCurrentIndex(4);
 
     ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelStatus->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D7DBDD; background-color:#074666;;  padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 28pt; font-weight: bold; color: #D7DBDD; background-color:#236D5F;;  padding: 2px;");
 
-    ui->labelVoltage->setStyleSheet("font-size: 64pt; font-weight: bold; color: #D1F2EB; background-color: #043652;  padding: 2px;");
+    ui->labelVoltage->setStyleSheet("font-size: 64pt; font-weight: bold; color: #D1F2EB; background-color: #236D5F;  padding: 2px;");
 
-    ui->labelFuelConsumption->setStyleSheet("font: 56pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB; background-color: #043652;  padding: 2px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 56pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB; background-color: #236D5F;  padding: 2px;");
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
                                       + " / "
                                       + QString::number(0, 'f', 1)
@@ -40,13 +40,15 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
 
-    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #074666;padding: 2px;");
+    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #236D5F;padding: 2px;");
     ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A;padding: 2px;");
 
 
     ui->labelFuelConsumption->setFocus();
 
     m_networkManager = NetworkManager::getInstance();
+    m_bluetoothManager = BluetoothManager::getInstance();
+
     commandOrder = 0;
     EngineDisplacement = ui->comboEngineDisplacement->currentText().toInt();
 
@@ -54,6 +56,17 @@ ObdScan::ObdScan(QWidget *parent) :
     {
         connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
         if(m_networkManager->isConnected())
+        {
+            mRunning = true;
+            mAvarageFuelConsumption.clear();
+            send(VOLTAGE);
+        }
+    }
+
+    if(m_bluetoothManager)
+    {
+        connect(m_bluetoothManager, &BluetoothManager::dataReceived, this, &ObdScan::dataReceived);
+        if(m_bluetoothManager->isConnected())
         {
             mRunning = true;
             mAvarageFuelConsumption.clear();
@@ -81,13 +94,20 @@ void ObdScan::on_pushExit_clicked()
     close();
 }
 
-void ObdScan::send(QString &data)
+void ObdScan::send(const QString &data)
 {
     if(!mRunning)return;
 
-    if(!m_networkManager->isConnected())return;
+    if(m_bluetoothManager->isConnected())
+    {
+        m_bluetoothManager->send(data);
+    }
 
-    m_networkManager->send(data);
+    if(m_networkManager->isConnected())
+    {
+        m_networkManager->send(data);
+    }
+
     ui->labelStatus->setText(data);
 }
 
@@ -128,15 +148,21 @@ void ObdScan::analysData(const QString &dataReceived)
     std::vector<QString> vec;
     auto resp= elm.prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>0 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
         PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
+
         vec.insert(vec.begin(),resp.begin()+2, resp.end());
         if(vec.size()>=2)
         {
             A = std::stoi(vec[0].toStdString(),nullptr,16);
             B = std::stoi(vec[1].toStdString(),nullptr,16);
+        }
+        else if(vec.size()>=1)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = 0;
         }
 
         switch (PID)
@@ -235,8 +261,8 @@ void ObdScan::analysData(const QString &dataReceived)
             if(!getFuelPid)
             {
                 auto AL = mMAF * mLoad;                                 // Airflow * Load
-                auto coeff = 0.0021;                                    // Fuel flow coefficient
-                auto LH = AL * coeff + EngineDisplacement / 1000;       // Fuel flow L/h
+                auto coeff = (EngineDisplacement / 1000) / 715;                                    // Fuel flow coefficient
+                auto LH = AL * coeff + 1;       // Fuel flow L/h
                 mFuelConsumption = LH;
                 //mFuelConsumption = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
 
@@ -251,7 +277,8 @@ void ObdScan::analysData(const QString &dataReceived)
 
     if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
     {
-        ui->labelVoltage->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
+        if(!dataReceived.contains("ATRV"))
+            ui->labelVoltage->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
     }
 }
 

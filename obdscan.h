@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "networkmanager.h"
+#include "bluetoothmanager.h"
 #include <QVector>
 
 namespace Ui {
@@ -19,6 +20,7 @@ public:
 
 private:
     NetworkManager *m_networkManager;
+    BluetoothManager *m_bluetoothManager;
     int commandOrder{0};
     bool mRunning{false};
     bool getFuelPid{false};
@@ -30,7 +32,7 @@ private:
     qreal mFuelConsumption{0.0};    
     QVector<qreal> mAvarageFuelConsumption{};
 
-    void send(QString &);
+    void send(const QString &);
     void analysData(const QString &);    
     qreal calculateAverage(QVector<qreal> &listavg) ;
 

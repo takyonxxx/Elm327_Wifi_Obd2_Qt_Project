@@ -17,7 +17,7 @@ QString ELM::AT(QString& cmd)
 }
 
 std::vector<QString> ELM::prepareResponseToDecode(const QString &response_str)
-{
+{   
     std::vector<QString> result;
     result.reserve(8);
     std::string str(response_str.toStdString());
