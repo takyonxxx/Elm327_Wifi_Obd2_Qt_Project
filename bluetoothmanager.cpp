@@ -60,28 +60,18 @@ void BluetoothManager::connectBle(const QBluetoothAddress &address)
 {
     if(socket)
         return;
-    try
-    {
-        QString msg{};
-        msg.append("Connecting to : " + QString(address.toString()));
-        emit stateChanged(msg);
-        socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-        QObject::connect(socket, &QBluetoothSocket::connected, this, &BluetoothManager::connected);
-        QObject::connect(socket,  &QBluetoothSocket::disconnected, this, &BluetoothManager::disconnected);
-        QObject::connect(socket, SIGNAL(error(QBluetoothSocket::SocketError)), this, SLOT(socketError(QBluetoothSocket::SocketError)));
-        QObject:: connect(socket,  &QBluetoothSocket::readyRead, this, &BluetoothManager::readyRead);
-        socket->connectToService(address, QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB")), QIODevice::ReadWrite);
-        socket->open(QIODevice::ReadWrite);
-        socket->openMode();
-    }
-    catch (std::exception& e)
-    {
-        qDebug() << e.what();
-        QString err{};
-        err.append("Error on connectting ble device: " + QString(e.what()));
-        emit stateChanged(err);
-    }
 
+    QString msg{};
+    msg.append("Connecting to : " + QString(address.toString()));
+    emit stateChanged(msg);
+    socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+    QObject::connect(socket, &QBluetoothSocket::connected, this, &BluetoothManager::connected);
+    QObject::connect(socket,  &QBluetoothSocket::disconnected, this, &BluetoothManager::disconnected);
+    QObject::connect(socket, SIGNAL(error(QBluetoothSocket::SocketError)), this, SLOT(socketError(QBluetoothSocket::SocketError)));
+    QObject:: connect(socket,  &QBluetoothSocket::readyRead, this, &BluetoothManager::readyRead);
+    socket->connectToService(address, QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB")), QIODevice::ReadWrite);
+    socket->open(QIODevice::ReadWrite);
+    socket->openMode();
 }
 
 void BluetoothManager::disconnectBle()
@@ -130,22 +120,19 @@ void BluetoothManager::disconnected()
 
 void BluetoothManager::socketError(QBluetoothSocket::SocketError error)
 {
-    qDebug() << "Socket error: " << error;
+    qDebug() << "Socket error: " << socket->errorString();
 
     QString msg{};
 
-    msg.append("ocket error: ");
-    msg.append( error);
+    msg.append("Socket error : " + socket->errorString());
     emit stateChanged(msg);
 }
 
 void BluetoothManager::addDevice(const QBluetoothDeviceInfo &info)
 {
     //if(info.name().contains("OBD") || info.name().contains("ECU") || info.name().contains("ELM") || info.name().contains("SCAN"))
-    QString msg{};
-    msg.append(info.name());
-    emit stateChanged(msg);
-    emit addDeviceToList(info.address(), info.name());
+    if(!info.name().isEmpty())
+        emit addDeviceToList(info.address(), info.name());
 }
 
 void BluetoothManager::scanFinished()
