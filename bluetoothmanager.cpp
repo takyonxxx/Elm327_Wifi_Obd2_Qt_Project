@@ -21,7 +21,12 @@ BluetoothManager *BluetoothManager::getInstance()
 void BluetoothManager::scan()
 {
     if(discoveryAgent)
+    {
+        QString msg{};
+        msg.append("Scaning Bluetooth devices..");
+        emit stateChanged(msg);
         discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+    }
 }
 
 BluetoothManager::BluetoothManager():localDevice(new QBluetoothLocalDevice)
@@ -37,7 +42,7 @@ BluetoothManager::BluetoothManager():localDevice(new QBluetoothLocalDevice)
         localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
         discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
         discoveryAgent->setInquiryType(QBluetoothDeviceDiscoveryAgent::GeneralUnlimitedInquiry);
-        discoveryAgent->setLowEnergyDiscoveryTimeout(3000);
+        discoveryAgent->setLowEnergyDiscoveryTimeout(5000);
 
         QObject::connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BluetoothManager::addDevice);
         QObject::connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, this, &BluetoothManager::scanFinished);
@@ -126,17 +131,29 @@ void BluetoothManager::disconnected()
 void BluetoothManager::socketError(QBluetoothSocket::SocketError error)
 {
     qDebug() << "Socket error: " << error;
+
+    QString msg{};
+
+    msg.append("ocket error: ");
+    msg.append( error);
+    emit stateChanged(msg);
 }
 
 void BluetoothManager::addDevice(const QBluetoothDeviceInfo &info)
 {
-    if(info.name().contains("OBD") || info.name().contains("ECU") || info.name().contains("ELM") || info.name().contains("SCAN"))
-        emit addDeviceToList(info.address(), info.name());
+    //if(info.name().contains("OBD") || info.name().contains("ECU") || info.name().contains("ELM") || info.name().contains("SCAN"))
+    QString msg{};
+    msg.append(info.name());
+    emit stateChanged(msg);
+    emit addDeviceToList(info.address(), info.name());
 }
 
 void BluetoothManager::scanFinished()
 {
     qDebug() << "Ble Discovery finished.";
+    QString msg{};
+    msg.append("Ble Discovery finished.");
+    emit stateChanged(msg);
 }
 
 void BluetoothManager::readyRead()
