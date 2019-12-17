@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
-QT += bluetooth serialport network
+QT += bluetooth network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -43,8 +43,7 @@ SOURCES += \
         networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
-        qcgaugewidget.cpp \
-        serialmanager.cpp
+        qcgaugewidget.cpp
 
 HEADERS += \
         bluetoothmanager.h \
@@ -55,8 +54,7 @@ HEADERS += \
         obdgauge.h \
         obdscan.h \
         pid.h \
-        qcgaugewidget.h \
-        serialmanager.h
+        qcgaugewidget.h
 
 FORMS += \
         mainwindow.ui \
