@@ -19,6 +19,12 @@ ios {
     QMAKE_INFO_PLIST = ios/Info.plist
     QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
     QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+
+    LIBS +=-lpthread
+}
+
+linux{
+    LIBS +=-lpthread
 }
 
 # The following define makes your compiler emit warnings if you use

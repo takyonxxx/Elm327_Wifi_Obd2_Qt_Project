@@ -6,6 +6,8 @@
 #include <QDataStream>
 #include <qbluetoothlocaldevice.h>
 #include <QBluetoothSocket>
+#include <iostream>
+#include <thread>
 
 QT_FORWARD_DECLARE_CLASS(QBluetoothDeviceDiscoveryAgent)
 QT_FORWARD_DECLARE_CLASS(QBluetoothDeviceInfo)
