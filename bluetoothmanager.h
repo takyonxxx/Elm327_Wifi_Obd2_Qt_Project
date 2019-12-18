@@ -2,6 +2,8 @@
 #define BLUETOOTHMANAGER_H
 
 #include <QObject>
+#include <QMutex>
+#include <QDataStream>
 #include <qbluetoothlocaldevice.h>
 #include <QBluetoothSocket>
 
@@ -44,10 +46,14 @@ private slots:
     void readyRead();
 
 private:
+    QMutex m_mutex;
     bool m_connected{false};  
     QBluetoothSocket* socket{};
+    QByteArray byteblock{};
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QBluetoothLocalDevice *localDevice;
+    static void *discoveryThread(void * this_ptr);
+    pthread_t scanThread{};    
     static BluetoothManager* theInstance_;
 };
 

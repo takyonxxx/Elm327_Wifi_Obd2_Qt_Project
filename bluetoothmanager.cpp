@@ -6,6 +6,7 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QThread>
 
 BluetoothManager* BluetoothManager::theInstance_ = nullptr;
 
@@ -18,39 +19,55 @@ BluetoothManager *BluetoothManager::getInstance()
     return theInstance_;
 }
 
+void *BluetoothManager::discoveryThread(void * this_ptr)
+{
+    qRegisterMetaType<QBluetoothDeviceInfo>("QBluetoothDeviceInfo");
+
+    BluetoothManager* obj_ptr = static_cast<BluetoothManager*>(this_ptr);
+    QMutexLocker locker(&obj_ptr->m_mutex);
+
+    if (obj_ptr->localDevice->isValid())
+    {
+        //Turn BT on
+        obj_ptr->localDevice->powerOn();
+
+        // Make it visible to others
+        obj_ptr->localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
+        obj_ptr->discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
+        obj_ptr->discoveryAgent->setInquiryType(QBluetoothDeviceDiscoveryAgent::GeneralUnlimitedInquiry);
+        obj_ptr->discoveryAgent->setLowEnergyDiscoveryTimeout(0);
+
+        QObject::connect(obj_ptr->discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, obj_ptr, &BluetoothManager::addDevice);
+        QObject::connect(obj_ptr->discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, obj_ptr, &BluetoothManager::scanFinished);
+
+        if(obj_ptr->discoveryAgent)
+        {
+            QString msg{};
+
+            msg.append("Scanning bluetooth devices");
+            emit obj_ptr->stateChanged(msg);
+
+            obj_ptr->discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+        }
+    }
+
+}
+
 void BluetoothManager::scan()
 {
-    if(discoveryAgent)
-    {
-        QString msg{};
-        msg.append("Scaning Bluetooth devices..");
-        emit stateChanged(msg);
-        discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
-    }
+    pthread_create( &scanThread, nullptr, &BluetoothManager::discoveryThread, this);
 }
 
 BluetoothManager::BluetoothManager():localDevice(new QBluetoothLocalDevice)
 {
-    if (localDevice->isValid())
-    {
-        qDebug() << "Bluetooth is available on this device";
 
-        //Turn BT on
-        localDevice->powerOn();
-
-        // Make it visible to others
-        localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
-        discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
-        discoveryAgent->setInquiryType(QBluetoothDeviceDiscoveryAgent::GeneralUnlimitedInquiry);
-        discoveryAgent->setLowEnergyDiscoveryTimeout(5000);
-
-        QObject::connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &BluetoothManager::addDevice);
-        QObject::connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, this, &BluetoothManager::scanFinished);
-    }
 }
 
 BluetoothManager::~BluetoothManager()
 {
+    if(scanThread)
+        pthread_cancel(scanThread);
+
     delete localDevice;
     delete discoveryAgent;
     delete socket;
@@ -58,12 +75,10 @@ BluetoothManager::~BluetoothManager()
 
 void BluetoothManager::connectBle(const QBluetoothAddress &address)
 {
-    if(socket)
-        return;
-
     QString msg{};
-    msg.append("Connecting to : " + QString(address.toString()));
+    msg.append("Connecting to bluetooth : " + QString(address.toString()));
     emit stateChanged(msg);
+
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     QObject::connect(socket, &QBluetoothSocket::connected, this, &BluetoothManager::connected);
     QObject::connect(socket,  &QBluetoothSocket::disconnected, this, &BluetoothManager::disconnected);
@@ -71,18 +86,17 @@ void BluetoothManager::connectBle(const QBluetoothAddress &address)
     QObject:: connect(socket,  &QBluetoothSocket::readyRead, this, &BluetoothManager::readyRead);
     socket->connectToService(address, QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB")), QIODevice::ReadWrite);
     socket->open(QIODevice::ReadWrite);
-    socket->openMode();
 }
 
 void BluetoothManager::disconnectBle()
 {
     if(socket->isOpen())
     {
+        if(scanThread)
+            pthread_cancel(scanThread);
+
         socket->disconnectFromService();
         socket->deleteLater();
-        QString msg{};
-        msg.append("Ble disconnected.");
-        emit stateChanged(msg);
     }
 }
 
@@ -94,27 +108,25 @@ bool BluetoothManager::isConnected()
 void BluetoothManager::connected()
 {
     m_connected = true;
-    emit bleConnected();
 
     QString msg{};
 
     msg.append("Ble Socket connected\n");
-    msg.append( "Local:\n");
-    msg.append( socket->localName() + "\n");
-    msg.append( socket->localAddress().toString()+ "\n");
-    msg.append( socket->localPort() + "\n");
-    msg.append( "Peer:\n");
-    msg.append( socket->peerName()+ "\n");
-    msg.append( socket->peerAddress().toString()+ "\n");
-    msg.append( socket->peerPort() + "\n");
+    msg.append( socket->peerName()+ " : ");
+    msg.append( socket->peerAddress().toString());
     emit stateChanged(msg);
+
+    emit bleConnected();
 }
 
 void BluetoothManager::disconnected()
-{
-    emit bleDisconnected();
+{    
     socket->deleteLater();
     m_connected = false;
+    emit bleDisconnected();
+    QString msg{};
+    msg.append("Ble disconnected.");
+    emit stateChanged(msg);
 }
 
 
@@ -130,8 +142,7 @@ void BluetoothManager::socketError(QBluetoothSocket::SocketError error)
 
 void BluetoothManager::addDevice(const QBluetoothDeviceInfo &info)
 {
-    //if(info.name().contains("OBD") || info.name().contains("ECU") || info.name().contains("ELM") || info.name().contains("SCAN"))
-    if(!info.name().isEmpty())
+    if(info.name().contains("OBD") || info.name().contains("ECU") || info.name().contains("ELM") || info.name().contains("SCAN"))
         emit addDeviceToList(info.address(), info.name());
 }
 
@@ -143,29 +154,48 @@ void BluetoothManager::scanFinished()
     emit stateChanged(msg);
 }
 
+qint32 ArrayToInt(QByteArray source)
+{
+    qint32 temp;
+    QDataStream data(&source, QIODevice::ReadWrite);
+    data >> temp;
+    return temp;
+}
+
 void BluetoothManager::readyRead()
 {
-    auto received = socket->readAll();
-    auto strData = QString::fromStdString(received.toStdString());
+    while (!socket->atEnd()) {
+        QByteArray data = socket->read(socket->bytesAvailable());
+        byteblock += data;
+    }
 
-    QString s_received = strData
-            .trimmed()
-            .simplified()
-            .remove(QRegExp("[\\n\\t\\r]"))
-            .remove(QRegExp("[^a-zA-Z0-9]+"));
+    auto strData = QString::fromStdString(byteblock.toStdString());
+    if(strData.contains("\r"))
+    {
+        strData.remove("\r");
+        strData.remove(">");
+        strData.remove("atrv").remove("ATRV");
+        if(!strData.isEmpty())
+        {
+            strData = strData.trimmed()
+                    .simplified()
+                    .remove(QRegExp("[\\n\\t\\r]"))
+                    .remove(QRegExp("[^a-zA-Z0-9]+"));
+            // Some of these look like errors that ought to be handled..
+            strData.replace("STOPPED","");
+            strData.replace("SEARCHING","");
+            strData.replace("NODATA","");
+            strData.replace("OK","");
+            strData.replace("?","");
+            strData.replace(",","");
 
-    s_received.replace(">","");
-
-    // Some of these look like errors that ought to be handled..
-    s_received.replace("STOPPED","");
-    s_received.replace("SEARCHING","");
-    s_received.replace("NO DATA","");
-    s_received.replace("NODATA","");
-    s_received.replace("OK","");
-    s_received.replace("?","");
-    s_received.replace(",","");
-
-    emit dataReceived(s_received);
+            if(!strData.isEmpty())
+            {
+                emit dataReceived(strData);
+            }
+            byteblock.clear();
+        }
+    }
 }
 
 bool BluetoothManager::send(const QString &string)
@@ -177,13 +207,13 @@ bool BluetoothManager::send(const QString &string)
         if (string.isEmpty())
         {
             // If toWrite is empty then just send a CR char.
-            dataToSend += ('\r\r');
+            dataToSend += ('\r');
         }
         else
         {
             // Check for CR at end.
             if (dataToSend[dataToSend.size()] != '\r')
-                dataToSend += '\r\r';
+                dataToSend += '\r';
         }
 
         socket->write(dataToSend);

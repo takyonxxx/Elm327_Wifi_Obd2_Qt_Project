@@ -165,7 +165,6 @@ void MainWindow::connectWifi()
     {
         QString ip = ui->ipEdit->text();
         int port = ui->portEdit->text().toInt();
-        ui->textTerminal->append("Trying to connect Wifi " + ip + " : " + port);
         m_networkManager->connectWifi(ip, port);
     }
 }
@@ -174,7 +173,6 @@ void MainWindow::connectBle(const QBluetoothAddress &address)
 {
     if(m_bluetoothManager)
     {
-        ui->textTerminal->append("Trying to connect Bluetooth");
         m_bluetoothManager->connectBle(address);
     }
 }
@@ -195,7 +193,7 @@ void MainWindow::on_pushConnect_clicked()
             connectBle(bAddress);
         }
         else if(ui->radioWifi->isChecked())
-           connectWifi();
+            connectWifi();
     }
     else
     {
@@ -298,7 +296,6 @@ void MainWindow::disconnected()
     ui->pushDiagnostic->setEnabled(false);
 
     ui->textTerminal->clear();
-    ui->textTerminal->append("Disconnected");
     ui->pushConnect->setText(QString("Connect"));
 
     commandOrder = 0;
@@ -346,8 +343,9 @@ void MainWindow::analysData(const QString &dataReceived)
     if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive) && !resp[1].compare("01",Qt::CaseInsensitive))
     {
         vec.insert(vec.begin(),resp.begin()+2, resp.end());
-        std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);
-        ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + dtcNumber.second);
+        std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);        
+        QString milText = dtcNumber.second ? "true" : "false";
+        ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + milText);
     }
     //dtc codes
     if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
@@ -382,10 +380,9 @@ void MainWindow::dataReceived(QString &dataReceived)
     if(!m_ConsoleEnable)return;
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
-    {
+    {        
         m_initialized = true;
         commandOrder = 0;
-        ui->textTerminal->append("<- initalized");
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
@@ -424,6 +421,9 @@ void MainWindow::on_radioBle_clicked(bool checked)
 {
     if(checked)
     {
+        ui->textTerminal->clear();
+        ui->textTerminal->append("Ready for elm327 bluetooth devices..");
+
         if(m_networkManager)
         {
             if(m_networkManager->isConnected())
@@ -432,8 +432,8 @@ void MainWindow::on_radioBle_clicked(bool checked)
 
         if(m_bluetoothManager)
         {
-             ui->comboBleList->clear();
-             m_bluetoothManager->scan();
+            ui->comboBleList->clear();
+            m_bluetoothManager->scan();
         }
     }
 }
@@ -442,7 +442,11 @@ void MainWindow::on_radioWifi_clicked(bool checked)
 {
     if(checked)
     {
+        ui->textTerminal->clear();
+        ui->textTerminal->append("Ready for elm327 wifi devices..");
+
         ui->comboBleList->clear();
+
         if(m_bluetoothManager)
         {
             if(m_bluetoothManager->isConnected())

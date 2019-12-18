@@ -45,6 +45,7 @@ private:
     QString statetoString(QAbstractSocket::SocketState);
     static NetworkManager* theInstance_;
     QTcpSocket *socket{nullptr};
+    QByteArray byteblock{};
     bool m_connected{false};
 };
 

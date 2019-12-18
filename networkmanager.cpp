@@ -42,6 +42,9 @@ void NetworkManager::connected()
 void NetworkManager::disconnected()
 {
     m_connected = false;
+    QString msg{};
+    msg.append("Wifi disconnected.");
+    emit stateChanged(msg);
     emit wifiDisconnected();
 }
 
@@ -129,27 +132,38 @@ void NetworkManager::readyRead()
     if(customRead)
         return;
 
-    auto received = socket->readAll();
-    auto strData = QString::fromStdString(received.toStdString());
+    while (!socket->atEnd()) {
+        QByteArray data = socket->read(socket->bytesAvailable());
+        byteblock += data;
+    }
 
-    QString s_received = strData
-            .trimmed()
-            .simplified()
-            .remove(QRegExp("[\\n\\t\\r]"))
-            .remove(QRegExp("[^a-zA-Z0-9]+"));
+    auto strData = QString::fromStdString(byteblock.toStdString());
+    if(strData.contains("\r"))
+    {
+        strData.remove("\r");
+        strData.remove(">");
+        strData.remove("atrv").remove("ATRV");
+        if(!strData.isEmpty())
+        {
+            strData = strData.trimmed()
+                    .simplified()
+                    .remove(QRegExp("[\\n\\t\\r]"))
+                    .remove(QRegExp("[^a-zA-Z0-9]+"));
+            // Some of these look like errors that ought to be handled..
+            strData.replace("STOPPED","");
+            strData.replace("SEARCHING","");
+            strData.replace("NODATA","");
+            strData.replace("OK","");
+            strData.replace("?","");
+            strData.replace(",","");
 
-    s_received.replace(">","");
-
-    // Some of these look like errors that ought to be handled..
-    s_received.replace("STOPPED","");
-    s_received.replace("SEARCHING","");
-    s_received.replace("NO DATA","");
-    s_received.replace("OK","");
-    s_received.replace("?","");
-    s_received.replace(",","");
-
-    emit dataReceived(s_received);
-
+            if(!strData.isEmpty())
+            {
+                emit dataReceived(strData);
+            }
+            byteblock.clear();
+        }
+    }
     //emit dataBytesReceived(strData);
 }
 
@@ -162,6 +176,10 @@ void NetworkManager::error(QAbstractSocket::SocketError serr)
 void NetworkManager::connectWifi(const QString &ip, int port)
 {
     if(!socket)return;
+
+    QString msg{};
+    msg.append("Connecting to Wifi " + ip + " : " + port);
+    emit stateChanged(msg);
 
     socket->connectToHost(ip, port);
     socket->waitForConnected(3000);
