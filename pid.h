@@ -39,8 +39,6 @@ inline constexpr signum(T x) {
     return (T(0) < x) - (x < T(0));
 }
 
-static int EngineDisplacement = 1500;
-
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
 END_LINE = "\r",
@@ -50,8 +48,9 @@ INFO = "ATI",
 MONITOR_ALL = "ATMA",
 ALLOW_LONG_MESSAGE = "ATAL",
 VOLTAGE = "ATRV",
-GET_PROTOCOL = "ATDPN",
+GET_PROTOCOL = "ATDP",
 GET_PP_SUMMARY= "ATPPS",
+GET_ELM_INFO = "ATI",
 PROTOCOL_AUTO = "ATSP0",
 PROTOCOL_SEARCH_ORDER= "ATSS",
 ECHO_OFF = "ATE0",
@@ -95,10 +94,12 @@ PEDAL_POSITION = "015A", //Relative accelerator pedal position 0 -100 % A*100/25
 DISTANCE_TRAVALED = "0131", //Distance traveled since codes cleared  256A+B
 ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
 REQUEST_TROUBLE = "03", //Request trouble codes
-CLEAR_TROUBLE = "04"; //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
+CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
+ONLY_ENGINE_ECU ="ATSH7E0";
 
 static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, ECHO_OFF, ECHO_OFF};
-static QStringList runtimeCommands{ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, MAF_AIR_FLOW, VOLTAGE};
+//static QStringList runtimeCommands{ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, MAF_AIR_FLOW, VOLTAGE};
+static QStringList runtimeCommands{};
 static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
 
 static long long currentTimeMillis()

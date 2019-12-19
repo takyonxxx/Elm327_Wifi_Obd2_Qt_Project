@@ -4,16 +4,20 @@ ELM::ELM()
 {
 }
 
-QString ELM::get_available_pids()
-{   
-    QString data = "";
-    return data;
-}
-
-QString ELM::AT(QString& cmd)
+QString ELM::AT(QString & cmd)
 {
-    auto data = NetworkManager::getInstance()->readData(cmd);
-    return data;
+    QString response{"Not Connected"};
+
+    if(NetworkManager::getInstance()->isConnected())
+    {
+        response = NetworkManager::getInstance()->readData(cmd);
+    }
+    else if(BluetoothManager::getInstance()->isConnected())
+    {
+        response = BluetoothManager::getInstance()->readData(cmd);
+    }
+
+    return response;
 }
 
 std::vector<QString> ELM::prepareResponseToDecode(const QString &response_str)
@@ -71,3 +75,127 @@ std::pair<int,bool> ELM::decodeNumberOfDtc(const std::vector<QString> &hex_vals)
     }
     return std::make_pair(dtcNumber,milOn);
 }
+
+QString ELM::get_available_pids()
+{
+    if (!available_pids_checked)
+    {
+        update_available_pids();
+    }
+    QString data = "";
+    bool first = true;
+    for (int i = 1; i <= 255; i++)
+    {
+        if (available_pids[i-1])
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                data.append(",");
+            }
+
+            QString hexvalue = QString("01") + QString("%1").arg(i, 2, 16, QLatin1Char( '0' ));
+            data.append(hexvalue.toUpper());
+        }
+    }
+    return data;
+}
+
+void ELM::update_available_pids()
+{
+    // initialize supported pid list
+    for (int h = 0; h < 256; h++) {
+        available_pids[h] = false;
+    }
+    available_pids[0] = true; // PID0 is always supported and can't be checked for support
+    update_available_pidset(1);
+
+    // Check if pid 0x20 is available (meaning next set is supported)
+    if ( available_pids[0x20] ) {
+        update_available_pidset(2);
+        if ( available_pids[0x40] ) {
+            update_available_pidset(3);
+            if ( available_pids[0x60] ) {
+                update_available_pidset(4);
+                if ( available_pids[0x80] ) {
+                    update_available_pidset(5);
+                    if ( available_pids[0xA0] ) {
+                        update_available_pidset(6);
+                        if ( available_pids[0xC0] ) {
+                            update_available_pidset(7);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    available_pids_checked = true;
+}
+
+void ELM::update_available_pidset(quint8 set)
+{
+    QString cmd1;
+
+    // Select command
+    switch (set) {
+    case 1:
+        cmd1 = "0100";
+        break;
+    case 2:
+        cmd1 = "0120";
+        break;
+    case 3:
+        cmd1 = "0140";
+        break;
+    case 4:
+        cmd1 = "0160";
+        break;
+    case 5:
+        cmd1 = "0180";
+        break;
+    case 6:
+        cmd1 = "01A0";
+        break;
+    case 7:
+        cmd1 = "01C0";
+        break;
+    default:
+        cmd1 = "0100";
+        break;
+    }
+    QString flags{};
+    // Get first set of pids
+    QString cmd = "4100983B0011410080108000";
+    //QString cmd = AT(cmd1);
+
+    auto list = cmd.split("41");
+    for(auto &item: list)
+    {
+        QString setPart = item.mid(0,2);
+
+        // trim to continuous 32bit hex string
+        QString dataPart = item.mid(2, item.size());
+        const char *str;
+        QByteArray byteArray{};
+        byteArray = dataPart.toLatin1();
+        str = byteArray.data();
+        unsigned long longData = strtoul(str,nullptr,16);
+        auto binaryString = DecimalToBinaryString(longData);
+        int m = (set-1) * 32;
+
+        // fill supported pid list
+        for (int i = 0; i < binaryString.length(); i++)
+        {
+            if (binaryString[i] == '0') {
+                if(!available_pids[i+m])
+                    available_pids[i+m] = false;
+            } else {
+                available_pids[i+m] = true;
+            }
+        }
+    }
+}
+

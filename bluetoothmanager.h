@@ -29,6 +29,8 @@ public:
     void disconnectBle();
     bool isConnected();
     bool send(const QString &);
+    QString checkData();
+    QString readData(QString &);
 
 public: signals:
     void dataReceived(QString &);

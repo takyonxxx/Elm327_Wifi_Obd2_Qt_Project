@@ -2,9 +2,8 @@
 #define OBDSCAN_H
 
 #include <QMainWindow>
-#include "networkmanager.h"
-#include "bluetoothmanager.h"
 #include <QVector>
+#include "elm.h"
 
 namespace Ui {
 class ObdScan;
@@ -18,9 +17,7 @@ public:
     explicit ObdScan(QWidget *parent = nullptr);
     ~ObdScan();
 
-private:
-    NetworkManager *m_networkManager;
-    BluetoothManager *m_bluetoothManager;
+private:    
     int commandOrder{0};
     bool mRunning{false};
     bool getFuelPid{false};
@@ -28,10 +25,10 @@ private:
     int mRpm{0};
     int mLoad{0};
     int mMAF{0};
-    int mTPos{0};
-    qreal mFuelConsumption{0.0};
-    qreal mFuelLPer100{0.0};
+    int mTPos{0};    
     QVector<qreal> mAvarageFuelConsumption{};
+    QVector<qreal> mAvarageFuelConsumption100{};
+    ELM *elm{};
 
     void send(const QString &);
     void analysData(const QString &);    

@@ -49,7 +49,8 @@ SOURCES += \
         networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
-        qcgaugewidget.cpp
+        qcgaugewidget.cpp \
+        settingsmanager.cpp
 
 HEADERS += \
         bluetoothmanager.h \
@@ -60,7 +61,8 @@ HEADERS += \
         obdgauge.h \
         obdscan.h \
         pid.h \
-        qcgaugewidget.h
+        qcgaugewidget.h \
+        settingsmanager.h
 
 FORMS += \
         mainwindow.ui \

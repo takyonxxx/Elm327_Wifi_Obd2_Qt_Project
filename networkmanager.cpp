@@ -20,7 +20,7 @@ NetworkManager::NetworkManager()
     {
         connect(socket,&QTcpSocket::connected,this, &NetworkManager::connected);
         connect(socket,&QTcpSocket::disconnected,this,&NetworkManager::disconnected);
-        connect(socket,&QTcpSocket::readyRead,this,&NetworkManager::readyRead);
+        //connect(socket,&QTcpSocket::readyRead,this,&NetworkManager::readyRead);
         connect(socket,&QTcpSocket::stateChanged,this,&NetworkManager::stateChange);
         connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(error(QAbstractSocket::SocketError)));
     }
@@ -67,7 +67,8 @@ QString NetworkManager::statetoString(QAbstractSocket::SocketState socketState)
         break;
     case QAbstractSocket::ListeningState : statestring="Listening state";
         break;
-    default: statestring="Unknown state";
+    default:
+        statestring="Unknown state";
         break;
     }
     return statestring;
@@ -79,25 +80,80 @@ void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
     emit stateChanged(state);
 }
 
-QString NetworkManager::readData(QString &command)
+QString NetworkManager::checkData()
 {
-    customRead = true;
     QString strData{};
-    if(send(command))
+
+    if (socket->waitForReadyRead())
     {
-        while (socket->bytesAvailable() > 0)
+        QByteArray data = socket->readAll();
+        byteblock += data;
+
+        strData = QString::fromStdString(byteblock.toStdString());
+        if(strData.contains("\r"))
         {
-            if (!socket->waitForReadyRead())
+            strData.remove("\r");
+            strData.remove(">");
+            strData.remove("atrv").remove("ATRV");
+            if(!strData.isEmpty())
             {
-                qDebug() << "waitForReadyRead() timed out";
+                strData = strData.trimmed()
+                        .simplified()
+                        .remove(QRegExp("[\\n\\t\\r]"))
+                        .remove(QRegExp("[^a-zA-Z0-9]+"));
+
                 return strData;
             }
-
-            auto received = socket->readAll();
-            auto strData = QString::fromStdString(received.toStdString());
         }
     }
-    customRead = false;
+
+    return strData;
+}
+
+QString NetworkManager::readData(QString &command)
+{
+    QString strData{};
+
+    if(send(command))
+    {
+        if (socket->waitForReadyRead())
+        {
+            QByteArray data = socket->readAll();
+            byteblock += data;
+
+            strData = QString::fromStdString(byteblock.toStdString());
+            if(strData.contains("\r"))
+            {
+                strData.remove("\r");
+                strData.remove(">");
+                strData.remove("atrv").remove("ATRV");
+                if(!strData.isEmpty())
+                {
+                    byteblock.clear();
+
+                    strData = strData.trimmed()
+                            .simplified()
+                            .remove(QRegExp("[\\n\\t\\r]"))
+                            .remove(QRegExp("[^a-zA-Z0-9]+"));                    
+
+                    strData.replace("OK","");
+                    strData.replace("?","");
+                    strData.replace(",","");
+
+                    if(strData.contains("SEARCHING"))
+                    {
+                        auto check = checkData();
+                        emit dataReceived(check);
+                    }
+                    else if(!strData.isEmpty())
+                    {
+                        emit dataReceived(strData);
+                    }
+                }
+            }
+        }
+    }
+
     return strData;
 }
 
@@ -128,14 +184,9 @@ bool NetworkManager::send(const QString &string)
 }
 
 void NetworkManager::readyRead()
-{   
-    if(customRead)
-        return;
-
-    while (!socket->atEnd()) {
-        QByteArray data = socket->read(socket->bytesAvailable());
-        byteblock += data;
-    }
+{
+    QByteArray data = socket->readAll();
+    byteblock += data;
 
     auto strData = QString::fromStdString(byteblock.toStdString());
     if(strData.contains("\r"))
@@ -164,7 +215,6 @@ void NetworkManager::readyRead()
             byteblock.clear();
         }
     }
-    //emit dataBytesReceived(strData);
 }
 
 void NetworkManager::error(QAbstractSocket::SocketError serr)

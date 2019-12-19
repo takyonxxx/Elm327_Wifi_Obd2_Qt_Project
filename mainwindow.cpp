@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     keep_screen_on(true);
 #endif
 
+    m_settingsManager = SettingsManager::getInstance();
+
     m_bluetoothManager = BluetoothManager::getInstance();
 
     if(m_bluetoothManager)
@@ -94,9 +96,12 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
         connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
     }
+
+    elm = new ELM();
+
     ui->radioWifi->setChecked(true);
 
-    ui->pushConnect->setFocus();
+    ui->pushConnect->setFocus();   
 }
 
 MainWindow::~MainWindow()
@@ -214,7 +219,7 @@ void MainWindow::on_pushExit_clicked()
 }
 
 void MainWindow::on_pushSend_clicked()
-{
+{   
     QString text = ui->textSend->toPlainText();
     send(text);
 }
@@ -265,14 +270,6 @@ void MainWindow::on_pushGauge_clicked()
     m_ConsoleEnable = false;
 }
 
-void MainWindow::getPidsSupported()
-{
-    ELM elm{};
-    QString supportedPIDs = elm.get_available_pids();
-    pidsSupportedCommands.append(supportedPIDs);
-    ui->textTerminal->append("PIDs supported: " + supportedPIDs);
-}
-
 void MainWindow::connected()
 {
     ui->pushSend->setEnabled(true);
@@ -286,6 +283,14 @@ void MainWindow::connected()
     m_initialized = false;
 
     send(RESET);
+    send(ECHO_OFF);
+    send(LINEFEED_OFF);
+    send(HEADERS_OFF);
+    send(SPACES_OFF);
+    send(TIMEOUT_DEFAULT);
+    send(PROTOCOL_AUTO);
+    send(GET_PROTOCOL);
+    send(GET_ELM_INFO);
 }
 
 void MainWindow::disconnected()
@@ -303,21 +308,17 @@ void MainWindow::disconnected()
 }
 
 void MainWindow::analysData(const QString &dataReceived)
-{    
-    if(dataReceived.isEmpty())return;
+{
 
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
-    ELM elm{};
-
-    ui->textTerminal->append("<- " + dataReceived);
 
     if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
         return;
 
     std::vector<QString> vec;
-    auto resp= elm.prepareResponseToDecode(dataReceived);
+    auto resp= elm->prepareResponseToDecode(dataReceived);
 
     if(resp.size()>0 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
@@ -343,7 +344,7 @@ void MainWindow::analysData(const QString &dataReceived)
     if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive) && !resp[1].compare("01",Qt::CaseInsensitive))
     {
         vec.insert(vec.begin(),resp.begin()+2, resp.end());
-        std::pair<int,bool> dtcNumber = elm.decodeNumberOfDtc(vec);        
+        std::pair<int,bool> dtcNumber = elm->decodeNumberOfDtc(vec);
         QString milText = dtcNumber.second ? "true" : "false";
         ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + milText);
     }
@@ -351,7 +352,7 @@ void MainWindow::analysData(const QString &dataReceived)
     if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
     {
         vec.insert(vec.begin(),resp.begin()+1, resp.end());
-        std::vector<QString> dtcCodes( elm.decodeDTC(vec));
+        std::vector<QString> dtcCodes( elm->decodeDTC(vec));
         if(dtcCodes.size()>0)
         {
             for(auto &code : dtcCodes)
@@ -377,44 +378,31 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::dataReceived(QString &dataReceived)
 {
-    if(!m_ConsoleEnable)return;
-
-    if(!m_initialized && initializeCommands.size() == commandOrder)
-    {        
-        m_initialized = true;
-        commandOrder = 0;
-    }
-
-    if(!m_initialized && commandOrder < initializeCommands.size())
+    if(dataReceived.isEmpty())
     {
-        send(initializeCommands[commandOrder]);
-        commandOrder++;
+        ui->textTerminal->append("<- null");
+        return;
     }
 
-    if(m_initialized)
-    {
-        analysData(dataReceived);
-    }
+    ui->textTerminal->append("<- " + dataReceived);
+    analysData(dataReceived);
 }
 
-void MainWindow::send(const QString &data)
+QString MainWindow::send(QString &data)
 {
-    if(!m_ConsoleEnable)return;
-
-    if(m_bluetoothManager->isConnected())
+    if(m_ConsoleEnable)
     {
-        m_bluetoothManager->send(data);
+        ui->textTerminal->append("-> " + data.trimmed()
+                                 .simplified()
+                                 .remove(QRegExp("[\\n\\t\\r]"))
+                                 .remove(QRegExp("[^a-zA-Z0-9]+")));
+
+        QCoreApplication::processEvents();
+
+        return elm->AT(data);
     }
 
-    if(m_networkManager->isConnected())
-    {
-        m_networkManager->send(data);
-    }
-
-    ui->textTerminal->append("-> " + data.trimmed()
-                             .simplified()
-                             .remove(QRegExp("[\\n\\t\\r]"))
-                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+    return QString();
 }
 
 void MainWindow::on_radioBle_clicked(bool checked)

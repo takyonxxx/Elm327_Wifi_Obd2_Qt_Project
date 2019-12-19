@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include "qcgaugewidget.h"
 #include "networkmanager.h"
+#include "elm.h"
 
 namespace Ui {
 class ObdGauge;
@@ -35,6 +36,8 @@ private:
 
     QcGaugeWidget * mRpmGauge{};
     QcNeedleItem *mRpmNeedle{};
+
+    ELM *elm{};
 
     void send(QString &);
     void analysData(const QString &);

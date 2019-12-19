@@ -34,8 +34,8 @@ public:
     void connectWifi(const QString &, int );
     void disconnectWifi();
     bool isConnected();
+    QString checkData();
     QString readData(QString &);
-    bool customRead {false};
 
 protected:
     bool m_headerRead{false};

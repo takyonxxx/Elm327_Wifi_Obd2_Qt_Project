@@ -2,6 +2,9 @@
 #include "ui_obdscan.h"
 #include "pid.h"
 #include "elm.h"
+#include "settingsmanager.h"
+#include "networkmanager.h"
+#include "bluetoothmanager.h"
 
 ObdScan::ObdScan(QWidget *parent) :
     QMainWindow(parent),
@@ -24,23 +27,18 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelCoolant->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color: #154360 ;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360;  padding: 2px;");
-    ui->comboEngineDisplacement->setCurrentIndex(4);
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 32pt; font-weight: bold; color: darkgray; background-color: #154360;  padding: 2px;");
+    ui->comboEngineDisplacement->setCurrentText(QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
     ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelStatus->setStyleSheet("font-size: 28pt; font-weight: bold; color: #D7DBDD; background-color:#154360 ;;  padding: 2px;");
 
-    ui->labelVoltage->setStyleSheet("font-size: 56pt; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
-    ui->labelFuelConsumption->setStyleSheet("font: 48pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
-    ui->labelFuel100->setStyleSheet("font-size: 48pt; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
+    ui->labelVoltage->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
+    ui->labelFuel100->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
 
-    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
-                                      + " / "
-                                      + QString::number(0, 'f', 1)
-                                      + "\nl / h");
-
-    ui->labelFuel100->setText(QString::number(0, 'f', 1) + " l / 100km");
-
+    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
+    ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
 
     ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ;padding: 2px;");
@@ -49,34 +47,19 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelFuelConsumption->setFocus();
 
-    m_networkManager = NetworkManager::getInstance();
-    m_bluetoothManager = BluetoothManager::getInstance();
-
-    EngineDisplacement = ui->comboEngineDisplacement->currentText().toInt();
-
-    if(m_networkManager)
+    if(NetworkManager::getInstance()->isConnected() || BluetoothManager::getInstance()->isConnected())
     {
-        if(m_networkManager->isConnected())
-        {
-            connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
-            mRunning = true;
-            mAvarageFuelConsumption.clear();
-            commandOrder = 0;
-            send(VOLTAGE);
-        }
+        mRunning = true;
+        mAvarageFuelConsumption.clear();
+        mAvarageFuelConsumption100.clear();
+        commandOrder = 0;
+
+        elm = new ELM();
+        QString supportedPIDs = elm->get_available_pids();
+        runtimeCommands = supportedPIDs.split(",");
+        qDebug() << "PIDs supported: "  << runtimeCommands;
     }
 
-    if(m_bluetoothManager)
-    {
-        if(m_bluetoothManager->isConnected())
-        {
-            connect(m_bluetoothManager, &BluetoothManager::dataReceived, this, &ObdScan::dataReceived);
-            mRunning = true;
-            mAvarageFuelConsumption.clear();
-            commandOrder = 0;
-            send(VOLTAGE);
-        }
-    }
 }
 
 ObdScan::~ObdScan()
@@ -102,14 +85,14 @@ void ObdScan::send(const QString &data)
 {
     if(!mRunning)return;
 
-    if(m_bluetoothManager->isConnected())
+    if(BluetoothManager::getInstance()->isConnected())
     {
-        m_bluetoothManager->send(data);
+        BluetoothManager::getInstance()->send(data);
     }
 
-    if(m_networkManager->isConnected())
+    if(NetworkManager::getInstance()->isConnected())
     {
-        m_networkManager->send(data);
+        NetworkManager::getInstance()->send(data);
     }
 
     ui->labelStatus->setText(data);
@@ -241,13 +224,13 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
+        {
             getFuelPid = true;
-            mFuelConsumption = ((A*256)+B) / 20;
-            mAvarageFuelConsumption.append(mFuelConsumption);
-            ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
-                                              + " / "
-                                              + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                              + "\nl / h");
+            auto FuelFlowLH = ((A*256)+B) / 20;
+            mAvarageFuelConsumption.append(FuelFlowLH);
+            ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + " l / h");
+        }
+
             break;
         case 98://PID(62) Actual engine - percent torque
             // A-125
@@ -263,23 +246,30 @@ void ObdScan::analysData(const QString &dataReceived)
         {
             if(!getFuelPid)
             {
+                auto EngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
                 auto AL = mMAF * mLoad;  // Airflow * Load
-                auto coeff = (EngineDisplacement / 1000.0) / 714.0;
-                // Fuel flow coefficient
-                auto LH = AL * coeff + 1;   // Fuel flow L/h
-                mFuelConsumption = LH;
-                mFuelLPer100 = LH * 100 / mSpeed;   // FuelConsumption in l per 100km
+                auto coeff = (EngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
+                auto FuelFlowLH = AL * coeff + 1;   // Fuel flow L/h
+                auto mFuelLPer100 = FuelFlowLH * 100 / mSpeed;   // FuelConsumption in l per 100km
+
+                if(FuelFlowLH > 99)
+                    FuelFlowLH = 99;
+
                 if(mFuelLPer100 > 99)
                     mFuelLPer100 = 99;
 
-                mAvarageFuelConsumption.append(mFuelConsumption);
-                ui->labelFuelConsumption->setText(QString::number(mFuelConsumption, 'f', 1)
-                                                  + " / "
-                                                  + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1)
-                                                  + "\nl / h"
-                                                  );
+                mAvarageFuelConsumption.append(FuelFlowLH);
+                ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
 
-               ui->labelFuel100->setText(QString::number(mFuelLPer100, 'f', 1) + " l / 100km");
+                if(mSpeed > 0)
+                {
+                    mAvarageFuelConsumption100.append(mFuelLPer100);
+                    ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
+                }
+                else
+                {
+                    ui->labelFuel100->setText(QString::number(99, 'f', 1) + "  l / 100km");
+                }
             }
         }
     }
@@ -303,19 +293,14 @@ qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
 
 void ObdScan::on_pushClear_clicked()
 {
-    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1)
-                                      + " / "
-                                      + QString::number(0, 'f', 1)
-                                      + "\nl / h");
-
-    ui->labelFuel100->setText(QString::number(0, 'f', 1) + " l / 100km");
-
+    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
+    ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
-
-    mAvarageFuelConsumption.clear();
+    mAvarageFuelConsumption.clear();    
 }
 
 void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
 {
-    EngineDisplacement = arg1.toInt();
+    SettingsManager::getInstance()->setEngineDisplacement(arg1.toInt());
+    SettingsManager::getInstance()->saveSettings();
 }

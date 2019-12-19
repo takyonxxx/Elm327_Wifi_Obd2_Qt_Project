@@ -162,12 +162,89 @@ qint32 ArrayToInt(QByteArray source)
     return temp;
 }
 
+QString BluetoothManager::checkData()
+{
+    QString strData{};
+
+    if (socket->waitForReadyRead(5000))
+    {
+        QByteArray data = socket->readAll();
+        byteblock += data;
+
+        strData = QString::fromStdString(byteblock.toStdString());
+        if(strData.contains("\r"))
+        {
+            strData.remove("\r");
+            strData.remove(">");
+            strData.remove("atrv").remove("ATRV");
+            if(!strData.isEmpty())
+            {
+                strData = strData.trimmed()
+                        .simplified()
+                        .remove(QRegExp("[\\n\\t\\r]"))
+                        .remove(QRegExp("[^a-zA-Z0-9]+"));
+
+                return strData;
+            }
+        }
+    }
+
+    return strData;
+}
+
+
+QString BluetoothManager::readData(QString &command)
+{
+    QString strData{};
+
+    if(send(command))
+    {
+        if (socket->waitForReadyRead(5000))
+        {
+            QByteArray data = socket->readAll();
+            byteblock += data;
+
+            strData = QString::fromStdString(byteblock.toStdString());
+            if(strData.contains("\r"))
+            {
+                strData.remove("\r");
+                strData.remove(">");
+                strData.remove("atrv").remove("ATRV");
+                if(!strData.isEmpty())
+                {
+                    byteblock.clear();
+
+                    strData = strData.trimmed()
+                            .simplified()
+                            .remove(QRegExp("[\\n\\t\\r]"))
+                            .remove(QRegExp("[^a-zA-Z0-9]+"));
+
+                    strData.replace("OK","");
+                    strData.replace("?","");
+                    strData.replace(",","");
+
+                    if(strData.contains("SEARCHING"))
+                    {
+                        auto check = checkData();
+                        emit dataReceived(check);
+                    }
+                    else if(!strData.isEmpty())
+                    {
+                        emit dataReceived(strData);
+                    }
+                }
+            }
+        }
+    }
+
+    return strData;
+}
+
+
 void BluetoothManager::readyRead()
 {
-    while (!socket->atEnd()) {
-        QByteArray data = socket->read(socket->bytesAvailable());
-        byteblock += data;
-    }
+    QByteArray data = socket->readAll();
+    byteblock += data;
 
     auto strData = QString::fromStdString(byteblock.toStdString());
     if(strData.contains("\r"))

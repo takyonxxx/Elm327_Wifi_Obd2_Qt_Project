@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "networkmanager.h"
 #include "bluetoothmanager.h"
+#include "settingsmanager.h"
 #include "obdscan.h"
 #include "obdgauge.h"
 
@@ -92,15 +93,17 @@ public:
 private:
     void connectWifi();
     void connectBle(const QBluetoothAddress &);
-    void send(const QString &);
+    QString send(QString &);
     void analysData(const QString &);
-    void getPidsSupported();   
-    QStringList pidsSupportedCommands{};
+
 #ifdef Q_OS_ANDROID
     bool setScreenOrientation(int orientation);
 #endif
-    NetworkManager *m_networkManager;
-    BluetoothManager *m_bluetoothManager;
+
+    NetworkManager *m_networkManager{};
+    BluetoothManager *m_bluetoothManager{};
+    SettingsManager *m_settingsManager{};
+    ELM *elm{};
 
     int commandOrder{0};
     bool m_initialized{false};
@@ -127,9 +130,7 @@ private slots:
     void on_pushGauge_clicked();
     void orientationChanged(Qt::ScreenOrientation orientation);    
     void addDeviceToList(const QBluetoothAddress&, const QString&);
-
     void on_radioBle_clicked(bool checked);
-
     void on_radioWifi_clicked(bool checked);
 
 private:
