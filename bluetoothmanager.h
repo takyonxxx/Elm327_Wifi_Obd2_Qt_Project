@@ -24,13 +24,14 @@ public:
     ~BluetoothManager();
 
     static BluetoothManager* getInstance();
+    QMutex m_mutex{};
     void scan();
     void connectBle(const QBluetoothAddress &);
     void disconnectBle();
     bool isConnected();
     bool send(const QString &);
     QString checkData();
-    QString readData(QString &);
+    QString readData(const QString &);
 
 public: signals:
     void dataReceived(QString &);
@@ -50,14 +51,13 @@ private slots:
     void readyRead();
 
 private:
-    QMutex m_mutex;
     bool m_connected{false};  
     QBluetoothSocket* socket{};
     QByteArray byteblock{};
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QBluetoothLocalDevice *localDevice;
+    pthread_t m_discoveryThread{};
     static void *discoveryThread(void * this_ptr);
-    pthread_t scanThread{};    
     static BluetoothManager* theInstance_;
 };
 

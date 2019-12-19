@@ -55,7 +55,7 @@ void *BluetoothManager::discoveryThread(void * this_ptr)
 
 void BluetoothManager::scan()
 {
-    pthread_create( &scanThread, nullptr, &BluetoothManager::discoveryThread, this);
+    pthread_create( &m_discoveryThread, nullptr, &BluetoothManager::discoveryThread, this);
 }
 
 BluetoothManager::BluetoothManager():localDevice(new QBluetoothLocalDevice)
@@ -65,8 +65,8 @@ BluetoothManager::BluetoothManager():localDevice(new QBluetoothLocalDevice)
 
 BluetoothManager::~BluetoothManager()
 {
-    if(scanThread)
-        pthread_cancel(scanThread);
+    if(m_discoveryThread)
+        pthread_cancel(m_discoveryThread);
 
     delete localDevice;
     delete discoveryAgent;
@@ -92,8 +92,8 @@ void BluetoothManager::disconnectBle()
 {
     if(socket->isOpen())
     {
-        if(scanThread)
-            pthread_cancel(scanThread);
+        if(m_discoveryThread)
+            pthread_cancel(m_discoveryThread);
 
         socket->disconnectFromService();
         socket->deleteLater();
@@ -193,7 +193,7 @@ QString BluetoothManager::checkData()
 }
 
 
-QString BluetoothManager::readData(QString &command)
+QString BluetoothManager::readData(const QString &command)
 {
     QString strData{};
 

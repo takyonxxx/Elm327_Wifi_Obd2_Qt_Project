@@ -15,9 +15,10 @@ class ObdScan : public QMainWindow
 
 public:
     explicit ObdScan(QWidget *parent = nullptr);
-    ~ObdScan();
+    ~ObdScan() override;
 
-private:    
+private:
+    QMutex m_mutex{};
     int commandOrder{0};
     bool mRunning{false};
     bool getFuelPid{false};
@@ -29,8 +30,11 @@ private:
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};
+    bool m_stop{false};
+    static void *scanThread(void * this_ptr);
+    pthread_t m_scanThread{};
 
-    void send(const QString &);
+    QString send(const QString &);
     void analysData(const QString &);    
     qreal calculateAverage(QVector<qreal> &listavg) ;
 

@@ -9,24 +9,13 @@ class ELM
 {
 public:
     ELM();
-    QString get_available_pids();    
-    QString AT(QString &);
+    static ELM* getInstance();
+    QString get_available_pids();
+    void resetPids();
+    QString AT(const QString &);
     std::vector<QString> decodeDTC(const std::vector<QString> &hex_vals);
     std::pair<int,bool> decodeNumberOfDtc(const std::vector<QString> &hex_vals);
     std::vector<QString> prepareResponseToDecode(const QString &response_str);
-
-    std::string DecimalToBinaryString(unsigned long a)
-    {
-        uint b = static_cast<uint>(a);
-        std::string binary = "";
-        uint mask = 0x80000000u;
-        while (mask > 0)
-        {
-            binary += ((b & mask) == 0) ? '0' : '1';
-            mask >>= 1;
-        }
-        return binary;
-    }
 
 private:
     bool available_pids[256];
@@ -38,6 +27,7 @@ private:
                                       {'8',QString("B0")},{'9',QString("B1")},{'A',QString("B2")},{'B',QString("B3")},
                                       {'C',QString("U0")},{'D',QString("U1")},{'E',QString("U2")},{'F',QString("U3")}
                                      };
+    static ELM* theInstance_;
 
 };
 

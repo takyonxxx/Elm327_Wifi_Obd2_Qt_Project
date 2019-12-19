@@ -110,7 +110,7 @@ QString NetworkManager::checkData()
     return strData;
 }
 
-QString NetworkManager::readData(QString &command)
+QString NetworkManager::readData(const QString &command)
 {
     QString strData{};
 

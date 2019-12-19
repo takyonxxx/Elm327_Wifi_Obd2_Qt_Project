@@ -1,10 +1,34 @@
 #include "elm.h"
 
+std::string DecimalToBinaryString(unsigned long a)
+{
+    uint b = static_cast<uint>(a);
+    std::string binary = "";
+    uint mask = 0x80000000u;
+    while (mask > 0)
+    {
+        binary += ((b & mask) == 0) ? '0' : '1';
+        mask >>= 1;
+    }
+    return binary;
+}
+
+ELM* ELM::theInstance_ = nullptr;
+
+ELM *ELM::getInstance()
+{
+    if (theInstance_ == nullptr)
+    {
+        theInstance_ = new ELM();
+    }
+    return theInstance_;
+}
+
 ELM::ELM()
 {
 }
 
-QString ELM::AT(QString & cmd)
+QString ELM::AT(const QString & cmd)
 {
     QString response{"Not Connected"};
 
@@ -76,12 +100,18 @@ std::pair<int,bool> ELM::decodeNumberOfDtc(const std::vector<QString> &hex_vals)
     return std::make_pair(dtcNumber,milOn);
 }
 
+void ELM::resetPids()
+{
+    // initialize supported pid list
+    for (int h = 0; h < 256; h++) {
+        available_pids[h] = false;
+    }
+}
+
 QString ELM::get_available_pids()
 {
-    if (!available_pids_checked)
-    {
-        update_available_pids();
-    }
+    update_available_pids();
+
     QString data = "";
     bool first = true;
     for (int i = 1; i <= 255; i++)
@@ -106,10 +136,6 @@ QString ELM::get_available_pids()
 
 void ELM::update_available_pids()
 {
-    // initialize supported pid list
-    for (int h = 0; h < 256; h++) {
-        available_pids[h] = false;
-    }
     available_pids[0] = true; // PID0 is always supported and can't be checked for support
     update_available_pidset(1);
 
@@ -189,10 +215,7 @@ void ELM::update_available_pidset(quint8 set)
         // fill supported pid list
         for (int i = 0; i < binaryString.length(); i++)
         {
-            if (binaryString[i] == '0') {
-                if(!available_pids[i+m])
-                    available_pids[i+m] = false;
-            } else {
+            if (binaryString[i] == '1') {
                 available_pids[i+m] = true;
             }
         }
