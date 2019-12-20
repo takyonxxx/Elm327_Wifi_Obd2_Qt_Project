@@ -50,7 +50,7 @@ ObdScan::ObdScan(QWidget *parent) :
     connect(BluetoothManager::getInstance(), &BluetoothManager::dataReceived, this, &ObdScan::dataReceived);
     connect(NetworkManager::getInstance(), &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
 
-    if(NetworkManager::getInstance()->isConnected() || BluetoothManager::getInstance()->isConnected())
+    //if(NetworkManager::getInstance()->isConnected() || BluetoothManager::getInstance()->isConnected())
     {
         mRunning = true;
         mAvarageFuelConsumption.clear();
@@ -62,13 +62,16 @@ ObdScan::ObdScan(QWidget *parent) :
         QString supportedPIDs = elm->get_available_pids();
         runtimeCommands = supportedPIDs.split(",");
         qDebug() << "PIDs supported: "  << runtimeCommands;
-        pthread_create( &m_scanThread, nullptr, &ObdScan::scanThread, this);
+        manager = new NetworkManager();
+        manager->start();
+        //pthread_create( &m_scanThread, nullptr, &ObdScan::scanThread, this);
     }
 
 }
 
 ObdScan::~ObdScan()
 {
+    delete manager;
     delete ui;
 }
 
@@ -76,7 +79,7 @@ void ObdScan::closeEvent (QCloseEvent *event)
 {
     Q_UNUSED(event);
     mRunning = false;
-    m_stop = true;
+    manager->setStop(true);
     if(m_scanThread)
         pthread_cancel(m_scanThread);
     emit on_close_scan();
@@ -290,7 +293,7 @@ void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1
     SettingsManager::getInstance()->saveSettings();
 }
 
-void *ObdScan::scanThread(void *this_ptr)
+/*void *ObdScan::scanThread(void *this_ptr)
 {
     qRegisterMetaType<QString>("QString");
 
@@ -305,8 +308,7 @@ void *ObdScan::scanThread(void *this_ptr)
         for(auto &cmd: runtimeCommands)
         {
             qDebug() << cmd;
-            //obj_ptr->send(cmd);
         }
         QThread::msleep(1000);
     }
-}
+}*/

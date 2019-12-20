@@ -30,7 +30,7 @@ private:
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};
-    bool m_stop{false};
+    NetworkManager *manager{};
     static void *scanThread(void * this_ptr);
     pthread_t m_scanThread{};
 

@@ -4,15 +4,18 @@
 #include <QObject>
 #include <QtNetwork>
 
-class NetworkManager : public QObject
+class NetworkManager : public QThread
 {
     Q_OBJECT
 
 public:
     NetworkManager();
-    ~NetworkManager();
+    ~NetworkManager() override;
 
     static NetworkManager* getInstance();
+
+public:
+     void run() override;
 
 public: signals:
     void dataReceived(QString &);
@@ -37,6 +40,8 @@ public:
     QString checkData();
     QString readData(const QString &);
 
+    void setStop(bool stop);
+
 protected:
     bool m_headerRead{false};
     unsigned int m_size_of_data_to_read;
@@ -47,6 +52,7 @@ private:
     QTcpSocket *socket{nullptr};
     QByteArray byteblock{};
     bool m_connected{false};
+    bool m_stop{false};
 };
 
 #endif // NETWORKMANAGER_H

@@ -1,5 +1,6 @@
 #include "networkmanager.h"
 #include <QDebug>
+#include "pid.h"
 
 NetworkManager* NetworkManager::theInstance_ = nullptr;
 
@@ -10,6 +11,63 @@ NetworkManager *NetworkManager::getInstance()
         theInstance_ = new NetworkManager();
     }
     return theInstance_;
+}
+
+void NetworkManager::run()
+{
+    QString ip = "192.168.0.10";
+    int port = 35000;
+    QTcpSocket *socket = new QTcpSocket(this);
+    socket->connectToHost(ip, port);
+    socket->waitForConnected(3000);
+    QByteArray byteblock{};
+    qDebug() << "tcp thread started";
+
+    while (true)
+    {
+        if(m_stop)
+            break;
+
+        if(socket->isOpen())
+        {
+            QString string{VOLTAGE};
+            QByteArray dataToSend = string.toUtf8();
+
+            if (string.isEmpty())
+            {
+                // If toWrite is empty then just send a CR char.
+                dataToSend += ('\r');
+            }
+            else
+            {
+                // Check for CR at end.
+                if (dataToSend[dataToSend.size()] != '\r')
+                    dataToSend += '\r';
+            }
+
+            socket->write(dataToSend);
+            socket->waitForBytesWritten();
+
+            if (socket->waitForReadyRead())
+            {
+                QByteArray data = socket->readAll();
+                byteblock += data;
+
+                auto strData = QString::fromStdString(byteblock.toStdString());
+                if(strData.contains("\r"))
+                {
+                    qDebug() << strData;
+                    byteblock.clear();
+                }
+            }
+        }
+
+        QThread::msleep(500);
+    }
+
+    socket->close();
+    delete socket;
+    exec();
 }
 
 NetworkManager::NetworkManager()
@@ -72,6 +130,11 @@ QString NetworkManager::statetoString(QAbstractSocket::SocketState socketState)
         break;
     }
     return statestring;
+}
+
+void NetworkManager::setStop(bool stop)
+{
+    m_stop = stop;
 }
 
 void NetworkManager::stateChange(QAbstractSocket::SocketState socketState)
@@ -189,7 +252,9 @@ void NetworkManager::readyRead()
     byteblock += data;
 
     auto strData = QString::fromStdString(byteblock.toStdString());
-    if(strData.contains("\r"))
+    qDebug() << strData;
+
+    /*if(strData.contains("\r"))
     {
         strData.remove("\r");
         strData.remove(">");
@@ -214,7 +279,7 @@ void NetworkManager::readyRead()
             }
             byteblock.clear();
         }
-    }
+    }*/
 }
 
 void NetworkManager::error(QAbstractSocket::SocketError serr)
