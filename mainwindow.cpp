@@ -44,8 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->textSend->setText(PIDS_SUPPORTED20);
     ui->pushSend->setEnabled(false);
-    //ui->pushScan->setEnabled(false);
-    //ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
     ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
@@ -53,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textTerminal->append("Connect to the Wi-Fi signal with name similar to these examples:");
     ui->textTerminal->append("WIFI ELM327, WiFiOBD, OBDDevice, V-Link.");
     ui->textTerminal->append("Press Connect Button");
-
-    runtimeCommands.clear();
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
@@ -66,48 +62,27 @@ MainWindow::MainWindow(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
 
+    m_settingsManager = SettingsManager::getInstance();
+    QString ip = ui->ipEdit->text();
+    quint16 port = ui->portEdit->text().toUShort();
+    m_settingsManager->setIp(ip);
+    m_settingsManager->setPort(port);
+    m_settingsManager->saveSettings();
+
+    elm = new ELM();
+    ui->radioWifi->setChecked(true);
+    ui->pushConnect->setFocus();
 
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
     keep_screen_on(true);
 #endif
 
-    m_settingsManager = SettingsManager::getInstance();
-
-    m_bluetoothManager = BluetoothManager::getInstance();
-
-    if(m_bluetoothManager)
-    {
-        connect(m_bluetoothManager, &BluetoothManager::bleConnected, this, &MainWindow::connected);
-        connect(m_bluetoothManager, &BluetoothManager::bleDisconnected, this, &MainWindow::disconnected);
-        connect(m_bluetoothManager, &BluetoothManager::addDeviceToList, this, &MainWindow::addDeviceToList);
-        connect(m_bluetoothManager, &BluetoothManager::stateChanged, this, &MainWindow::stateChanged);
-        connect(m_bluetoothManager, &BluetoothManager::dataReceived, this, &MainWindow::dataReceived);
-    }
-
-    m_networkManager = NetworkManager::getInstance();
-
-    if(m_networkManager)
-    {
-        connect(m_networkManager, &NetworkManager::wifiConnected, this, &MainWindow::connected);
-        connect(m_networkManager, &NetworkManager::wifiDisconnected, this, &MainWindow::disconnected);
-        connect(m_networkManager, &NetworkManager::dataReceived, this, &MainWindow::dataReceived);
-        connect(m_networkManager, &NetworkManager::dataBytesReceived, this, &MainWindow::dataByteReceived);
-        connect(m_networkManager, &NetworkManager::stateChanged, this, &MainWindow::stateChanged);
-        connect(m_networkManager, &NetworkManager::errorAccrued, this, &MainWindow::errorAccrued);
-    }
-
-    elm = new ELM();
-
-    ui->radioWifi->setChecked(true);
-
-    ui->pushConnect->setFocus();   
 }
 
 MainWindow::~MainWindow()
 {
-    delete m_networkManager;
-    delete m_bluetoothManager;
+    delete mElmTcpSocket;
     delete ui;
 }
 
@@ -141,13 +116,6 @@ void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
     }
 }
 
-void MainWindow::addDeviceToList(const QBluetoothAddress& address, const QString& name)
-{
-    QString label = QString("%1 %2").arg(address.toString()).arg(name);
-
-    ui->comboBleList->addItem(label);
-}
-
 void MainWindow::stateChanged(QString &state)
 {
     ui->textTerminal->append(state);
@@ -166,19 +134,21 @@ void MainWindow::errorAccrued(QString & error)
 
 void MainWindow::connectWifi()
 {
-    if(m_networkManager)
-    {
-        QString ip = ui->ipEdit->text();
-        int port = ui->portEdit->text().toInt();
-        m_networkManager->connectWifi(ip, port);
-    }
-}
+    QString ip = ui->ipEdit->text();
+    quint16 port = ui->portEdit->text().toUShort();
+    m_settingsManager->setIp(ip);
+    m_settingsManager->setPort(port);
+    m_settingsManager->saveSettings();
 
-void MainWindow::connectBle(const QBluetoothAddress &address)
-{
-    if(m_bluetoothManager)
+    mElmTcpSocket = new ElmTcpSocket(ip, port, this);
+    if(mElmTcpSocket)
     {
-        m_bluetoothManager->connectBle(address);
+        connect(mElmTcpSocket,&ElmTcpSocket::tcpConnected,this, &MainWindow::connected);
+        connect(mElmTcpSocket,&ElmTcpSocket::tcpDisconnected,this,&MainWindow::disconnected);
+        connect(mElmTcpSocket,&ElmTcpSocket::dataReceived,this,&MainWindow::dataReceived);
+        connect(mElmTcpSocket, &ElmTcpSocket::stateChanged, this, &MainWindow::stateChanged);
+
+        mElmTcpSocket->connectTcp();
     }
 }
 
@@ -194,34 +164,43 @@ void MainWindow::on_pushConnect_clicked()
                 return;
 
             auto strAddress = text.split(" ").at(0);
-            const QBluetoothAddress bAddress(strAddress);
-            connectBle(bAddress);
         }
         else if(ui->radioWifi->isChecked())
             connectWifi();
     }
     else
     {
-        if(m_networkManager->isConnected())
-            m_networkManager->disconnectWifi();
-
-        if(m_bluetoothManager->isConnected())
-            m_bluetoothManager->disconnectBle();
+        if(mElmTcpSocket && mElmTcpSocket->isConnected())
+        {
+            mElmTcpSocket->disconnectTcp();
+            delete mElmTcpSocket;
+            mElmTcpSocket = nullptr;
+        }
     }
 }
 
 void MainWindow::on_pushExit_clicked()
 {
-    if(m_networkManager->isConnected())
-        m_networkManager->disconnectWifi();
+    if(mElmTcpSocket && mElmTcpSocket->isConnected())
+    {
+        mElmTcpSocket->disconnectTcp();
+        delete mElmTcpSocket;
+        mElmTcpSocket = nullptr;
+    }
 
     exit(0);
 }
 
 void MainWindow::on_pushSend_clicked()
 {   
-    QString text = ui->textSend->toPlainText();
-    send(text);
+    QString command = ui->textSend->toPlainText();
+    ui->textTerminal->append("-> " + command.trimmed()
+                             .simplified()
+                             .remove(QRegExp("[\\n\\t\\r]"))
+                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+
+
+    mElmTcpSocket->readData(command);
 }
 
 void MainWindow::on_pushClear_clicked()
@@ -248,6 +227,7 @@ void MainWindow::on_close_dialog_triggered()
 
 void MainWindow::on_pushScan_clicked()
 {
+    m_ConsoleEnable = false;
     ObdScan *obdScan = new ObdScan;
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
@@ -266,38 +246,24 @@ void MainWindow::on_pushGauge_clicked()
     QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
-
     m_ConsoleEnable = false;
 }
 
 void MainWindow::connected()
 {
     ui->pushSend->setEnabled(true);
-    ui->pushScan->setEnabled(true);
-    ui->pushGauge->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
 
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
     m_initialized = false;
-
     send(RESET);
-    send(ECHO_OFF);
-    send(LINEFEED_OFF);
-    send(HEADERS_OFF);
-    send(SPACES_OFF);
-    send(TIMEOUT_DEFAULT);
-    send(PROTOCOL_AUTO);
-    send(GET_PROTOCOL);
-    send(GET_ELM_INFO);
 }
 
 void MainWindow::disconnected()
 {
     ui->pushSend->setEnabled(false);
-    ui->pushScan->setEnabled(false);
-    ui->pushGauge->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
 
     ui->textTerminal->clear();
@@ -362,11 +328,6 @@ void MainWindow::analysData(const QString &dataReceived)
         }
     }
 
-    if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
-    {
-        ui->textTerminal->append(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
-    }
-
     if(m_clearCodeRequest)
     {
         ui->textTerminal->append("Clearing the trouble codes.");
@@ -378,28 +339,39 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::dataReceived(QString &dataReceived)
 {
-    if(dataReceived.isEmpty())
-    {
-        ui->textTerminal->append("<- null");
-        return;
-    }
+    if(!m_ConsoleEnable)return;
+    if(dataReceived.isEmpty())return;
 
     ui->textTerminal->append("<- " + dataReceived);
-    analysData(dataReceived);
+
+    if(!m_initialized && initializeCommands.size() == commandOrder)
+    {
+        m_initialized = true;
+        commandOrder = 0;
+    }
+
+    if(!m_initialized && commandOrder < initializeCommands.size())
+    {
+        send(initializeCommands[commandOrder]);
+        commandOrder++;
+    }
+
+    if(m_initialized && !dataReceived.isEmpty())
+    {
+        analysData(dataReceived);
+    }
 }
 
-QString MainWindow::send(QString &data)
+QString MainWindow::send(const QString &command)
 {
-    if(m_ConsoleEnable)
+    if(m_ConsoleEnable && mElmTcpSocket)
     {
-        ui->textTerminal->append("-> " + data.trimmed()
+        ui->textTerminal->append("-> " + command.trimmed()
                                  .simplified()
                                  .remove(QRegExp("[\\n\\t\\r]"))
                                  .remove(QRegExp("[^a-zA-Z0-9]+")));
 
-        QCoreApplication::processEvents();
-
-        return elm->AT(data);
+        mElmTcpSocket->send(command);
     }
 
     return QString();
@@ -412,17 +384,13 @@ void MainWindow::on_radioBle_clicked(bool checked)
         ui->textTerminal->clear();
         ui->textTerminal->append("Ready for elm327 bluetooth devices..");
 
-        if(m_networkManager)
+        if(mElmTcpSocket && mElmTcpSocket->isConnected())
         {
-            if(m_networkManager->isConnected())
-                m_networkManager->disconnectWifi();
+            mElmTcpSocket->disconnectTcp();
+            delete mElmTcpSocket;
+            mElmTcpSocket = nullptr;
         }
 
-        if(m_bluetoothManager)
-        {
-            ui->comboBleList->clear();
-            m_bluetoothManager->scan();
-        }
     }
 }
 
@@ -434,11 +402,5 @@ void MainWindow::on_radioWifi_clicked(bool checked)
         ui->textTerminal->append("Ready for elm327 wifi devices..");
 
         ui->comboBleList->clear();
-
-        if(m_bluetoothManager)
-        {
-            if(m_bluetoothManager->isConnected())
-                m_bluetoothManager->disconnectBle();
-        }
     }
 }

@@ -41,23 +41,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        bluetoothmanager.cpp \
         elm.cpp \
+        elmblesocket.cpp \
+        elmtcpsocket.cpp \
         main.cpp \
         mainwindow.cpp \
         methods.cpp \
-        networkmanager.cpp \
         obdgauge.cpp \
         obdscan.cpp \
         qcgaugewidget.cpp \
         settingsmanager.cpp
 
 HEADERS += \
-        bluetoothmanager.h \
         elm.h \
+        elmblesocket.h \
+        elmtcpsocket.h \
         mainwindow.h \
         methods.h \
-        networkmanager.h \
         obdgauge.h \
         obdscan.h \
         pid.h \

@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include "qcgaugewidget.h"
-#include "networkmanager.h"
 #include "elm.h"
+#include "elmtcpsocket.h"
 
 namespace Ui {
 class ObdGauge;
@@ -20,7 +20,6 @@ public:
     ~ObdGauge();
 
 private:
-    NetworkManager *m_networkManager;
     int commandOrder{0};
 
     int m_timerId{};
@@ -39,7 +38,7 @@ private:
 
     ELM *elm{};
 
-    void send(QString &);
+    QString send(const QString &);
     void analysData(const QString &);
     void initGauges();
     void startSim();

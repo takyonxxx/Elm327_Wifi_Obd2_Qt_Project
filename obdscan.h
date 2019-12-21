@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QVector>
+#include "elmtcpsocket.h"
 #include "elm.h"
 
 namespace Ui {
@@ -19,7 +20,6 @@ public:
 
 private:
     QMutex m_mutex{};
-    int commandOrder{0};
     bool mRunning{false};
     bool getFuelPid{false};
     int mSpeed{0};
@@ -27,13 +27,10 @@ private:
     int mLoad{0};
     int mMAF{0};
     int mTPos{0};    
+    int commandOrder{0};
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};
-    NetworkManager *manager{};
-    static void *scanThread(void * this_ptr);
-    pthread_t m_scanThread{};
-
     QString send(const QString &);
     void analysData(const QString &);    
     qreal calculateAverage(QVector<qreal> &listavg) ;
@@ -49,7 +46,6 @@ signals:
 
 protected:
     void closeEvent (QCloseEvent *) override;
-
 
 private:
     Ui::ObdScan *ui;

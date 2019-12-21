@@ -97,10 +97,8 @@ REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 ONLY_ENGINE_ECU ="ATSH7E0";
 
-static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, ECHO_OFF, ECHO_OFF};
-//static QStringList runtimeCommands{ENGINE_RPM, ENGINE_LOAD, VEHICLE_SPEED, COOLANT_TEMP, MAF_AIR_FLOW, VOLTAGE};
-static QStringList runtimeCommands{VOLTAGE, VOLTAGE,VOLTAGE};
-static QStringList gaugeCommands{ENGINE_RPM, VEHICLE_SPEED};
+static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, ECHO_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_ELM_INFO};
+static QStringList runtimeCommands{};
 
 static long long currentTimeMillis()
 {

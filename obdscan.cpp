@@ -3,8 +3,6 @@
 #include "pid.h"
 #include "elm.h"
 #include "settingsmanager.h"
-#include "networkmanager.h"
-#include "bluetoothmanager.h"
 
 ObdScan::ObdScan(QWidget *parent) :
     QMainWindow(parent),
@@ -44,34 +42,32 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ;padding: 2px;");
     ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A;padding: 2px;");
 
-
     ui->labelFuelConsumption->setFocus();
 
-    connect(BluetoothManager::getInstance(), &BluetoothManager::dataReceived, this, &ObdScan::dataReceived);
-    connect(NetworkManager::getInstance(), &NetworkManager::dataReceived, this, &ObdScan::dataReceived);
+    mAvarageFuelConsumption.clear();
+    mAvarageFuelConsumption100.clear();
 
-    //if(NetworkManager::getInstance()->isConnected() || BluetoothManager::getInstance()->isConnected())
+    if(ElmTcpSocket::getInstance())
     {
-        mRunning = true;
-        mAvarageFuelConsumption.clear();
-        mAvarageFuelConsumption100.clear();
-        commandOrder = 0;
+        connect(ElmTcpSocket::getInstance(),&ElmTcpSocket::dataReceived,this, &ObdScan::dataReceived);
 
         elm = ELM::getInstance();
         elm->resetPids();
         QString supportedPIDs = elm->get_available_pids();
-        runtimeCommands = supportedPIDs.split(",");
-        qDebug() << "PIDs supported: "  << runtimeCommands;
-        manager = new NetworkManager();
-        manager->start();
-        //pthread_create( &m_scanThread, nullptr, &ObdScan::scanThread, this);
-    }
+        if(!supportedPIDs.isEmpty())
+        {
+            runtimeCommands.clear();
+            runtimeCommands.append(VOLTAGE);
+            runtimeCommands.append(supportedPIDs.split(","));
+        }
 
+        mRunning = true;
+        send(VOLTAGE);
+    }
 }
 
 ObdScan::~ObdScan()
 {
-    delete manager;
     delete ui;
 }
 
@@ -79,9 +75,6 @@ void ObdScan::closeEvent (QCloseEvent *event)
 {
     Q_UNUSED(event);
     mRunning = false;
-    manager->setStop(true);
-    if(m_scanThread)
-        pthread_cancel(m_scanThread);
     emit on_close_scan();
 }
 
@@ -91,29 +84,41 @@ void ObdScan::on_pushExit_clicked()
     close();
 }
 
-QString ObdScan::send(const QString &data)
+QString ObdScan::send(const QString &command)
 {
-    if(mRunning)
+    if(mRunning && ElmTcpSocket::getInstance())
     {
-        ui->labelStatus->setText(data);
-        return elm->AT(data);
+        ui->labelStatus->setText(command);
+        ElmTcpSocket::getInstance()->send(command);
     }
 
     return QString();
 }
 
-
 void ObdScan::dataReceived(QString &dataReceived)
 {
     if(!mRunning)return;
-    qDebug() << dataReceived;
+
+    if(runtimeCommands.size() == commandOrder)
+    {
+        commandOrder = 0;
+        send(runtimeCommands[commandOrder]);
+    }
+
+    if(commandOrder < runtimeCommands.size())
+    {
+        send(runtimeCommands[commandOrder]);
+        commandOrder++;
+    }
+
+    if(dataReceived.isEmpty())return;
+
+    dataReceived.remove("ATRV").remove("atrv");
     analysData(dataReceived);
 }
 
 void ObdScan::analysData(const QString &dataReceived)
 {
-    if(dataReceived.isEmpty())return;
-
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
@@ -278,13 +283,13 @@ qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
     return sum / listavg.size();
 }
 
-
 void ObdScan::on_pushClear_clicked()
 {
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
     ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
     mAvarageFuelConsumption.clear();
+    mAvarageFuelConsumption100.clear();
 }
 
 void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
@@ -292,23 +297,3 @@ void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1
     SettingsManager::getInstance()->setEngineDisplacement(arg1.toInt());
     SettingsManager::getInstance()->saveSettings();
 }
-
-/*void *ObdScan::scanThread(void *this_ptr)
-{
-    qRegisterMetaType<QString>("QString");
-
-    ObdScan* obj_ptr = static_cast<ObdScan*>(this_ptr);
-    QMutexLocker locker(&obj_ptr->m_mutex);
-
-    while(true)
-    {
-        if(obj_ptr->m_stop)
-            break;
-
-        for(auto &cmd: runtimeCommands)
-        {
-            qDebug() << cmd;
-        }
-        QThread::msleep(1000);
-    }
-}*/

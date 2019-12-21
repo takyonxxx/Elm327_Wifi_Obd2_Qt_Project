@@ -24,9 +24,6 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     initGauges();
 
-    m_networkManager = NetworkManager::getInstance();
-    commandOrder = 0;
-
     if(osName() == "windows")
     {
         ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
@@ -61,14 +58,17 @@ ObdGauge::ObdGauge(QWidget *parent) :
         }
     }
 
-    if(m_networkManager)
+    if(ElmTcpSocket::getInstance())
     {
-        connect(m_networkManager, &NetworkManager::dataReceived, this, &ObdGauge::dataReceived);
-        if(m_networkManager->isConnected())
-        {
-            mRunning = true;
-            send(VOLTAGE);
-        }
+        connect(ElmTcpSocket::getInstance(),&ElmTcpSocket::dataReceived,this, &ObdGauge::dataReceived);
+
+        elm = ELM::getInstance();
+        runtimeCommands.clear();
+        runtimeCommands.append(ENGINE_RPM);
+        runtimeCommands.append(VEHICLE_SPEED);
+
+        mRunning = true;
+        send(VOLTAGE);
     }
 }
 
@@ -226,11 +226,14 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 }
 
 
-void ObdGauge::send(QString &data)
+QString ObdGauge::send(const QString &command)
 {
-    if(!mRunning)return;
-    if(!m_networkManager->isConnected())return;
-    m_networkManager->send(data);
+    if(mRunning && ElmTcpSocket::getInstance())
+    {
+        ElmTcpSocket::getInstance()->send(command);
+    }
+
+    return QString();
 }
 
 void ObdGauge::analysData(const QString &dataReceived)
@@ -260,10 +263,6 @@ void ObdGauge::analysData(const QString &dataReceived)
             value = ((A * 256) + B) / 4;
             setRpm(static_cast<int>(value / 100));
             break;
-        case 4://PID(04): Engine Load
-            // A*100/255
-            value = A * 100 / 255;
-            break;
         case 13://PID(0D): KM Speed
             // A
             value = A;
@@ -281,19 +280,21 @@ void ObdGauge::dataReceived(QString &dataReceived)
 {
     if(!mRunning)return;
 
-    if(dataReceived.toUpper().contains("SEARCHING"))
-        return;
-
-    if(gaugeCommands.size() == commandOrder)
+    if(runtimeCommands.size() == commandOrder)
     {
         commandOrder = 0;
-        send(gaugeCommands[commandOrder]);
+        send(runtimeCommands[commandOrder]);
     }
-    else
+
+    if(commandOrder < runtimeCommands.size())
     {
-        send(gaugeCommands[commandOrder]);
+        send(runtimeCommands[commandOrder]);
         commandOrder++;
-    }    
+    }
+
+    if(dataReceived.isEmpty())return;
+
+    dataReceived.remove("ATRV").remove("atrv");
 
     analysData(dataReceived);
 }

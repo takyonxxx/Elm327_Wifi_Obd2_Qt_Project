@@ -4,8 +4,7 @@
 #include <QMainWindow>
 #include <QDesktopWidget>
 #include <QTimer>
-#include "networkmanager.h"
-#include "bluetoothmanager.h"
+#include "elmtcpsocket.h"
 #include "settingsmanager.h"
 #include "obdscan.h"
 #include "obdgauge.h"
@@ -90,18 +89,16 @@ public:
     }
 #endif
 
-private:
-    void connectWifi();
-    void connectBle(const QBluetoothAddress &);
-    QString send(QString &);
-    void analysData(const QString &);
-
 #ifdef Q_OS_ANDROID
     bool setScreenOrientation(int orientation);
 #endif
 
-    NetworkManager *m_networkManager{};
-    BluetoothManager *m_bluetoothManager{};
+private:
+    void connectWifi();
+    QString send(const QString &);
+    void analysData(const QString &);
+
+    ElmTcpSocket *mElmTcpSocket{};
     SettingsManager *m_settingsManager{};
     ELM *elm{};
 
@@ -110,9 +107,6 @@ private:
     bool m_ConsoleEnable{true};
     bool m_clearCodeRequest{false};
     std::vector<uint32_t> cmds{};
-
-public slots:
-    void on_close_dialog_triggered();    
 
 private slots:
     void connected();
@@ -128,10 +122,10 @@ private slots:
     void on_pushDiagnostic_clicked();
     void on_pushScan_clicked();
     void on_pushGauge_clicked();
-    void orientationChanged(Qt::ScreenOrientation orientation);    
-    void addDeviceToList(const QBluetoothAddress&, const QString&);
+    void orientationChanged(Qt::ScreenOrientation orientation);
     void on_radioBle_clicked(bool checked);
     void on_radioWifi_clicked(bool checked);
+    void on_close_dialog_triggered();
 
 private:
     Ui::MainWindow *ui;

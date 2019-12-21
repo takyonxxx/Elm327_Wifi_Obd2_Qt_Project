@@ -28,22 +28,6 @@ ELM::ELM()
 {
 }
 
-QString ELM::AT(const QString & cmd)
-{
-    QString response{"Not Connected"};
-
-    if(NetworkManager::getInstance()->isConnected())
-    {
-        response = NetworkManager::getInstance()->readData(cmd);
-    }
-    else if(BluetoothManager::getInstance()->isConnected())
-    {
-        response = BluetoothManager::getInstance()->readData(cmd);
-    }
-
-    return response;
-}
-
 std::vector<QString> ELM::prepareResponseToDecode(const QString &response_str)
 {   
     std::vector<QString> result;
@@ -194,9 +178,12 @@ void ELM::update_available_pidset(quint8 set)
     }
     QString flags{};
     // Get first set of pids
-    QString cmd = "4100983B0011410080108000";
-    //QString cmd = AT(cmd1);
-
+    //QString cmd = "4100983B0011410080108000";
+    QString cmd = ElmTcpSocket::getInstance()->readData(cmd1);
+    if(cmd.contains("UNABLETOCONNECT"))
+    {
+        QString cmd = "4100983B0011410080108000";
+    }
     auto list = cmd.split("41");
     for(auto &item: list)
     {

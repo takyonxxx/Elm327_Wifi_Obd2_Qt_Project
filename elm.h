@@ -2,8 +2,7 @@
 #define ELM_H
 #include <QtCore>
 #include <string>
-#include "networkmanager.h"
-#include "bluetoothmanager.h"
+#include "elmtcpsocket.h"
 
 class ELM
 {
@@ -12,7 +11,6 @@ public:
     static ELM* getInstance();
     QString get_available_pids();
     void resetPids();
-    QString AT(const QString &);
     std::vector<QString> decodeDTC(const std::vector<QString> &hex_vals);
     std::pair<int,bool> decodeNumberOfDtc(const std::vector<QString> &hex_vals);
     std::vector<QString> prepareResponseToDecode(const QString &response_str);
