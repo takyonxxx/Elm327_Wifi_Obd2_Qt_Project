@@ -18,6 +18,7 @@ ElmTcpSocket::ElmTcpSocket(const QString &ip, const quint16 &port, QObject *pare
     {
         connect(socket,&QTcpSocket::connected,this, &ElmTcpSocket::connected);
         connect(socket,&QTcpSocket::disconnected,this,&ElmTcpSocket::disconnected);
+        connect(socket,&QTcpSocket::stateChanged,this,&ElmTcpSocket::stateChange);
         //connect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
         connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(error(QAbstractSocket::SocketError)));
     }
@@ -240,7 +241,38 @@ QString ElmTcpSocket::readData(const QString &command)
     return strData;
 }
 
+QString ElmTcpSocket::statetoString(QAbstractSocket::SocketState socketState)
+{
+    QString statestring;
+    switch(socketState)
+    {
+    case QAbstractSocket::UnconnectedState : statestring="The socket is not connected";
+        break;
+    case QAbstractSocket::HostLookupState : statestring="The socket is performing a host name lookup";
+        break;
+    case QAbstractSocket::ConnectingState : statestring="The socket has started establishing a connection";
+        break;
+    case QAbstractSocket::ConnectedState : statestring="Connection is established";
+        break;
+    case QAbstractSocket::BoundState : statestring="The socket is bound to an address and port";
+        break;
+    case QAbstractSocket::ClosingState : statestring="The socket is about to close";
+        break;
+    case QAbstractSocket::ListeningState : statestring="Listening state";
+        break;
+    default: statestring="Unknown state";
+        break;
+    }
+    return statestring;
+}
+
+void ElmTcpSocket::stateChange(QAbstractSocket::SocketState socketState)
+{
+    QString state(statetoString(socketState).toStdString().c_str());
+    emit stateChanged(state);
+}
 void ElmTcpSocket::error(QAbstractSocket::SocketError)
 {
-
+    auto errorString = socket->errorString();
+    emit stateChanged(errorString);
 }

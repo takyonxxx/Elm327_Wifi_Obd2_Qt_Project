@@ -31,11 +31,13 @@ private:
     QString returnedData{};
     bool m_connected{false};
     bool m_lockDataReady{false};
+    QString statetoString(QAbstractSocket::SocketState socketState);
 
 public slots:
     void connected();
     void disconnected();
     void readyRead();
+    void stateChange(QAbstractSocket::SocketState socketState);
     void error(QAbstractSocket::SocketError);
 signals:
     void dataReceived(QString &);
