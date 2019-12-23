@@ -107,7 +107,6 @@ private:
     int commandOrder{0};
     bool m_initialized{false};
     bool m_ConsoleEnable{true};
-    bool m_clearCodeRequest{false};
     std::vector<uint32_t> cmds{};
 
 private slots:

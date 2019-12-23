@@ -12,7 +12,7 @@ ConnectionManager *ConnectionManager::getInstance()
 }
 
 ConnectionManager::ConnectionManager(QObject *parent)
-{    
+{
     mElmTcpSocket = new ElmTcpSocket(this);
     if(mElmTcpSocket)
     {
@@ -20,7 +20,6 @@ ConnectionManager::ConnectionManager(QObject *parent)
         connect(mElmTcpSocket,&ElmTcpSocket::tcpDisconnected,this,&ConnectionManager::conDisconnected);
         connect(mElmTcpSocket,&ElmTcpSocket::dataReceived,this,&ConnectionManager::conDataReceived);
         connect(mElmTcpSocket, &ElmTcpSocket::stateChanged, this, &ConnectionManager::conStateChanged);
-
     }
 
     mElmBleSocket = new ElmBleSocket(this);
@@ -91,6 +90,8 @@ void ConnectionManager::connectElm()
 {
     if(cType == ConnectionType::None)
         return;
+
+    disConnectElm();
 
     m_settingsManager = SettingsManager::getInstance();
 

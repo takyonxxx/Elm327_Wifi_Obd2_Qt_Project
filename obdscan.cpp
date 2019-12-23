@@ -24,12 +24,15 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelCoolantTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
     ui->labelCoolant->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color: #154360 ;  padding: 2px;");
 
-    ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 32pt; font-weight: bold; color: darkgray; background-color: #154360;  padding: 2px;");
-    ui->comboEngineDisplacement->setCurrentText(QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
+    ui->labelManifoldTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->labelManifold->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color: #154360 ;  padding: 2px;");
 
     ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelStatus->setStyleSheet("font-size: 28pt; font-weight: bold; color: #D7DBDD; background-color:#154360 ;;  padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color:#154360 ;;  padding: 2px;");
+
+    ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 36pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
+    ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
     ui->labelVoltage->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
     ui->labelFuelConsumption->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
@@ -58,7 +61,9 @@ ObdScan::ObdScan(QWidget *parent) :
         {
             runtimeCommands.clear();
             runtimeCommands.append(VOLTAGE);
-            runtimeCommands.append(supportedPIDs.split(","));
+            if(supportedPIDs.contains(","))
+                runtimeCommands.append(supportedPIDs.split(","));
+            qDebug() << runtimeCommands;
         }
 
         mRunning = true;
@@ -162,8 +167,9 @@ void ObdScan::analysData(const QString &dataReceived)
             value = A * 3;
             break;
         case 11://PID(0B): Manifold Absolute Pressure
-            // A - 40
+            // A
             value = A;
+            ui->labelManifold->setText(QString::number(value) + " kPa");
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
@@ -185,7 +191,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 17://PID(11): Throttle position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;
+            value = (100 * A) / 255;
             break;
         case 33://PID(21) Distance traveled with malfunction indicator lamp (MIL) on
             // ((A*256)+B)
@@ -209,7 +215,7 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 90://PID(5A): Relative accelerator pedal position
             // (100 * A) / 255 %
-            mTPos = (100 * A) / 255;
+            value = (100 * A) / 255;
             break;
         case 92://PID(5C): Oil Temperature
             // A-40
@@ -294,6 +300,6 @@ void ObdScan::on_pushClear_clicked()
 
 void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
 {
-    SettingsManager::getInstance()->setEngineDisplacement(arg1.toInt());
+    SettingsManager::getInstance()->setEngineDisplacement(arg1.trimmed().toInt());
     SettingsManager::getInstance()->saveSettings();
 }

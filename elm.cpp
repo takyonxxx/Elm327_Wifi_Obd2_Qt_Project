@@ -120,7 +120,7 @@ QString ELM::get_available_pids()
 
 void ELM::update_available_pids()
 {
-    available_pids[0] = true; // PID0 is always supported and can't be checked for support
+    available_pids[0] = false; // PID0 is always supported and can't be checked for support
     update_available_pidset(1);
 
     // Check if pid 0x20 is available (meaning next set is supported)
@@ -180,10 +180,18 @@ void ELM::update_available_pidset(quint8 set)
     // Get first set of pids
     //QString cmd = "4100983B0011410080108000";
     QString cmd = ConnectionManager::getInstance()->readData(cmd1);
+
     if(cmd.contains("UNABLETOCONNECT"))
     {
-        QString cmd = "4100983B0011410080108000";
+        available_pids[3]  = true;  //04  Calculated engine load
+        available_pids[4]  = true;  //05  Engine coolant temperature
+        available_pids[10] = true;  //0B  Intake manifold absolute pressure
+        available_pids[11] = true;  //0C  Engine RPM
+        available_pids[12] = true;  //0D  Vehicle speed
+        available_pids[15] = true;  //0F  Maf air flow rate
+        return;
     }
+
     auto list = cmd.split("41");
     for(auto &item: list)
     {
@@ -198,9 +206,8 @@ void ELM::update_available_pidset(quint8 set)
         unsigned long longData = strtoul(str,nullptr,16);
         auto binaryString = DecimalToBinaryString(longData);
         int m = (set-1) * 32;
-
-        // fill supported pid list
-        for (int i = 0; i < binaryString.length(); i++)
+        // fill supported pid list, ignor 0101
+        for (int i = 1; i < binaryString.length(); i++)
         {
             if (binaryString[i] == '1') {
                 available_pids[i+m] = true;

@@ -46,7 +46,6 @@ ObdGauge::ObdGauge(QWidget *parent) :
                 ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
                 ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
                 ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
-                //ui->gridLayout_Gauges->addWidget(pushSim, 3, 0);
             }
 
             screen->setOrientationUpdateMask(Qt::LandscapeOrientation |

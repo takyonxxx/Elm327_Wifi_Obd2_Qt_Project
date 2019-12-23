@@ -26,7 +26,6 @@ private:
     int mRpm{0};
     int mLoad{0};
     int mMAF{0};
-    int mTPos{0};    
     int commandOrder{0};
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
@@ -35,9 +34,11 @@ private:
     void analysData(const QString &);    
     qreal calculateAverage(QVector<qreal> &listavg) ;
 
-private slots:
-    void on_pushExit_clicked();    
+public slots:
     void dataReceived(QString &);
+
+private slots:
+    void on_pushExit_clicked();
     void on_pushClear_clicked();
     void on_comboEngineDisplacement_currentIndexChanged(const QString &arg1);
 

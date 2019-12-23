@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setText(PIDS_SUPPORTED20);
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
+    ui->pushScan->setEnabled(false);
+    ui->pushGauge->setEnabled(false);
     ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
     ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
     ui->textTerminal->append("On your device : go to Settings > Wi-Fi. ");
@@ -72,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->radioWifi->setChecked(true);
     ui->pushConnect->setFocus();
 
-    m_connectionManager = new ConnectionManager(this);
+    m_connectionManager = ConnectionManager::getInstance();
     if(m_connectionManager)
     {
         connect(m_connectionManager,&ConnectionManager::connected,this, &MainWindow::connected);
@@ -198,13 +200,13 @@ void MainWindow::on_pushClear_clicked()
 
 void MainWindow::on_pushDiagnostic_clicked()
 {
-    ui->textTerminal->clear();
-    //0x03 : show stored diagnostic trouble code.
-    //0x04 : clear diagnostic trouble code.
-    m_clearCodeRequest = true;
-    ui->textTerminal->append("The trouble codes requested.");
-    QString text(REQUEST_TROUBLE);
-    send(text);
+    ui->textTerminal->append("-> Clearing the trouble codes.");
+    ui->textTerminal->append("-> " + CLEAR_TROUBLE
+                             .simplified()
+                             .remove(QRegExp("[\\n\\t\\r]"))
+                             .remove(QRegExp("[^a-zA-Z0-9]+")));
+
+    m_connectionManager->readData(CLEAR_TROUBLE);
 }
 
 void MainWindow::on_close_dialog_triggered()
@@ -218,7 +220,7 @@ void MainWindow::on_pushScan_clicked()
     ObdScan *obdScan = new ObdScan;
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
-    QObject::connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
+    connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
     obdScan->show();
     m_ConsoleEnable = false;
@@ -230,7 +232,7 @@ void MainWindow::on_pushGauge_clicked()
     ObdGauge *obdGauge = new ObdGauge;
     obdGauge->setGeometry(this->rect());
     obdGauge->move(this->x(), this->y());
-    QObject::connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
+    connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
     m_ConsoleEnable = false;
@@ -240,6 +242,8 @@ void MainWindow::connected()
 {
     ui->pushSend->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
+    ui->pushScan->setEnabled(true);
+    ui->pushGauge->setEnabled(true);
 
     ui->pushConnect->setText(QString("Disconnect"));
 
@@ -252,6 +256,8 @@ void MainWindow::disconnected()
 {
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
+    ui->pushScan->setEnabled(false);
+    ui->pushGauge->setEnabled(false);
 
     ui->textTerminal->clear();
     ui->pushConnect->setText(QString("Connect"));
@@ -313,14 +319,6 @@ void MainWindow::analysData(const QString &dataReceived)
                 ui->textTerminal->append(code);
             }
         }
-    }
-
-    if(m_clearCodeRequest)
-    {
-        ui->textTerminal->append("Clearing the trouble codes.");
-        QString text(CLEAR_TROUBLE);
-        send(text);
-        m_clearCodeRequest = false;
     }
 }
 
