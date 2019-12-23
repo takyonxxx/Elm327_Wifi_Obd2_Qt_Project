@@ -41,6 +41,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        connectionmanager.cpp \
         elm.cpp \
         elmblesocket.cpp \
         elmtcpsocket.cpp \
@@ -53,6 +54,7 @@ SOURCES += \
         settingsmanager.cpp
 
 HEADERS += \
+        connectionmanager.h \
         elm.h \
         elmblesocket.h \
         elmtcpsocket.h \

@@ -63,15 +63,26 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     m_settingsManager = SettingsManager::getInstance();
-    QString ip = ui->ipEdit->text();
-    quint16 port = ui->portEdit->text().toUShort();
-    m_settingsManager->setIp(ip);
-    m_settingsManager->setPort(port);
-    m_settingsManager->saveSettings();
+    if(m_settingsManager)
+    {
+        saveSettings();
+    }
 
     elm = new ELM();
     ui->radioWifi->setChecked(true);
     ui->pushConnect->setFocus();
+
+    m_connectionManager = new ConnectionManager(this);
+    if(m_connectionManager)
+    {
+        connect(m_connectionManager,&ConnectionManager::connected,this, &MainWindow::connected);
+        connect(m_connectionManager,&ConnectionManager::disconnected,this,&MainWindow::disconnected);
+        connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);
+        connect(m_connectionManager, &ConnectionManager::addBleDevice, this, &MainWindow::addBleDeviceToList);
+        connect(m_connectionManager, &ConnectionManager::stateChanged, this, &MainWindow::stateChanged);
+        m_connectionManager->setCType(ConnectionType::Wifi);
+    }
+
 
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
@@ -82,8 +93,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete mElmTcpSocket;
+    if(m_connectionManager)
+        delete m_connectionManager;
     delete ui;
+}
+
+void MainWindow::connectElm()
+{
+    if(m_connectionManager)
+        m_connectionManager->connectElm();
+}
+
+void MainWindow::disConnectElm()
+{
+    if(m_connectionManager)
+        m_connectionManager->disConnectElm();
 }
 
 #ifdef Q_OS_ANDROID
@@ -121,78 +145,42 @@ void MainWindow::stateChanged(QString &state)
     ui->textTerminal->append(state);
 }
 
-void MainWindow::dataByteReceived(QString &data)
-{
-    ui->textTerminal->append("<- " + data);
-}
 
 void MainWindow::errorAccrued(QString & error)
 {
     ui->textTerminal->append("Error: " + error );
 }
 
-
-void MainWindow::connectWifi()
-{
-    QString ip = ui->ipEdit->text();
-    quint16 port = ui->portEdit->text().toUShort();
-    m_settingsManager->setIp(ip);
-    m_settingsManager->setPort(port);
-    m_settingsManager->saveSettings();
-
-    mElmTcpSocket = new ElmTcpSocket(ip, port, this);
-    if(mElmTcpSocket)
-    {
-        connect(mElmTcpSocket,&ElmTcpSocket::tcpConnected,this, &MainWindow::connected);
-        connect(mElmTcpSocket,&ElmTcpSocket::tcpDisconnected,this,&MainWindow::disconnected);
-        connect(mElmTcpSocket,&ElmTcpSocket::dataReceived,this,&MainWindow::dataReceived);
-        connect(mElmTcpSocket, &ElmTcpSocket::stateChanged, this, &MainWindow::stateChanged);
-
-        mElmTcpSocket->connectTcp();
-    }
-}
-
 void MainWindow::on_pushConnect_clicked()
 {
+    if(m_settingsManager)
+    {
+        saveSettings();
+    }
+
     if(ui->pushConnect->text() == "Connect")
     {
         ui->textTerminal->clear();
-        if(ui->radioBle->isChecked())
-        {
-            auto text = ui->comboBleList->currentText();
-            if(text.isEmpty())
-                return;
-
-            auto strAddress = text.split(" ").at(0);
-        }
-        else if(ui->radioWifi->isChecked())
-            connectWifi();
+        if(m_connectionManager)
+            m_connectionManager->connectElm();
     }
     else
     {
-        if(mElmTcpSocket && mElmTcpSocket->isConnected())
-        {
-            mElmTcpSocket->disconnectTcp();
-            delete mElmTcpSocket;
-            mElmTcpSocket = nullptr;
-        }
+        if(m_connectionManager)
+            m_connectionManager->disConnectElm();
     }
 }
 
 void MainWindow::on_pushExit_clicked()
 {
-    if(mElmTcpSocket && mElmTcpSocket->isConnected())
-    {
-        mElmTcpSocket->disconnectTcp();
-        delete mElmTcpSocket;
-        mElmTcpSocket = nullptr;
-    }
+    if(m_connectionManager)
+        m_connectionManager->disConnectElm();
 
     exit(0);
 }
 
 void MainWindow::on_pushSend_clicked()
-{   
+{
     QString command = ui->textSend->toPlainText();
     ui->textTerminal->append("-> " + command.trimmed()
                              .simplified()
@@ -200,7 +188,7 @@ void MainWindow::on_pushSend_clicked()
                              .remove(QRegExp("[^a-zA-Z0-9]+")));
 
 
-    mElmTcpSocket->readData(command);
+    m_connectionManager->readData(command);
 }
 
 void MainWindow::on_pushClear_clicked()
@@ -223,7 +211,6 @@ void MainWindow::on_close_dialog_triggered()
 {
     m_ConsoleEnable = true;
 }
-
 
 void MainWindow::on_pushScan_clicked()
 {
@@ -364,14 +351,14 @@ void MainWindow::dataReceived(QString &dataReceived)
 
 QString MainWindow::send(const QString &command)
 {
-    if(m_ConsoleEnable && mElmTcpSocket)
+    if(m_connectionManager)
     {
         ui->textTerminal->append("-> " + command.trimmed()
                                  .simplified()
                                  .remove(QRegExp("[\\n\\t\\r]"))
                                  .remove(QRegExp("[^a-zA-Z0-9]+")));
 
-        mElmTcpSocket->send(command);
+        m_connectionManager->send(command);
     }
 
     return QString();
@@ -379,28 +366,47 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::on_radioBle_clicked(bool checked)
 {
-    if(checked)
+    if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
         ui->textTerminal->append("Ready for elm327 bluetooth devices..");
 
-        if(mElmTcpSocket && mElmTcpSocket->isConnected())
-        {
-            mElmTcpSocket->disconnectTcp();
-            delete mElmTcpSocket;
-            mElmTcpSocket = nullptr;
-        }
-
+        m_connectionManager->setCType(ConnectionType::BlueTooth);
     }
 }
 
 void MainWindow::on_radioWifi_clicked(bool checked)
 {
-    if(checked)
+    if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
         ui->textTerminal->append("Ready for elm327 wifi devices..");
-
         ui->comboBleList->clear();
+
+        m_connectionManager->setCType(ConnectionType::Wifi);
     }
 }
+
+void MainWindow::saveSettings()
+{
+    QString ip = ui->ipEdit->text();
+    quint16 port = ui->portEdit->text().toUShort();
+    m_settingsManager->setIp(ip);
+    m_settingsManager->setPort(port);
+
+    auto text = ui->comboBleList->currentText();
+    if(text.isEmpty())
+        return;
+
+    auto strAddress = text.split(" ").at(0);
+    m_settingsManager->setBleAddress(QBluetoothAddress(strAddress));
+
+    m_settingsManager->saveSettings();
+}
+
+void MainWindow::addBleDeviceToList(const QBluetoothAddress & bleAddress, const QString & bleName)
+{
+    QString item = bleAddress.toString() + QString(" ") + bleName;
+    ui->comboBleList->addItem(item);
+}
+

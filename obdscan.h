@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QVector>
-#include "elmtcpsocket.h"
+#include "connectionmanager.h"
 #include "elm.h"
 
 namespace Ui {

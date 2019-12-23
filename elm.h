@@ -2,7 +2,7 @@
 #define ELM_H
 #include <QtCore>
 #include <string>
-#include "elmtcpsocket.h"
+#include "connectionmanager.h"
 
 class ELM
 {

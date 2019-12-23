@@ -179,7 +179,7 @@ void ELM::update_available_pidset(quint8 set)
     QString flags{};
     // Get first set of pids
     //QString cmd = "4100983B0011410080108000";
-    QString cmd = ElmTcpSocket::getInstance()->readData(cmd1);
+    QString cmd = ConnectionManager::getInstance()->readData(cmd1);
     if(cmd.contains("UNABLETOCONNECT"))
     {
         QString cmd = "4100983B0011410080108000";

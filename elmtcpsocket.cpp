@@ -1,27 +1,9 @@
 #include "elmtcpsocket.h"
 #include <QDebug>
 
-ElmTcpSocket* ElmTcpSocket::theInstance_ = nullptr;
-
-ElmTcpSocket *ElmTcpSocket::getInstance()
+ElmTcpSocket::ElmTcpSocket(QObject *parent)
 {
-    return theInstance_;
-}
 
-ElmTcpSocket::ElmTcpSocket(const QString &ip, const quint16 &port, QObject *parent)
-{
-    theInstance_ = this;
-    this->ip = ip;
-    this->port = port;
-    this->socket = new QTcpSocket(this);
-    if(socket)
-    {
-        connect(socket,&QTcpSocket::connected,this, &ElmTcpSocket::connected);
-        connect(socket,&QTcpSocket::disconnected,this,&ElmTcpSocket::disconnected);
-        connect(socket,&QTcpSocket::stateChanged,this,&ElmTcpSocket::stateChange);
-        //connect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
-        connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(error(QAbstractSocket::SocketError)));
-    }
 }
 
 ElmTcpSocket::~ElmTcpSocket()
@@ -35,14 +17,20 @@ void ElmTcpSocket::run()
     exec();
 }
 
-void ElmTcpSocket::connectTcp()
+void ElmTcpSocket::connectTcp(const QString &ip, const quint16 &port)
 {
+    QString msg{};
+    msg.append("Connecting to Wifi " + ip + " : " + QString::number(port));
+    emit stateChanged(msg);
+
+    this->socket = new QTcpSocket(this);
     if(socket)
     {
-        QString msg{};
-        msg.append("Connecting to Wifi " + ip + " : " + QString::number(port));
-        emit stateChanged(msg);
-
+        connect(socket,&QTcpSocket::connected,this, &ElmTcpSocket::connected);
+        connect(socket,&QTcpSocket::disconnected,this,&ElmTcpSocket::disconnected);
+        connect(socket,&QTcpSocket::stateChanged,this,&ElmTcpSocket::stateChange);
+        //connect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
+        connect(socket,SIGNAL(socketError(QAbstractSocket::SocketError)),this, SLOT(socketError(QAbstractSocket::SocketError)));
         socket->connectToHost(ip, port);
         socket->waitForConnected(3000);
     }
@@ -53,8 +41,9 @@ void ElmTcpSocket::disconnectTcp()
     if(socket)
     {
         socket->close();
+        socket->deleteLater();
         QString msg{};
-        msg.append("DisConnected Wifi " + ip + " : " + QString::number(port));
+        msg.append("DisConnected Wifi");
         emit stateChanged(msg);
     }
 }
@@ -271,7 +260,7 @@ void ElmTcpSocket::stateChange(QAbstractSocket::SocketState socketState)
     QString state(statetoString(socketState).toStdString().c_str());
     emit stateChanged(state);
 }
-void ElmTcpSocket::error(QAbstractSocket::SocketError)
+void ElmTcpSocket::socketError(QAbstractSocket::SocketError)
 {
     auto errorString = socket->errorString();
     emit stateChanged(errorString);

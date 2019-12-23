@@ -47,9 +47,9 @@ ObdScan::ObdScan(QWidget *parent) :
     mAvarageFuelConsumption.clear();
     mAvarageFuelConsumption100.clear();
 
-    if(ElmTcpSocket::getInstance())
+    if(ConnectionManager::getInstance())
     {
-        connect(ElmTcpSocket::getInstance(),&ElmTcpSocket::dataReceived,this, &ObdScan::dataReceived);
+        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
 
         elm = ELM::getInstance();
         elm->resetPids();
@@ -86,10 +86,10 @@ void ObdScan::on_pushExit_clicked()
 
 QString ObdScan::send(const QString &command)
 {
-    if(mRunning && ElmTcpSocket::getInstance())
+    if(mRunning && ConnectionManager::getInstance())
     {
         ui->labelStatus->setText(command);
-        ElmTcpSocket::getInstance()->send(command);
+        ConnectionManager::getInstance()->send(command);
     }
 
     return QString();

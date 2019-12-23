@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QDesktopWidget>
 #include <QTimer>
-#include "elmtcpsocket.h"
+#include "connectionmanager.h"
 #include "settingsmanager.h"
 #include "obdscan.h"
 #include "obdgauge.h"
@@ -94,11 +94,13 @@ public:
 #endif
 
 private:
-    void connectWifi();
+    void connectElm();
+    void disConnectElm();
     QString send(const QString &);
     void analysData(const QString &);
+    void saveSettings();
 
-    ElmTcpSocket *mElmTcpSocket{};
+    ConnectionManager *m_connectionManager{};
     SettingsManager *m_settingsManager{};
     ELM *elm{};
 
@@ -113,7 +115,6 @@ private slots:
     void disconnected();
     void dataReceived(QString &);
     void stateChanged(QString &state);
-    void dataByteReceived(QString &);
     void errorAccrued(QString &);    
     void on_pushConnect_clicked();
     void on_pushExit_clicked();
@@ -126,6 +127,7 @@ private slots:
     void on_radioBle_clicked(bool checked);
     void on_radioWifi_clicked(bool checked);
     void on_close_dialog_triggered();
+    void addBleDeviceToList(const QBluetoothAddress&, const QString&);
 
 private:
     Ui::MainWindow *ui;

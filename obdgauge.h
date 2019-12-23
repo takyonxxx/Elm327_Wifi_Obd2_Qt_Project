@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include "qcgaugewidget.h"
 #include "elm.h"
-#include "elmtcpsocket.h"
+#include "connectionmanager.h"
 
 namespace Ui {
 class ObdGauge;

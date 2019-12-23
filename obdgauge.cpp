@@ -58,9 +58,9 @@ ObdGauge::ObdGauge(QWidget *parent) :
         }
     }
 
-    if(ElmTcpSocket::getInstance())
+    if(ConnectionManager::getInstance())
     {
-        connect(ElmTcpSocket::getInstance(),&ElmTcpSocket::dataReceived,this, &ObdGauge::dataReceived);
+        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
 
         elm = ELM::getInstance();
         runtimeCommands.clear();
@@ -228,9 +228,9 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 
 QString ObdGauge::send(const QString &command)
 {
-    if(mRunning && ElmTcpSocket::getInstance())
+    if(mRunning && ConnectionManager::getInstance())
     {
-        ElmTcpSocket::getInstance()->send(command);
+        ConnectionManager::getInstance()->send(command);
     }
 
     return QString();

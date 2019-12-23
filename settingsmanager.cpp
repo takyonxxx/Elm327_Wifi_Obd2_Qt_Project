@@ -26,6 +26,7 @@ void SettingsManager::loadSettings()
     EngineDisplacement = settings.value("EngineDisplacement", "").toString().toUInt();
     Ip = settings.value("Ip", "").toString();
     Port = settings.value("Port", "").toString().toUShort();
+    BleAddress = QBluetoothAddress(settings.value("BleAddress", "").toString());
 }
 
 void SettingsManager::saveSettings()
@@ -34,6 +35,7 @@ void SettingsManager::saveSettings()
     settings.setValue("EngineDisplacement", QString::number(EngineDisplacement));
     settings.setValue("Ip", Ip);
     settings.setValue("Port", QString::number(Port));
+    settings.setValue("BleAddress", BleAddress.toString());
 }
 
 unsigned int SettingsManager::getEngineDisplacement() const
@@ -64,6 +66,16 @@ QString SettingsManager::getIp() const
 quint16 SettingsManager::getPort() const
 {
     return Port;
+}
+
+void SettingsManager::setBleAddress(const QBluetoothAddress &value)
+{
+    BleAddress = value;
+}
+
+QBluetoothAddress SettingsManager::getBleAddress() const
+{
+    return BleAddress;
 }
 
 
