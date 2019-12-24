@@ -154,7 +154,7 @@ bool ElmBleSocket::send(const QString &string)
         }
 
         socket->write(dataToSend);
-        return socket->waitForBytesWritten(-1);
+        return true;
     }
     else
         return false;
