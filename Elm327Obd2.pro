@@ -25,7 +25,7 @@ ios {
 }
 
 linux{
-    LIBS +=-lpthread -lbluetooth
+    LIBS +=-lpthread
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -42,7 +42,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        bluetoothcon.cpp \
         connectionmanager.cpp \
         elm.cpp \
         elmblesocket.cpp \
@@ -56,7 +55,6 @@ SOURCES += \
         settingsmanager.cpp
 
 HEADERS += \
-        bluetoothcon.h \
         connectionmanager.h \
         elm.h \
         elmblesocket.h \
