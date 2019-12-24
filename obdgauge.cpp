@@ -2,12 +2,11 @@
 #include "ui_obdgauge.h"
 #include "pid.h"
 
-ObdGauge::ObdGauge(QStringList runtimeCommands, QWidget *parent) :
+ObdGauge::ObdGauge(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ObdGauge)
 {
     ui->setupUi(this);
-    this->runtimeCommands = runtimeCommands;
 
     setWindowTitle("Elm327 Obd2");
 
@@ -61,6 +60,10 @@ ObdGauge::ObdGauge(QStringList runtimeCommands, QWidget *parent) :
     if(ConnectionManager::getInstance())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
+
+        runtimeCommands.clear();
+        runtimeCommands.append(ENGINE_RPM);
+        runtimeCommands.append(VEHICLE_SPEED);
 
         mRunning = true;
         send(VOLTAGE);

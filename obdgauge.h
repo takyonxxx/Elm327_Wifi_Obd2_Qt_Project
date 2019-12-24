@@ -16,7 +16,7 @@ class ObdGauge : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ObdGauge(QStringList runtimeCommands, QWidget *parent = nullptr);
+    explicit ObdGauge(QWidget *parent = nullptr);
     ~ObdGauge();
 
 private:

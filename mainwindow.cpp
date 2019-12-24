@@ -217,30 +217,10 @@ void MainWindow::on_pushDiagnostic_clicked()
 void MainWindow::on_close_dialog_triggered()
 {
     m_ConsoleEnable = true;
-    runtimeCommands.clear();
 }
 
 void MainWindow::on_pushScan_clicked()
-{  
-    if(m_connectionManager->getCType() == ConnectionType::Wifi)
-    {
-        elm->resetPids();
-        ui->textTerminal->append("-> Searching available pids.");
-        QString supportedPIDs = elm->get_available_pids();
-
-        if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
-        {
-            runtimeCommands.clear();
-            runtimeCommands.append(VOLTAGE);
-            if(supportedPIDs.contains(","))
-                runtimeCommands.append(supportedPIDs.split(","));
-
-            QString str = runtimeCommands.join("");
-            str = runtimeCommands.join(", ");
-            ui->textTerminal->append("<- Pids:  " + str);
-        }
-    }
-
+{
     if(runtimeCommands.size() == 0)
         return;
 
@@ -251,17 +231,12 @@ void MainWindow::on_pushScan_clicked()
     connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
     obdScan->show();
-    m_ConsoleEnable = false;
 }
 
 
 void MainWindow::on_pushGauge_clicked()
-{
-    runtimeCommands.clear();
-    runtimeCommands.append(ENGINE_RPM);
-    runtimeCommands.append(VEHICLE_SPEED);
-
-    ObdGauge *obdGauge = new ObdGauge(runtimeCommands, this);
+{   
+    ObdGauge *obdGauge = new ObdGauge(this);
     obdGauge->setGeometry(this->rect());
     obdGauge->move(this->x(), this->y());
     connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
@@ -283,7 +258,7 @@ void MainWindow::connected()
     m_initialized = false;
     m_connectionManager->readData(END_LINE);
     send(RESET);
-    QThread::msleep(800);
+    QThread::msleep(1000);
 }
 
 void MainWindow::disconnected()
@@ -364,6 +339,25 @@ void MainWindow::dataReceived(QString &dataReceived)
     {
         commandOrder = 0;
         m_initialized = true;
+
+        if(m_connectionManager->getCType() == ConnectionType::Wifi)
+        {
+            elm->resetPids();
+            ui->textTerminal->append("-> Searching available pids.");
+            QString supportedPIDs = elm->get_available_pids();
+
+            if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
+            {
+                runtimeCommands.clear();
+                runtimeCommands.append(VOLTAGE);
+                if(supportedPIDs.contains(","))
+                    runtimeCommands.append(supportedPIDs.split(","));
+
+                QString str = runtimeCommands.join("");
+                str = runtimeCommands.join(", ");
+                ui->textTerminal->append("<- Pids:  " + str);
+            }
+        }
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
