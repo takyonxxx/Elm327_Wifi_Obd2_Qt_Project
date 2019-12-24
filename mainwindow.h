@@ -105,6 +105,7 @@ private:
     ELM *elm{};
 
     int commandOrder{0};
+    QStringList runtimeCommands{};
     bool m_initialized{false};
     bool m_ConsoleEnable{true};
     std::vector<uint32_t> cmds{};

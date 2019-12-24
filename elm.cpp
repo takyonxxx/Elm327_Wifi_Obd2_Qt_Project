@@ -178,10 +178,15 @@ void ELM::update_available_pidset(quint8 set)
     }
     QString flags{};
     // Get first set of pids
-    //QString cmd = "4100983B0011410080108000";
-    QString cmd = ConnectionManager::getInstance()->readData(cmd1);
+    //QString cmd = "4100983B0011410080108000"; jeep
+    //QString cmd = "4100983B0011"; dacia
+    QString cmd{};
+    while(cmd.isEmpty())
+    {
+        cmd = ConnectionManager::getInstance()->readData(cmd1);
+    }
 
-    if(cmd.contains("UNABLETOCONNECT"))
+    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT") || cmd.contains("NODATA"))
     {
         available_pids[3]  = true;  //04  Calculated engine load
         available_pids[4]  = true;  //05  Engine coolant temperature

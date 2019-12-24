@@ -42,9 +42,6 @@ void ElmTcpSocket::disconnectTcp()
     {
         socket->close();
         socket->deleteLater();
-        QString msg{};
-        msg.append("DisConnected Wifi");
-        emit stateChanged(msg);
     }
 }
 
@@ -117,7 +114,7 @@ void ElmTcpSocket::readyRead()
     if(strData.contains("\r"))
     {
         if(!strData.isEmpty())
-        {
+        {           
             byteblock.clear();
             strData.remove("\r");
             strData.remove(">");
@@ -148,15 +145,13 @@ void ElmTcpSocket::connected()
 void ElmTcpSocket::disconnected()
 {
     m_connected = false;
-    QString msg{};
-    msg.append("Wifi disconnected.");
-    emit stateChanged(msg);
     emit tcpDisconnected();
 }
 
 QString ElmTcpSocket::checkData()
 {
     QString strData{};
+    QCoreApplication::processEvents(QEventLoop::AllEvents);
 
     if (socket->waitForReadyRead())
     {
@@ -191,9 +186,10 @@ QString ElmTcpSocket::readData(const QString &command)
 
     if(sendAsync(command))
     {
-        QCoreApplication::processEvents();
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
         if (socket->waitForReadyRead())
         {
+            QCoreApplication::processEvents(QEventLoop::AllEvents);
             QByteArray data = socket->readAll();
             byteblock += data;
 
@@ -216,7 +212,6 @@ QString ElmTcpSocket::readData(const QString &command)
                 {
                     if(strData.contains("SEARCHING"))
                     {
-                        QCoreApplication::processEvents();
                         return  checkData();
                     }
                 }

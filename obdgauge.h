@@ -16,11 +16,12 @@ class ObdGauge : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ObdGauge(QWidget *parent = nullptr);
+    explicit ObdGauge(QStringList runtimeCommands, QWidget *parent = nullptr);
     ~ObdGauge();
 
 private:
     int commandOrder{0};
+    QStringList runtimeCommands{};
 
     int m_timerId{};
     float m_realTime{};

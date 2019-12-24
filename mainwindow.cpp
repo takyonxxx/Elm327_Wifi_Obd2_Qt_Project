@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Elm327 Obd2");
 
     QRect desktopRect = QApplication::desktop()->availableGeometry(this);
@@ -96,7 +97,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     if(m_connectionManager)
-        delete m_connectionManager;
+        m_connectionManager->disConnectElm();
+
+    delete m_connectionManager;
+    delete m_settingsManager;
+    delete elm;
+
+    qDebug() << "exiting...";
+
     delete ui;
 }
 
@@ -175,10 +183,7 @@ void MainWindow::on_pushConnect_clicked()
 
 void MainWindow::on_pushExit_clicked()
 {
-    if(m_connectionManager)
-        m_connectionManager->disConnectElm();
-
-    exit(0);
+     QApplication::quit();
 }
 
 void MainWindow::on_pushSend_clicked()
@@ -212,12 +217,35 @@ void MainWindow::on_pushDiagnostic_clicked()
 void MainWindow::on_close_dialog_triggered()
 {
     m_ConsoleEnable = true;
+    runtimeCommands.clear();
 }
 
 void MainWindow::on_pushScan_clicked()
-{
+{  
+    if(m_connectionManager->getCType() == ConnectionType::Wifi)
+    {
+        elm->resetPids();
+        ui->textTerminal->append("-> Searching available pids.");
+        QString supportedPIDs = elm->get_available_pids();
+
+        if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
+        {
+            runtimeCommands.clear();
+            runtimeCommands.append(VOLTAGE);
+            if(supportedPIDs.contains(","))
+                runtimeCommands.append(supportedPIDs.split(","));
+
+            QString str = runtimeCommands.join("");
+            str = runtimeCommands.join(", ");
+            ui->textTerminal->append("<- Pids:  " + str);
+        }
+    }
+
+    if(runtimeCommands.size() == 0)
+        return;
+
     m_ConsoleEnable = false;
-    ObdScan *obdScan = new ObdScan;
+    ObdScan *obdScan = new ObdScan(runtimeCommands, this);
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
     connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
@@ -229,7 +257,11 @@ void MainWindow::on_pushScan_clicked()
 
 void MainWindow::on_pushGauge_clicked()
 {
-    ObdGauge *obdGauge = new ObdGauge;
+    runtimeCommands.clear();
+    runtimeCommands.append(ENGINE_RPM);
+    runtimeCommands.append(VEHICLE_SPEED);
+
+    ObdGauge *obdGauge = new ObdGauge(runtimeCommands, this);
     obdGauge->setGeometry(this->rect());
     obdGauge->move(this->x(), this->y());
     connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
@@ -249,7 +281,9 @@ void MainWindow::connected()
 
     commandOrder = 0;
     m_initialized = false;
+    m_connectionManager->readData(END_LINE);
     send(RESET);
+    QThread::msleep(800);
 }
 
 void MainWindow::disconnected()
@@ -268,13 +302,9 @@ void MainWindow::disconnected()
 
 void MainWindow::analysData(const QString &dataReceived)
 {
-
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
-
-    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
-        return;
 
     std::vector<QString> vec;
     auto resp= elm->prepareResponseToDecode(dataReceived);
@@ -324,15 +354,16 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::dataReceived(QString &dataReceived)
 {
-    if(!m_ConsoleEnable)return;
-    if(dataReceived.isEmpty())return;
+    if(!m_ConsoleEnable)
+        return;
 
-    ui->textTerminal->append("<- " + dataReceived);
+    if(dataReceived.isEmpty())
+        return;
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
-        m_initialized = true;
         commandOrder = 0;
+        m_initialized = true;
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())
@@ -343,6 +374,11 @@ void MainWindow::dataReceived(QString &dataReceived)
 
     if(m_initialized && !dataReceived.isEmpty())
     {
+        ui->textTerminal->append("<- " + dataReceived);
+
+        if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
+            return;
+
         analysData(dataReceived);
     }
 }
@@ -367,6 +403,8 @@ void MainWindow::on_radioBle_clicked(bool checked)
     if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
+        m_connectionManager->disConnectElm();
+
         ui->textTerminal->append("Ready for elm327 bluetooth devices..");
 
         m_connectionManager->setCType(ConnectionType::BlueTooth);
@@ -378,6 +416,8 @@ void MainWindow::on_radioWifi_clicked(bool checked)
     if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
+        m_connectionManager->disConnectElm();
+
         ui->textTerminal->append("Ready for elm327 wifi devices..");
         ui->comboBleList->clear();
 

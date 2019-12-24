@@ -23,6 +23,8 @@ public:
     QString readData(const QString &command);
     void setCType(const ConnectionType &value);
 
+    ConnectionType getCType() const;
+
 private:
     ConnectionType cType{None};
     SettingsManager *m_settingsManager{};

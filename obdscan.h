@@ -15,7 +15,7 @@ class ObdScan : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ObdScan(QWidget *parent = nullptr);
+    explicit ObdScan(QStringList runtimeCommands, QWidget *parent = nullptr);
     ~ObdScan() override;
 
 private:
@@ -27,6 +27,7 @@ private:
     int mLoad{0};
     int mMAF{0};
     int commandOrder{0};
+    QStringList runtimeCommands{};
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};

@@ -4,11 +4,12 @@
 #include "elm.h"
 #include "settingsmanager.h"
 
-ObdScan::ObdScan(QWidget *parent) :
+ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ObdScan)
 {
     ui->setupUi(this);
+    this->runtimeCommands = runtimeCommands;
 
     setWindowTitle("Elm327 Obd2");
 
@@ -31,12 +32,14 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelStatus->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color:#154360 ;;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 36pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 24pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
     ui->labelVoltage->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
     ui->labelFuelConsumption->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
     ui->labelFuel100->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
+
+    ui->labelPids->setStyleSheet("font-size: 12pt; font-weight: bold; color: #1F618D; padding: 2px;");
 
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
     ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
@@ -53,21 +56,14 @@ ObdScan::ObdScan(QWidget *parent) :
     if(ConnectionManager::getInstance())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
-
-        elm = ELM::getInstance();
-        elm->resetPids();
-        QString supportedPIDs = elm->get_available_pids();
-        if(!supportedPIDs.isEmpty())
+        if(this->runtimeCommands.size() > 0)
         {
-            runtimeCommands.clear();
-            runtimeCommands.append(VOLTAGE);
-            if(supportedPIDs.contains(","))
-                runtimeCommands.append(supportedPIDs.split(","));
-            qDebug() << runtimeCommands;
+            QString str = this->runtimeCommands.join("");
+            str = this->runtimeCommands.join(", ");
+            ui->labelPids->setText("Pids:  " + str);
+            mRunning = true;
+            send(VOLTAGE);
         }
-
-        mRunning = true;
-        send(VOLTAGE);
     }
 }
 

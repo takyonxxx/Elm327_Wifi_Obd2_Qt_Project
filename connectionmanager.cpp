@@ -127,6 +127,11 @@ void ConnectionManager::setCType(const ConnectionType &value)
     }
 }
 
+ConnectionType ConnectionManager::getCType() const
+{
+    return cType;
+}
+
 void ConnectionManager::conConnected()
 {
     emit connected();

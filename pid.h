@@ -42,6 +42,10 @@ inline constexpr signum(T x) {
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
 END_LINE = "\r",
+SERIAL_NUMBER = "STSN",
+FIRMWARE_VERSION = "STI",
+DEVICE_VERSION = "STDIX",
+OBD_DUMP = "ATBD",
 SET_ALL_DEFAULT = "ATD",
 SOFT_RESET = "ATWS",
 INFO = "ATI",
@@ -51,7 +55,7 @@ VOLTAGE = "ATRV",
 GET_PROTOCOL = "ATDP",
 GET_PP_SUMMARY= "ATPPS",
 GET_ELM_INFO = "ATI",
-PROTOCOL_AUTO = "ATSP0",
+PROTOCOL_AUTO = "ATSPA0",
 PROTOCOL_SEARCH_ORDER= "ATSS",
 ECHO_OFF = "ATE0",
 ECHO_ON = "ATE1",
@@ -97,8 +101,8 @@ REQUEST_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 ONLY_ENGINE_ECU ="ATSH7E0";
 
-static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, ECHO_OFF, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_ELM_INFO};
-static QStringList runtimeCommands{};
+static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, ECHO_OFF,
+            TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_ELM_INFO};
 
 static long long currentTimeMillis()
 {

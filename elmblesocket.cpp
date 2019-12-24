@@ -1,40 +1,6 @@
 #include "elmblesocket.h"
 #include <QDebug>
 
-void *ElmBleSocket::bleDiscoveryThread(void * this_ptr)
-{
-    qRegisterMetaType<QBluetoothDeviceInfo>("QBluetoothDeviceInfo");
-    qRegisterMetaType<QString>("QString&");
-
-    ElmBleSocket* obj_ptr = static_cast<ElmBleSocket*>(this_ptr);
-    QMutexLocker locker(&obj_ptr->m_mutex);
-
-    if (obj_ptr->localDevice->isValid())
-    {
-        //Turn BT on
-        obj_ptr->localDevice->powerOn();
-
-        // Make it visible to others
-        obj_ptr->localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
-        obj_ptr->discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
-        obj_ptr->discoveryAgent->setInquiryType(QBluetoothDeviceDiscoveryAgent::GeneralUnlimitedInquiry);
-        obj_ptr->discoveryAgent->setLowEnergyDiscoveryTimeout(0);
-
-        QObject::connect(obj_ptr->discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, obj_ptr, &ElmBleSocket::addDevice);
-        QObject::connect(obj_ptr->discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, obj_ptr, &ElmBleSocket::scanFinished);
-
-        if(obj_ptr->discoveryAgent)
-        {
-            QString msg{};
-
-            msg.append("Scanning bluetooth devices");
-            emit obj_ptr->stateChanged(msg);
-
-            obj_ptr->discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
-        }
-    }
-}
-
 
 ElmBleSocket::ElmBleSocket(QObject *parent):localDevice(new QBluetoothLocalDevice)
 {
@@ -43,9 +9,6 @@ ElmBleSocket::ElmBleSocket(QObject *parent):localDevice(new QBluetoothLocalDevic
 
 ElmBleSocket::~ElmBleSocket()
 {
-    if(m_discoveryThread)
-        pthread_cancel(m_discoveryThread);
-
     delete localDevice;
     delete discoveryAgent;
     delete socket;
@@ -55,9 +18,45 @@ void ElmBleSocket::run()
 {
 }
 
-void ElmBleSocket::scan()
+void ElmBleSocket::scanBle()
 {
-    pthread_create( &m_discoveryThread, nullptr, &ElmBleSocket::bleDiscoveryThread, this);
+    qRegisterMetaType<QBluetoothDeviceInfo>("QBluetoothDeviceInfo");
+    qRegisterMetaType<QString>("QString&");
+
+    QMutexLocker locker(&m_mutex);
+
+    if (localDevice->isValid())
+    {
+        //Turn BT on
+        localDevice->powerOn();
+
+        // Make it visible to others
+        localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
+        discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
+        discoveryAgent->setInquiryType(QBluetoothDeviceDiscoveryAgent::GeneralUnlimitedInquiry);
+        discoveryAgent->setLowEnergyDiscoveryTimeout(3000);
+
+        connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &ElmBleSocket::addDevice);
+        connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, this, &ElmBleSocket::scanFinished);
+        connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::canceled, this, &ElmBleSocket::scanFinished);
+        connect(discoveryAgent, static_cast<void (QBluetoothDeviceDiscoveryAgent::*)
+                (QBluetoothDeviceDiscoveryAgent::Error)>(&QBluetoothDeviceDiscoveryAgent::error), this, &ElmBleSocket::scanError);
+
+        if(discoveryAgent)
+        {
+            QString msg{};
+            msg.append("Scanning bluetooth devices");
+            emit stateChanged(msg);
+
+            discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+        }
+    }
+}
+
+void ElmBleSocket::scan()
+{    
+    QFuture<void> t1 = QtConcurrent::run(this, &ElmBleSocket::scanBle);
+    t1.waitForFinished();
 }
 
 void ElmBleSocket::connectBle(const QBluetoothAddress & address)
@@ -80,14 +79,8 @@ void ElmBleSocket::disconnectBle()
 {
     if(socket->isOpen())
     {
-        if(m_discoveryThread)
-            pthread_cancel(m_discoveryThread);
-
         socket->disconnectFromService();
         socket->deleteLater();
-        QString msg{};
-        msg.append("DisConnected Ble");
-        emit stateChanged(msg);
     }
 }
 
@@ -100,14 +93,6 @@ bool ElmBleSocket::isConnected()
 void ElmBleSocket::connected()
 {
     m_connected = true;
-
-    QString msg{};
-
-    msg.append("Ble Socket connected\n");
-    msg.append( socket->peerName()+ " : ");
-    msg.append( socket->peerAddress().toString());
-    emit stateChanged(msg);
-
     emit bleConnected();
 }
 
@@ -116,9 +101,6 @@ void ElmBleSocket::disconnected()
     socket->deleteLater();
     m_connected = false;
     emit bleDisconnected();
-    QString msg{};
-    msg.append("Ble disconnected.");
-    emit stateChanged(msg);
 }
 
 
@@ -128,9 +110,20 @@ void ElmBleSocket::socketError(QBluetoothSocket::SocketError error)
     emit stateChanged(errorString);
 }
 
+void ElmBleSocket::scanError(QBluetoothDeviceDiscoveryAgent::Error error)
+{
+    auto scanError = discoveryAgent->errorString();
+    emit stateChanged(scanError);
+}
+
 void ElmBleSocket::addDevice(const QBluetoothDeviceInfo &info)
 {
-      emit addBleDevice(info.address(), info.name());
+    if(info.name().toUpper().contains("ECU") || info.name().toUpper().contains("OBD")
+            || info.name().toUpper().contains("ELM") || info.name().toUpper().contains("SCAN"))
+    {
+        discoveryAgent->stop();
+        emit addBleDevice(info.address(), info.name());
+    }
 }
 
 void ElmBleSocket::scanFinished()
@@ -161,7 +154,7 @@ bool ElmBleSocket::send(const QString &string)
         }
 
         socket->write(dataToSend);
-        return socket->waitForBytesWritten(5000);
+        return socket->waitForBytesWritten(-1);
     }
     else
         return false;
@@ -185,8 +178,8 @@ bool ElmBleSocket::sendAsync(const QString &command)
                 dataToSend += '\r';
         }
 
-        socket->write(dataToSend);
-        return socket->waitForBytesWritten(5000);
+        auto writeStatus = socket->write(dataToSend);
+        return writeStatus;
     }
     else
         return false;
@@ -197,7 +190,7 @@ QString ElmBleSocket::checkData()
 {
     QString strData{};
 
-    if (socket->waitForReadyRead(5000))
+    while (socket->bytesAvailable() > 0)
     {
         QByteArray data = socket->readAll();
         byteblock += data;
@@ -230,38 +223,43 @@ QString ElmBleSocket::readData(const QString &command)
 
     if(sendAsync(command))
     {
-        QCoreApplication::processEvents();
-        if (socket->waitForReadyRead(5000))
+        //if (socket->waitForReadyRead(-1)) //not implemented
         {
-            QByteArray data = socket->readAll();
-            byteblock += data;
-
-            strData = QString::fromStdString(byteblock.toStdString());
-            if(strData.contains("\r"))
+            while (socket->bytesAvailable() > 0)
             {
-                byteblock.clear();
-                strData.remove("\r");
-                strData.remove(">");
+                QCoreApplication::processEvents(QEventLoop::AllEvents);
 
-                strData = strData.trimmed()
-                        .simplified()
-                        .remove(QRegExp("[\\n\\t\\r]"))
-                        .remove(QRegExp("[^a-zA-Z0-9]+"));
+                QByteArray data = socket->readAll();
+                byteblock += data;
 
-                // Some of these look like errors that ought to be handled..
-                strData.replace("?","");
-                strData.replace(",","");
-                if(!strData.isEmpty())
+                strData = QString::fromStdString(byteblock.toStdString());
+
+                if(strData.contains("\r"))
                 {
-                    if(strData.contains("SEARCHING"))
-                    {
-                        QCoreApplication::processEvents();
-                        return  checkData();
-                    }
-                }
+                    byteblock.clear();
+                    strData.remove("\r");
+                    strData.remove(">");
 
-                emit dataReceived(strData);
-                return strData;
+                    strData = strData.trimmed()
+                            .simplified()
+                            .remove(QRegExp("[\\n\\t\\r]"))
+                            .remove(QRegExp("[^a-zA-Z0-9]+"));
+
+                    // Some of these look like errors that ought to be handled..
+                    strData.replace("?","");
+                    strData.replace(",","");
+                    if(!strData.isEmpty())
+                    {
+                        if(strData.contains("SEARCHING"))
+                        {
+                            QCoreApplication::processEvents();
+                            return  checkData();
+                        }
+                    }
+
+                    emit dataReceived(strData);
+                    return strData;
+                }
             }
         }
     }

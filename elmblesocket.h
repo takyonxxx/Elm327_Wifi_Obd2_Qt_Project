@@ -8,7 +8,8 @@
 #include <QBluetoothSocket>
 #include <QCoreApplication>
 #include <iostream>
-#include <thread>
+#include <QFuture>
+#include <qtconcurrentrun.h>
 #include <QThread>
 #include <QBluetoothDeviceDiscoveryAgent>
 
@@ -43,6 +44,7 @@ private slots:
     void disconnected();    
     void readyRead();
     void socketError(QBluetoothSocket::SocketError);
+    void scanError(QBluetoothDeviceDiscoveryAgent::Error);
     QString statetoString(QBluetoothSocket::SocketState);
 
 
@@ -61,8 +63,8 @@ private:
     QBluetoothDeviceDiscoveryAgent *discoveryAgent{};
     QByteArray byteblock{};
     bool m_connected{false};
-    pthread_t m_discoveryThread{};
-    static void *bleDiscoveryThread(void * this_ptr);
+
+    void scanBle();
 };
 
 
