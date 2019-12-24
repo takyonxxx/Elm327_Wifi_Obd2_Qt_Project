@@ -178,8 +178,8 @@ bool ElmBleSocket::sendAsync(const QString &command)
                 dataToSend += '\r';
         }
 
-        auto writeStatus = socket->write(dataToSend);
-        return writeStatus;
+        socket->write(dataToSend);
+        return true;
     }
     else
         return false;

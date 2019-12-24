@@ -8,6 +8,7 @@
 #include "settingsmanager.h"
 #include "obdscan.h"
 #include "obdgauge.h"
+#include "bluetoothcon.h"
 
 #define SCREEN_ORIENTATION_LANDSCAPE 0
 #define SCREEN_ORIENTATION_PORTRAIT 1
