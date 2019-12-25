@@ -52,6 +52,7 @@ ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
 
     mAvarageFuelConsumption.clear();
     mAvarageFuelConsumption100.clear();
+    mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
     if(ConnectionManager::getInstance())
     {
@@ -114,8 +115,19 @@ void ObdScan::dataReceived(QString &dataReceived)
 
     if(dataReceived.isEmpty())return;
 
-    dataReceived.remove("ATRV").remove("atrv");
-    analysData(dataReceived);
+    try
+    {
+        analysData(dataReceived);
+    }
+    catch (const std::exception& e)
+    {
+        ui->labelPids->setText(e.what());
+    }
+    catch (...)
+    {
+        ui->labelPids->setText("analysData : something went wrong");
+    }
+
 }
 
 void ObdScan::analysData(const QString &dataReceived)
@@ -128,7 +140,7 @@ void ObdScan::analysData(const QString &dataReceived)
     std::vector<QString> vec;
     auto resp= elm->prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>0 && !resp[0].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
         PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
@@ -169,8 +181,8 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
-            mRpm = ((A * 256) + B) / 4;
-            ui->labelRpm->setText(QString::number(mRpm) + " rpm");
+            value = ((A * 256) + B) / 4;
+            ui->labelRpm->setText(QString::number(value) + " rpm");
             break;
         case 13://PID(0D): KM Speed
             // A
@@ -220,10 +232,9 @@ void ObdScan::analysData(const QString &dataReceived)
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
         {
-            getFuelPid = true;
-            auto FuelFlowLH = ((A*256)+B) / 20;
-            mAvarageFuelConsumption.append(FuelFlowLH);
-            ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + " l / h");
+            value = ((A*256)+B) / 20;
+            /*mAvarageFuelConsumption.append(value);
+            ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + " l / h");*/
         }
 
             break;
@@ -239,40 +250,40 @@ void ObdScan::analysData(const QString &dataReceived)
 
         if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
         {
-            if(!getFuelPid)
+            auto AL = mMAF * mLoad;  // Airflow * Load
+            auto coeff = (mEngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
+            auto FuelFlowLH = AL * coeff + 1;   // Fuel flow L/h
+
+            if(FuelFlowLH > 99)
+                FuelFlowLH = 99;
+
+            mAvarageFuelConsumption.append(FuelFlowLH);
+            ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
+
+            if(mSpeed > 0)
             {
-                auto EngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
-                auto AL = mMAF * mLoad;  // Airflow * Load
-                auto coeff = (EngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
-                auto FuelFlowLH = AL * coeff + 1;   // Fuel flow L/h
+                auto mFuelLPer100 = FuelFlowLH * 100 / mSpeed;   // FuelConsumption in l per 100km
+                if(mFuelLPer100 > 99)
+                    mFuelLPer100 = 99;
 
-                if(FuelFlowLH > 99)
-                    FuelFlowLH = 99;
-
-                mAvarageFuelConsumption.append(FuelFlowLH);
-                ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
-
-                if(mSpeed > 0)
-                {
-                    auto mFuelLPer100 = FuelFlowLH * 100 / mSpeed;   // FuelConsumption in l per 100km
-                    if(mFuelLPer100 > 99)
-                        mFuelLPer100 = 99;
-
-                    mAvarageFuelConsumption100.append(mFuelLPer100);
-                    ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
-                }
-                else
-                {
-                    ui->labelFuel100->setText(QString::number(99, 'f', 1) + "  l / 100km");
-                }
+                mAvarageFuelConsumption100.append(mFuelLPer100);
+                ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
+            }
+            else
+            {
+                ui->labelFuel100->setText(QString::number(99, 'f', 1) + "  l / 100km");
             }
         }
     }
 
     if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
     {
-        if(!dataReceived.contains("ATRV"))
-            ui->labelVoltage->setText(dataReceived.mid(0,2) + "." + dataReceived.mid(2,1) + " V");
+        auto voltData = dataReceived;
+        voltData.remove("ATRV").remove("atrv");
+        if(voltData.length() > 3)
+        {
+            ui->labelVoltage->setText(voltData.mid(0,2) + "." + voltData.mid(2,1) + " V");
+        }
     }
 }
 
@@ -298,4 +309,5 @@ void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1
 {
     SettingsManager::getInstance()->setEngineDisplacement(arg1.trimmed().toInt());
     SettingsManager::getInstance()->saveSettings();
+    mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 }

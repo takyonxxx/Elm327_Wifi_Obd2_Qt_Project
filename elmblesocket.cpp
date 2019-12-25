@@ -118,12 +118,13 @@ void ElmBleSocket::scanError(QBluetoothDeviceDiscoveryAgent::Error error)
 
 void ElmBleSocket::addDevice(const QBluetoothDeviceInfo &info)
 {
-    if(info.name().toUpper().contains("ECU") || info.name().toUpper().contains("OBD")
+    /*if(info.name().toUpper().contains("ECU") || info.name().toUpper().contains("OBD")
             || info.name().toUpper().contains("ELM") || info.name().toUpper().contains("SCAN"))
     {
         discoveryAgent->stop();
         emit addBleDevice(info.address(), info.name());
-    }
+    }*/
+    emit addBleDevice(info.address(), info.name());
 }
 
 void ElmBleSocket::scanFinished()

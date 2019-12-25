@@ -20,13 +20,12 @@ public:
 
 private:
     QMutex m_mutex{};
-    bool mRunning{false};
-    bool getFuelPid{false};
+    bool mRunning{false};    
     int mSpeed{0};
-    int mRpm{0};
-    int mLoad{0};
     int mMAF{0};
+    int mLoad{0};
     int commandOrder{0};
+    unsigned int mEngineDisplacement{0};
     QStringList runtimeCommands{};
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};

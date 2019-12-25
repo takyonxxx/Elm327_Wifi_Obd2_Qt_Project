@@ -4,6 +4,7 @@
 #include <QObject>
 #include "elmtcpsocket.h"
 #include "elmblesocket.h"
+#include "elmserialport.h"
 #include "settingsmanager.h"
 
 enum ConnectionType {BlueTooth, Wifi, Serial, None};
@@ -30,6 +31,7 @@ private:
     SettingsManager *m_settingsManager{};
     ElmTcpSocket *mElmTcpSocket{};
     ElmBleSocket *mElmBleSocket{};
+    ElmSerialPort *mElmSerialPort{};
 
 signals:
     void dataReceived(QString &);

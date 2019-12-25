@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
-QT += bluetooth network
+QT += bluetooth network serialport
 QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -20,12 +20,10 @@ ios {
     QMAKE_INFO_PLIST = ios/Info.plist
     QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
     QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-
-    LIBS +=-lpthread
 }
 
 linux{
-    LIBS +=-lpthread
+
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -45,6 +43,7 @@ SOURCES += \
         connectionmanager.cpp \
         elm.cpp \
         elmblesocket.cpp \
+        elmserialport.cpp \
         elmtcpsocket.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -52,12 +51,14 @@ SOURCES += \
         obdgauge.cpp \
         obdscan.cpp \
         qcgaugewidget.cpp \
+        serial.cpp \
         settingsmanager.cpp
 
 HEADERS += \
         connectionmanager.h \
         elm.h \
         elmblesocket.h \
+        elmserialport.h \
         elmtcpsocket.h \
         mainwindow.h \
         methods.h \
@@ -65,6 +66,7 @@ HEADERS += \
         obdscan.h \
         pid.h \
         qcgaugewidget.h \
+        serial.h \
         settingsmanager.h
 
 FORMS += \

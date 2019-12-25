@@ -31,6 +31,12 @@ ConnectionManager::ConnectionManager(QObject *parent)
         connect(mElmBleSocket, &ElmBleSocket::addBleDevice, this, &ConnectionManager::conAddBleDevice);
         connect(mElmBleSocket, &ElmBleSocket::stateChanged, this, &ConnectionManager::conStateChanged);
     }
+
+    mElmSerialPort = new ElmSerialPort(this);
+    if(mElmSerialPort)
+    {
+
+    }
 }
 
 bool ConnectionManager::send(const QString &command)

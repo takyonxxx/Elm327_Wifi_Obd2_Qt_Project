@@ -236,8 +236,6 @@ QString ObdGauge::send(const QString &command)
 
 void ObdGauge::analysData(const QString &dataReceived)
 {
-    if(dataReceived.isEmpty())return;
-
     unsigned A = 0;
     unsigned B = 0;
     unsigned PID = 0;
@@ -292,9 +290,16 @@ void ObdGauge::dataReceived(QString &dataReceived)
 
     if(dataReceived.isEmpty())return;
 
-    dataReceived.remove("ATRV").remove("atrv");
-
-    analysData(dataReceived);
+    try
+    {
+        analysData(dataReceived);
+    }
+    catch (const std::exception& e)
+    {
+    }
+    catch (...)
+    {
+    }
 }
 
 void ObdGauge::closeEvent(QCloseEvent *event)
