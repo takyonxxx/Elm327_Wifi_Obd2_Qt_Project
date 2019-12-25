@@ -17,8 +17,6 @@
 
 using namespace std;
 
-struct termios elm327_termios_original;
-
 Serial::Serial(char* dev, int baud, int parity, int blocking, QObject *parent)
 {
     _dev = dev;
@@ -44,12 +42,7 @@ bool Serial::isConnected() const
 
 int Serial::initPort()
 {
-    qDebug() << "SERIAL: Opening " << _dev << " at " << _baud << " baud..." << endl;
     _fd = open(_dev, O_RDWR | O_NOCTTY | O_NDELAY | O_SYNC);
-
-    /* Save original terminal settings (so we can restore at shutdown) */
-    if (tcgetattr(_fd, &elm327_termios_original) == -1)
-        return -1;
 
     if (_fd != -1)
     {
@@ -111,13 +104,11 @@ int Serial::initPort()
             return -1;
 
         tcflush(_fd, TCIOFLUSH);
-
+        qDebug() << "SERIAL: Connected " << _dev << " at " << _baud << " baud..." << endl;
         _connected = true;
     }
     else
     {
-        cout << "FAIL" << endl;
-        cerr << "Error opening port: ";
         closePort();
         _connected = false;
     }
@@ -169,7 +160,6 @@ void Serial::closePort()
 {
     if (_fd != -1)
     {
-        tcsetattr(_fd, TCSANOW, &elm327_termios_original);
         close(_fd);
         cout << "SERIAL: Device " << _dev << " is now closed." << endl;
     }

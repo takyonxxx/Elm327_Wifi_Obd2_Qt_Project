@@ -15,11 +15,13 @@ public:
     ~ElmSerialPort();
     Serial* serial{};
 
-private slots:
-    void openSerialPort(const QString &);
+    bool openSerialPort(const QString &);
     void closeSerialPort();
     bool send(const QString &);
     QString readData(const QString &);
+    bool isConnected() const;
+
+private slots:
     void socketError();
     void connected();
     void disconnected();

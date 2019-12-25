@@ -4,28 +4,7 @@
 ElmSerialPort::ElmSerialPort(QObject *parent)
 {
     QString sPort("/dev/pts/8");
-
-    try
-    {
-        openSerialPort(sPort);
-        if(serial->isConnected())
-        {
-            while(true)
-            {
-                if(mStop)
-                    break;
-
-                readData("ATZ\r");
-                QThread::sleep(1);
-                readData("ATRV\r");
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        qDebug() << e.what();
-    }
-
+    openSerialPort(sPort);
 }
 
 ElmSerialPort::~ElmSerialPort()
@@ -34,11 +13,12 @@ ElmSerialPort::~ElmSerialPort()
     delete serial;
 }
 
-void ElmSerialPort::openSerialPort(const QString &sPort)
+bool ElmSerialPort::openSerialPort(const QString &sPort)
 {
     serial = new Serial((char*)sPort.toStdString().c_str(), 38400, PARITY_8N1, 0);
     int result = serial->initPort();
     QThread::usleep(10000);
+    return result;
 }
 
 void ElmSerialPort::closeSerialPort()
@@ -47,6 +27,14 @@ void ElmSerialPort::closeSerialPort()
         serial->closePort();
 
     delete serial;
+}
+
+bool ElmSerialPort::isConnected() const
+{
+    if(!serial)
+        return false;
+
+    return serial->isConnected();
 }
 
 bool ElmSerialPort::send(const QString &command)

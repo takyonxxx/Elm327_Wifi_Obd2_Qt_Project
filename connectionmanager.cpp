@@ -33,10 +33,6 @@ ConnectionManager::ConnectionManager(QObject *parent)
     }
 
     mElmSerialPort = new ElmSerialPort(this);
-    if(mElmSerialPort)
-    {
-
-    }
 }
 
 bool ConnectionManager::send(const QString &command)
@@ -45,7 +41,7 @@ bool ConnectionManager::send(const QString &command)
     {
         if(mElmTcpSocket)
         {
-           return  mElmTcpSocket->send(command);
+            return  mElmTcpSocket->send(command);
         }
     }
     else if(cType == ConnectionType::BlueTooth)
@@ -65,7 +61,7 @@ QString ConnectionManager::readData(const QString &command)
     {
         if(mElmTcpSocket)
         {
-           return  mElmTcpSocket->readData(command);
+            return  mElmTcpSocket->readData(command);
         }
     }
     else if(cType == ConnectionType::BlueTooth)
