@@ -240,17 +240,31 @@ void ObdGauge::analysData(const QString &dataReceived)
     unsigned B = 0;
     unsigned PID = 0;
     double value = 0;
-    bool valid;
 
-    QString tmpmsg{};
+    std::vector<QString> vec;
+    auto resp= elm->prepareResponseToDecode(dataReceived);
 
-    if(dataReceived.startsWith(QString("41")))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
-        tmpmsg = dataReceived.mid(0, dataReceived.length());
+        QRegularExpression hexMatcher("^[0-9A-F]{2}$", QRegularExpression::CaseInsensitiveOption);
+        QRegularExpressionMatch match = hexMatcher.match(resp[1]);
+        if (!match.hasMatch())
+            return;
 
-        PID = tmpmsg.mid(2,2).toUInt(&valid,16);
-        A = tmpmsg.mid(4,2).toUInt(&valid,16);
-        B = tmpmsg.mid(6,2).toUInt(&valid,16);
+        PID =std::stoi(resp[1].toStdString(),nullptr,16);
+        std::vector<QString> vec;
+
+        vec.insert(vec.begin(),resp.begin()+2, resp.end());
+        if(vec.size()>=2)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = std::stoi(vec[1].toStdString(),nullptr,16);
+        }
+        else if(vec.size()>=1)
+        {
+            A = std::stoi(vec[0].toStdString(),nullptr,16);
+            B = 0;
+        }
 
         switch (PID)
         {
@@ -289,6 +303,9 @@ void ObdGauge::dataReceived(QString &dataReceived)
     }
 
     if(dataReceived.isEmpty())return;
+
+    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
+        return;
 
     try
     {

@@ -115,17 +115,18 @@ void ObdScan::dataReceived(QString &dataReceived)
 
     if(dataReceived.isEmpty())return;
 
+    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
+        return;
+
     try
     {
         analysData(dataReceived);
     }
     catch (const std::exception& e)
-    {
-        ui->labelPids->setText(e.what());
+    {       
     }
     catch (...)
-    {
-        ui->labelPids->setText("analysData : something went wrong");
+    {        
     }
 
 }
@@ -142,6 +143,11 @@ void ObdScan::analysData(const QString &dataReceived)
 
     if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
+        QRegularExpression hexMatcher("^[0-9A-F]{2}$", QRegularExpression::CaseInsensitiveOption);
+        QRegularExpressionMatch match = hexMatcher.match(resp[1]);
+        if (!match.hasMatch())
+            return;
+
         PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
 
@@ -256,6 +262,9 @@ void ObdScan::analysData(const QString &dataReceived)
 
             if(FuelFlowLH > 99)
                 FuelFlowLH = 99;
+
+            if(mLoad == 0)
+                FuelFlowLH = 0;
 
             mAvarageFuelConsumption.append(FuelFlowLH);
             ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");

@@ -129,6 +129,8 @@ private slots:
     void on_close_dialog_triggered();
     void addBleDeviceToList(const QBluetoothAddress&, const QString&);
 
+    void on_radioSerial_clicked(bool checked);
+
 private:
     Ui::MainWindow *ui;
 };

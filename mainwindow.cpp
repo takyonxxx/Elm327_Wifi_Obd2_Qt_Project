@@ -28,13 +28,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
     ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
     ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 2px;");
-    ui->labelIp->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+
+    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
+
     ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->labelPort->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->portEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->wifiPortEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+
     ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
+
     ui->radioBle->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
     ui->radioWifi->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
+
     ui->comboBleList->setStyleSheet("font-size: 14pt; font-weight: bold; color:black; padding: 2px;");
 
 #ifdef Q_OS_ANDROID
@@ -43,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setMaximumHeight(30);
 #endif
 
-    ui->textSend->setText(PIDS_SUPPORTED20);
+    ui->textSend->setText(VOLTAGE);
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->pushScan->setEnabled(false);
@@ -72,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     elm = new ELM();
+    elm->resetPids();
     ui->radioWifi->setChecked(true);
     ui->pushConnect->setFocus();
 
@@ -183,7 +190,7 @@ void MainWindow::on_pushConnect_clicked()
 
 void MainWindow::on_pushExit_clicked()
 {
-     QApplication::quit();
+    QApplication::quit();
 }
 
 void MainWindow::on_pushSend_clicked()
@@ -256,9 +263,11 @@ void MainWindow::connected()
 
     commandOrder = 0;
     m_initialized = false;
-    m_connectionManager->readData(END_LINE);
+
+    ui->textTerminal->append("Elm Connected");
+
     send(RESET);
-    QThread::msleep(1000);
+    QThread::msleep(800);
 }
 
 void MainWindow::disconnected()
@@ -273,6 +282,7 @@ void MainWindow::disconnected()
 
     commandOrder = 0;
     m_initialized = false;
+    ui->textTerminal->append("Elm DisConnected");
 }
 
 void MainWindow::analysData(const QString &dataReceived)
@@ -284,8 +294,13 @@ void MainWindow::analysData(const QString &dataReceived)
     std::vector<QString> vec;
     auto resp= elm->prepareResponseToDecode(dataReceived);
 
-    if(resp.size()>0 && !resp[0].compare("41",Qt::CaseInsensitive))
+    if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
+        QRegularExpression hexMatcher("^[0-9A-F]{2}$", QRegularExpression::CaseInsensitiveOption);
+        QRegularExpressionMatch match = hexMatcher.match(resp[1]);
+        if (!match.hasMatch())
+            return;
+
         PID =std::stoi(resp[1].toStdString(),nullptr,16);
         std::vector<QString> vec;
 
@@ -373,7 +388,16 @@ void MainWindow::dataReceived(QString &dataReceived)
         if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
             return;
 
-        analysData(dataReceived);
+        try
+        {
+            analysData(dataReceived);
+        }
+        catch (const std::exception& e)
+        {
+        }
+        catch (...)
+        {
+        }
     }
 }
 
@@ -390,6 +414,30 @@ QString MainWindow::send(const QString &command)
     }
 
     return QString();
+}
+
+void MainWindow::saveSettings()
+{
+    QString ip = ui->ipEdit->text();
+    quint16 wifiPort = ui->wifiPortEdit->text().toUShort();
+    m_settingsManager->setWifiIp(ip);
+    m_settingsManager->setWifiPort(wifiPort);
+    m_settingsManager->setSerialPort("/dev/pts/8");
+
+    auto text = ui->comboBleList->currentText();
+    if(!text.isEmpty())
+    {
+        auto strAddress = text.split(" ").at(0);
+        m_settingsManager->setBleAddress(QBluetoothAddress(strAddress));
+    }
+
+    m_settingsManager->saveSettings();
+}
+
+void MainWindow::addBleDeviceToList(const QBluetoothAddress & bleAddress, const QString & bleName)
+{
+    QString item = bleAddress.toString() + QString(" ") + bleName;
+    ui->comboBleList->addItem(item);
 }
 
 void MainWindow::on_radioBle_clicked(bool checked)
@@ -419,26 +467,16 @@ void MainWindow::on_radioWifi_clicked(bool checked)
     }
 }
 
-void MainWindow::saveSettings()
+void MainWindow::on_radioSerial_clicked(bool checked)
 {
-    QString ip = ui->ipEdit->text();
-    quint16 port = ui->portEdit->text().toUShort();
-    m_settingsManager->setIp(ip);
-    m_settingsManager->setPort(port);
+    if(checked && m_connectionManager)
+    {
+        ui->textTerminal->clear();
+        m_connectionManager->disConnectElm();
 
-    auto text = ui->comboBleList->currentText();
-    if(text.isEmpty())
-        return;
+        ui->textTerminal->append("Ready for elm327 serial devices..");
+        ui->comboBleList->clear();
 
-    auto strAddress = text.split(" ").at(0);
-    m_settingsManager->setBleAddress(QBluetoothAddress(strAddress));
-
-    m_settingsManager->saveSettings();
+        m_connectionManager->setCType(ConnectionType::Serial);
+    }
 }
-
-void MainWindow::addBleDeviceToList(const QBluetoothAddress & bleAddress, const QString & bleName)
-{
-    QString item = bleAddress.toString() + QString(" ") + bleName;
-    ui->comboBleList->addItem(item);
-}
-

@@ -51,7 +51,6 @@ SOURCES += \
         obdgauge.cpp \
         obdscan.cpp \
         qcgaugewidget.cpp \
-        serial.cpp \
         settingsmanager.cpp
 
 HEADERS += \
@@ -66,7 +65,6 @@ HEADERS += \
         obdscan.h \
         pid.h \
         qcgaugewidget.h \
-        serial.h \
         settingsmanager.h
 
 FORMS += \

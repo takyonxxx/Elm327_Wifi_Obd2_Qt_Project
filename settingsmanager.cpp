@@ -16,26 +16,26 @@ SettingsManager::SettingsManager()
     m_sSettingsFile = QCoreApplication::applicationDirPath() + "/settings.ini";
     if (QFile(m_sSettingsFile).exists())
         loadSettings();
-    else
-        EngineDisplacement = 1500;
 }
 
 void SettingsManager::loadSettings()
 {
     QSettings settings(m_sSettingsFile, QSettings::IniFormat);
     EngineDisplacement = settings.value("EngineDisplacement", "").toString().toUInt();
-    Ip = settings.value("Ip", "").toString();
-    Port = settings.value("Port", "").toString().toUShort();
+    WifiIp = settings.value("WifiIp", "").toString();
+    WifiPort = settings.value("WifiPort", "").toString().toUShort();
     BleAddress = QBluetoothAddress(settings.value("BleAddress", "").toString());
+    SerialPort = settings.value("SerialPort", "").toString();
 }
 
 void SettingsManager::saveSettings()
 {
     QSettings settings(m_sSettingsFile, QSettings::IniFormat);
     settings.setValue("EngineDisplacement", QString::number(EngineDisplacement));
-    settings.setValue("Ip", Ip);
-    settings.setValue("Port", QString::number(Port));
+    settings.setValue("WifiIp", WifiIp);
+    settings.setValue("WifiPort", QString::number(WifiPort));
     settings.setValue("BleAddress", BleAddress.toString());
+    settings.setValue("SerialPort", SerialPort);
 }
 
 unsigned int SettingsManager::getEngineDisplacement() const
@@ -48,24 +48,24 @@ void SettingsManager::setEngineDisplacement(unsigned int value)
     EngineDisplacement = value;
 }
 
-void SettingsManager::setIp(const QString &value)
+void SettingsManager::setWifiIp(const QString &value)
 {
-    Ip = value;
+    WifiIp = value;
 }
 
-void SettingsManager::setPort(const quint16 &value)
+void SettingsManager::setWifiPort(const quint16 &value)
 {
-    Port = value;
+    WifiPort = value;
 }
 
-QString SettingsManager::getIp() const
+QString SettingsManager::getWifiIp() const
 {
-    return Ip;
+    return WifiIp;
 }
 
-quint16 SettingsManager::getPort() const
+quint16 SettingsManager::getWifiPort() const
 {
-    return Port;
+    return WifiPort;
 }
 
 void SettingsManager::setBleAddress(const QBluetoothAddress &value)
@@ -76,6 +76,16 @@ void SettingsManager::setBleAddress(const QBluetoothAddress &value)
 QBluetoothAddress SettingsManager::getBleAddress() const
 {
     return BleAddress;
+}
+
+QString SettingsManager::getSerialPort() const
+{
+    return SerialPort;
+}
+
+void SettingsManager::setSerialPort(const QString &value)
+{
+    SerialPort = value;
 }
 
 

@@ -98,21 +98,30 @@ QString ELM::get_available_pids()
 
     QString data = "";
     bool first = true;
-    for (int i = 1; i <= 255; i++)
+    for (int i = 0; i <= 255; i++)
     {
         if (available_pids[i-1])
         {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                data.append(",");
-            }
-
             QString hexvalue = QString("01") + QString("%1").arg(i, 2, 16, QLatin1Char( '0' ));
-            data.append(hexvalue.toUpper());
+
+            if(hexvalue != "0101" &&
+                    hexvalue != "0120" &&
+                    hexvalue != "0140" &&
+                    hexvalue != "0160" &&
+                    hexvalue != "0180" &&
+                    hexvalue != "01C0")
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    data.append(",");
+                }
+
+                data.append(hexvalue.toUpper());
+            }
         }
     }
     return data;
@@ -178,15 +187,15 @@ void ELM::update_available_pidset(quint8 set)
     }
     QString flags{};
     // Get first set of pids
-    //QString cmd = "4100983B0011410080108000"; jeep
-    //QString cmd = "4100983B0011"; dacia
+    //QString cmd = "4100983B0011";
+
     QString cmd{};
     while(cmd.isEmpty())
     {
         cmd = ConnectionManager::getInstance()->readData(cmd1);
     }
 
-    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT") || cmd.contains("NODATA"))
+    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT") || cmd.contains("NODATA") || cmd.contains("41FFFFFFFF"))
     {
         available_pids[3]  = true;  //04  Calculated engine load
         available_pids[4]  = true;  //05  Engine coolant temperature
@@ -212,7 +221,7 @@ void ELM::update_available_pidset(quint8 set)
         auto binaryString = DecimalToBinaryString(longData);
         int m = (set-1) * 32;
         // fill supported pid list, ignor 0101
-        for (int i = 1; i < binaryString.length(); i++)
+        for (int i = 0; i < binaryString.length(); i++)
         {
             if (binaryString[i] == '1') {
                 available_pids[i+m] = true;
