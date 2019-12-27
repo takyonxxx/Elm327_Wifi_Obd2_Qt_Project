@@ -43,7 +43,6 @@ SOURCES += \
         connectionmanager.cpp \
         elm.cpp \
         elmblesocket.cpp \
-        elmserialport.cpp \
         elmtcpsocket.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -57,7 +56,6 @@ HEADERS += \
         connectionmanager.h \
         elm.h \
         elmblesocket.h \
-        elmserialport.h \
         elmtcpsocket.h \
         mainwindow.h \
         methods.h \

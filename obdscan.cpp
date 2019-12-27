@@ -258,7 +258,7 @@ void ObdScan::analysData(const QString &dataReceived)
         {
             auto AL = mMAF * mLoad;  // Airflow * Load
             auto coeff = (mEngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
-            auto FuelFlowLH = AL * coeff + 1;   // Fuel flow L/h
+            auto FuelFlowLH = AL * coeff + 1.2;   // Fuel flow L/h
 
             if(FuelFlowLH > 99)
                 FuelFlowLH = 99;
@@ -277,11 +277,7 @@ void ObdScan::analysData(const QString &dataReceived)
 
                 mAvarageFuelConsumption100.append(mFuelLPer100);
                 ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
-            }
-            else
-            {
-                ui->labelFuel100->setText(QString::number(99, 'f', 1) + "  l / 100km");
-            }
+            }            
         }
     }
 

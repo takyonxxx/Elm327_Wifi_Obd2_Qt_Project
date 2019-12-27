@@ -32,14 +32,6 @@ ConnectionManager::ConnectionManager(QObject *parent)
         connect(mElmBleSocket, &ElmBleSocket::stateChanged, this, &ConnectionManager::conStateChanged);
     }
 
-    /*mElmSerialPort = new ElmSerialPort(this);
-    if(mElmSerialPort)
-    {
-        connect(mElmSerialPort,&ElmSerialPort::serialConnected,this, &ConnectionManager::conConnected);
-        connect(mElmSerialPort,&ElmSerialPort::serialDisConnected,this,&ConnectionManager::conDisconnected);
-        connect(mElmSerialPort,&ElmSerialPort::dataReceived,this,&ConnectionManager::conDataReceived);
-        connect(mElmSerialPort, &ElmSerialPort::stateChanged, this, &ConnectionManager::conStateChanged);
-    }*/
 }
 
 bool ConnectionManager::send(const QString &command)
@@ -57,14 +49,7 @@ bool ConnectionManager::send(const QString &command)
         {
             return mElmBleSocket->send(command);
         }
-    }
-    else if(cType == ConnectionType::Serial)
-    {
-        if(mElmSerialPort)
-        {
-            return mElmSerialPort->send(command);
-        }
-    }
+    }    
 
     return false;
 }
@@ -84,14 +69,7 @@ QString ConnectionManager::readData(const QString &command)
         {
             return mElmBleSocket->readData(command);
         }
-    }
-    else if(cType == ConnectionType::Serial)
-    {
-        if(mElmSerialPort)
-        {
-            return mElmSerialPort->readData(command);
-        }
-    }
+    }   
 
     return QString();
 }
@@ -106,11 +84,6 @@ void ConnectionManager::disConnectElm()
     if(mElmBleSocket && mElmBleSocket->isConnected())
     {
         mElmBleSocket->disconnectBle();
-    }
-
-    if(mElmSerialPort && mElmSerialPort->isConnected())
-    {
-        mElmSerialPort->disconnectSerial();
     }
 }
 
@@ -139,15 +112,7 @@ void ConnectionManager::connectElm()
             auto bleAddress = m_settingsManager->getBleAddress();
             mElmBleSocket->connectBle(bleAddress);
         }
-    }
-    else if(cType == ConnectionType::Serial)
-    {
-        if(mElmSerialPort)
-        {
-            auto serialPort = m_settingsManager->getSerialPort();
-            mElmSerialPort->connectSerial(serialPort);
-        }
-    }
+    }    
 }
 
 void ConnectionManager::setCType(const ConnectionType &value)

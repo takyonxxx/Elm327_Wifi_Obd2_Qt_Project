@@ -195,7 +195,10 @@ void ELM::update_available_pidset(quint8 set)
         cmd = ConnectionManager::getInstance()->readData(cmd1);
     }
 
-    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT") || cmd.contains("NODATA") || cmd.contains("41FFFFFFFF"))
+    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT")
+            || cmd.contains("NODATA")
+            || cmd.contains("OK")
+            || cmd.contains("41FFFFFFFF"))
     {
         available_pids[3]  = true;  //04  Calculated engine load
         available_pids[4]  = true;  //05  Engine coolant temperature

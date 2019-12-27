@@ -305,19 +305,17 @@ QString ElmBleSocket::statetoString(QBluetoothSocket::SocketState socketState)
     QString statestring;
     switch(socketState)
     {
-    case QAbstractSocket::UnconnectedState : statestring="The socket is not connected";
+    case QBluetoothSocket::UnconnectedState : statestring="The socket is not connected";
+        break;   
+    case QBluetoothSocket::ConnectingState : statestring="The socket has started establishing a connection";
         break;
-    case QAbstractSocket::HostLookupState : statestring="The socket is performing a host name lookup";
+    case QBluetoothSocket::ConnectedState : statestring="Connection is established";
         break;
-    case QAbstractSocket::ConnectingState : statestring="The socket has started establishing a connection";
+    case QBluetoothSocket::BoundState : statestring="The socket is bound to an address and port";
         break;
-    case QAbstractSocket::ConnectedState : statestring="Connection is established";
+    case QBluetoothSocket::ClosingState : statestring="The socket is about to close";
         break;
-    case QAbstractSocket::BoundState : statestring="The socket is bound to an address and port";
-        break;
-    case QAbstractSocket::ClosingState : statestring="The socket is about to close";
-        break;
-    case QAbstractSocket::ListeningState : statestring="Listening state";
+    case QBluetoothSocket::ListeningState : statestring="Listening state";
         break;
     default: statestring="Unknown state";
         break;
