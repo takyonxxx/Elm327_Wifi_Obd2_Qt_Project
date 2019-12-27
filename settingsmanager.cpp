@@ -13,7 +13,7 @@ SettingsManager *SettingsManager::getInstance()
 
 SettingsManager::SettingsManager()
 {
-    m_sSettingsFile = QCoreApplication::applicationDirPath() + "/settings.ini";
+    m_sSettingsFile = QDir::currentPath() + "/settings.ini";
     if (QFile(m_sSettingsFile).exists())
         loadSettings();
 }

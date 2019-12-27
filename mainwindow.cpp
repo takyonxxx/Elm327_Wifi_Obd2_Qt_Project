@@ -38,10 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
 
-    ui->radioBle->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
-    ui->radioWifi->setStyleSheet("font-size: 16pt; font-weight: bold; color:darkblue; padding: 2px;");
+    ui->radioBle->setStyleSheet("font-size: 18pt; font-weight: bold; color:darkblue; padding: 2px;");
+    ui->radioWifi->setStyleSheet("font-size: 18pt; font-weight: bold; color:darkblue; padding: 2px;");
 
-    ui->comboBleList->setStyleSheet("font-size: 14pt; font-weight: bold; color:black; padding: 2px;");
+    ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 2px;");
 
 #ifdef Q_OS_ANDROID
     ui->textSend->setMinimumHeight(100);
@@ -52,8 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textSend->setText(VOLTAGE);
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
-    ui->pushScan->setEnabled(false);
-    ui->pushGauge->setEnabled(false);
+    ui->pushScan->setEnabled(true);
+    ui->pushGauge->setEnabled(true);
     ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
     ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
     ui->textTerminal->append("On your device : go to Settings > Wi-Fi. ");
@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
+    requestStorageWritePermission();
     keep_screen_on(true);
 #endif
 
@@ -228,8 +229,8 @@ void MainWindow::on_close_dialog_triggered()
 
 void MainWindow::on_pushScan_clicked()
 {
-    if(runtimeCommands.size() == 0)
-        return;
+    /*if(runtimeCommands.size() == 0)
+        return;*/
 
     m_ConsoleEnable = false;
     ObdScan *obdScan = new ObdScan(runtimeCommands, this);
@@ -256,8 +257,8 @@ void MainWindow::connected()
 {
     ui->pushSend->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
-    ui->pushScan->setEnabled(true);
-    ui->pushGauge->setEnabled(true);
+    //ui->pushScan->setEnabled(true);
+    //ui->pushGauge->setEnabled(true);
 
     ui->pushConnect->setText(QString("Disconnect"));
 
@@ -275,8 +276,8 @@ void MainWindow::disconnected()
 {
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
-    ui->pushScan->setEnabled(false);
-    ui->pushGauge->setEnabled(false);
+    //ui->pushScan->setEnabled(false);
+    //ui->pushGauge->setEnabled(false);
 
     ui->textTerminal->clear();
     ui->pushConnect->setText(QString("Connect"));

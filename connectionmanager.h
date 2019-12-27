@@ -25,11 +25,14 @@ public:
 
     ConnectionType getCType() const;
 
+    bool isConnected() const;
+
 private:
     ConnectionType cType{None};
     SettingsManager *m_settingsManager{};
     ElmTcpSocket *mElmTcpSocket{};
     ElmBleSocket *mElmBleSocket{};
+    bool m_connected{false};
 
 signals:
     void dataReceived(QString &);

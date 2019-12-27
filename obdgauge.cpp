@@ -57,7 +57,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         }
     }
 
-    if(ConnectionManager::getInstance())
+    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
 

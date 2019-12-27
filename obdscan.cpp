@@ -54,7 +54,7 @@ ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
     mAvarageFuelConsumption100.clear();
     mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
-    if(ConnectionManager::getInstance())
+    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
         if(this->runtimeCommands.size() > 0)

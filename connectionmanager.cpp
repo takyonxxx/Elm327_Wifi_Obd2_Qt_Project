@@ -133,13 +133,20 @@ ConnectionType ConnectionManager::getCType() const
     return cType;
 }
 
+bool ConnectionManager::isConnected() const
+{
+    return m_connected;
+}
+
 void ConnectionManager::conConnected()
 {
+    m_connected = true;
     emit connected();
 }
 
 void ConnectionManager::conDisconnected()
 {
+    m_connected = false;
     emit disconnected();
 }
 
