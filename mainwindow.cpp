@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else
         ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 2px;");
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 2px;");
     ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 2px;");
     ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px;");
     ui->pushDiagnostic->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px;");
@@ -97,6 +97,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #ifdef Q_OS_ANDROID
     //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
     requestStorageWritePermission();
+    requestBlueToothPermission();
     keep_screen_on(true);
 #endif
 

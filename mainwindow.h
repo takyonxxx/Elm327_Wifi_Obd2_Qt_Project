@@ -72,6 +72,22 @@ public:
         return true;
     }
 
+    bool requestBlueToothPermission()
+    {
+        QtAndroid::PermissionResult request = QtAndroid::checkPermission("android.permission.BLUETOOTH");
+        if (request == QtAndroid::PermissionResult::Denied){
+            QtAndroid::requestPermissionsSync(QStringList() <<  "android.permission.BLUETOOTH");
+            request = QtAndroid::checkPermission("android.permission.BLUETOOTH");
+            if (request == QtAndroid::PermissionResult::Denied)
+            {
+                qDebug() << "BlueTooth Permission denied";
+                return false;
+            }
+        }
+        qDebug() << "BlueTooth Permissions granted!";
+        return true;
+    }
+
     bool requestStorageWritePermission()
     {
         QtAndroid::PermissionResult request = QtAndroid::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE");

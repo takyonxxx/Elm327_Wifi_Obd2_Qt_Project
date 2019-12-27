@@ -73,6 +73,8 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
+android{
+
 QT += androidextras
 
 DISTFILES += \
@@ -85,3 +87,4 @@ DISTFILES += \
     android/gradlew.bat
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+}

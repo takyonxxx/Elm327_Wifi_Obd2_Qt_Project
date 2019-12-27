@@ -209,6 +209,7 @@ QString ElmBleSocket::checkData()
                     .remove(QRegExp("[^a-zA-Z0-9]+"));
 
             // Some of these look like errors that ought to be handled..
+            strData.replace("OK","");
             strData.replace("?","");
             strData.replace(",","");
             emit dataReceived(strData);
