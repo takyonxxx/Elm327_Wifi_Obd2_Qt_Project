@@ -265,6 +265,7 @@ void MainWindow::connected()
     m_initialized = false;
 
     ui->textTerminal->append("Elm Connected");
+    m_connectionManager->readData(END_LINE);
 
     send(RESET);
     QThread::msleep(800);

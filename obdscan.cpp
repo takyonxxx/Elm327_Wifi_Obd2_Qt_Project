@@ -29,7 +29,7 @@ ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
     ui->labelManifold->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color: #154360 ;  padding: 2px;");
 
     ui->labelStatusTitle->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->labelStatus->setStyleSheet("font-size: 36pt; font-weight: bold; color: #D1F2EB; background-color:#154360 ;;  padding: 2px;");
+    ui->labelStatus->setStyleSheet("font-size: 24pt; font-weight: bold; color: #D1F2EB; background-color:#154360 ;;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 24pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
