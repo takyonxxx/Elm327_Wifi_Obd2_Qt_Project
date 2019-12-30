@@ -32,7 +32,7 @@ ELM327 is one of a family of OBD translators from ELM Electronics. Other variant
 61 Driver's demand engine - percent torque </br>
 62 Actual engine - percent torque </br>
 
-<p align="center"><a href="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg">
-		<img src="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm327.jpg" 
+<p align="center"><a href="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm_327.jpg">
+		<img src="https://github.com/takyonxxx/Elm327_Obd2_Qt_Project/blob/master/elm_327.jpg" 
 		name="Image3" align="bottom" width="480" height="800" border="1"></a></p>
 
