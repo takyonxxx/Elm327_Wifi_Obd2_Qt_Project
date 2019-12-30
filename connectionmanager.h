@@ -22,6 +22,8 @@ public:
     bool send(const QString &);
     QString readData(const QString &command);
     void setCType(const ConnectionType &value);
+    void startScanBle();
+    void stopScanBle();
 
     ConnectionType getCType() const;
 
@@ -35,8 +37,8 @@ private:
     bool m_connected{false};
 
 signals:
-    void dataReceived(QString &);
-    void stateChanged(QString &);
+    void dataReceived(QString);
+    void stateChanged(QString);
     void connected();
     void disconnected();
     void addBleDevice(const QBluetoothAddress&, const QString&);
@@ -44,8 +46,8 @@ signals:
 public slots:
     void conConnected();
     void conDisconnected();
-    void conDataReceived(QString &);
-    void conStateChanged(QString &);
+    void conDataReceived(QString);
+    void conStateChanged(QString);
     void conAddBleDevice(const QBluetoothAddress&, const QString&);
 
 private:

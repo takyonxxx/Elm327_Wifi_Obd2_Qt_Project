@@ -97,7 +97,7 @@ QString ObdScan::send(const QString &command)
     return QString();
 }
 
-void ObdScan::dataReceived(QString &dataReceived)
+void ObdScan::dataReceived(QString dataReceived)
 {
     if(!mRunning)return;
 
@@ -258,7 +258,7 @@ void ObdScan::analysData(const QString &dataReceived)
         {
             auto AL = mMAF * mLoad;  // Airflow * Load
             auto coeff = (mEngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
-            auto FuelFlowLH = AL * coeff + 1.2;   // Fuel flow L/h
+            auto FuelFlowLH = AL * coeff + 0.8;   // Fuel flow L/h
 
             if(FuelFlowLH > 99)
                 FuelFlowLH = 99;

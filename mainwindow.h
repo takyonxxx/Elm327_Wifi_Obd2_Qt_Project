@@ -19,6 +19,15 @@
 #endif
 #include "elm.h"
 
+#if defined (Q_OS_ANDROID)
+#include <QtAndroid>
+const QVector<QString> permissions({"android.permission.BLUETOOTH",
+                                    "android.permission.BLUETOOTH_ADMIN",
+                                    "android.permission.INTERNET",
+                                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                                    "android.permission.READ_EXTERNAL_STORAGE"});
+#endif
+
 namespace Ui {
 class MainWindow;
 }
@@ -54,55 +63,7 @@ public:
                 env->ExceptionClear();
             }
         });
-    }
-
-    bool requestFineLocationPermission()
-    {
-        QtAndroid::PermissionResult request = QtAndroid::checkPermission("android.permission.ACCESS_FINE_LOCATION");
-        if (request == QtAndroid::PermissionResult::Denied){
-            QtAndroid::requestPermissionsSync(QStringList() <<  "android.permission.ACCESS_FINE_LOCATION");
-            request = QtAndroid::checkPermission("android.permission.ACCESS_FINE_LOCATION");
-            if (request == QtAndroid::PermissionResult::Denied)
-            {
-                qDebug() << "FineLocation Permission denied";
-                return false;
-            }
-        }
-        qDebug() << "FineLocation Permissions granted!";
-        return true;
-    }
-
-    bool requestBlueToothPermission()
-    {
-        QtAndroid::PermissionResult request = QtAndroid::checkPermission("android.permission.BLUETOOTH");
-        if (request == QtAndroid::PermissionResult::Denied){
-            QtAndroid::requestPermissionsSync(QStringList() <<  "android.permission.BLUETOOTH");
-            request = QtAndroid::checkPermission("android.permission.BLUETOOTH");
-            if (request == QtAndroid::PermissionResult::Denied)
-            {
-                qDebug() << "BlueTooth Permission denied";
-                return false;
-            }
-        }
-        qDebug() << "BlueTooth Permissions granted!";
-        return true;
-    }
-
-    bool requestStorageWritePermission()
-    {
-        QtAndroid::PermissionResult request = QtAndroid::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE");
-        if(request == QtAndroid::PermissionResult::Denied) {
-            QtAndroid::requestPermissionsSync( QStringList() << "android.permission.WRITE_EXTERNAL_STORAGE" );
-            request = QtAndroid::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE");
-            if(request == QtAndroid::PermissionResult::Denied)
-            {
-                qDebug() << "StorageWrite Permission denied";
-                return false;
-            }
-        }
-        qDebug() << "StorageWrite Permissions granted!";
-        return true;
-    }
+    }    
 #endif
 
 #ifdef Q_OS_ANDROID
@@ -129,9 +90,8 @@ private:
 private slots:
     void connected();
     void disconnected();
-    void dataReceived(QString &);
-    void stateChanged(QString &state);
-    void errorAccrued(QString &);    
+    void dataReceived(QString );
+    void stateChanged(QString);
     void on_pushConnect_clicked();
     void on_pushExit_clicked();
     void on_pushSend_clicked();
@@ -145,7 +105,7 @@ private slots:
     void on_close_dialog_triggered();
     void addBleDeviceToList(const QBluetoothAddress&, const QString&);
 
-    void on_radioSerial_clicked(bool checked);
+    void on_comboBleList_activated(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

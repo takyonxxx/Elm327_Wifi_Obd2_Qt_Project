@@ -49,7 +49,7 @@ bool ConnectionManager::send(const QString &command)
         {
             return mElmBleSocket->send(command);
         }
-    }    
+    }
 
     return false;
 }
@@ -69,7 +69,7 @@ QString ConnectionManager::readData(const QString &command)
         {
             return mElmBleSocket->readData(command);
         }
-    }   
+    }
 
     return QString();
 }
@@ -83,6 +83,7 @@ void ConnectionManager::disConnectElm()
 
     if(mElmBleSocket && mElmBleSocket->isConnected())
     {
+        mElmBleSocket->stopScan();
         mElmBleSocket->disconnectBle();
     }
 }
@@ -112,7 +113,7 @@ void ConnectionManager::connectElm()
             auto bleAddress = m_settingsManager->getBleAddress();
             mElmBleSocket->connectBle(bleAddress);
         }
-    }    
+    }
 }
 
 void ConnectionManager::setCType(const ConnectionType &value)
@@ -121,10 +122,23 @@ void ConnectionManager::setCType(const ConnectionType &value)
 
     if(cType == ConnectionType::BlueTooth)
     {
-        if(mElmBleSocket)
-        {
-            mElmBleSocket->scan();
-        }
+        startScanBle();
+    }
+}
+
+void ConnectionManager::startScanBle()
+{
+    if(mElmBleSocket)
+    {
+        mElmBleSocket->startScan();
+    }
+}
+
+void ConnectionManager::stopScanBle()
+{
+    if(mElmBleSocket)
+    {
+        mElmBleSocket->stopScan();
     }
 }
 
@@ -150,17 +164,18 @@ void ConnectionManager::conDisconnected()
     emit disconnected();
 }
 
-void ConnectionManager::conDataReceived(QString & data)
+void ConnectionManager::conDataReceived(QString data)
 {
     emit dataReceived(data);
 }
 
-void ConnectionManager::conStateChanged(QString & state)
+void ConnectionManager::conStateChanged(QString state)
 {
     emit stateChanged(state);
 }
 
 void ConnectionManager::conAddBleDevice(const QBluetoothAddress& address, const QString& name)
 {
-    emit addBleDevice(address, name);
+    if(cType == ConnectionType::BlueTooth)
+        emit addBleDevice(address, name);
 }

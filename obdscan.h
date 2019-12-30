@@ -35,7 +35,7 @@ private:
     qreal calculateAverage(QVector<qreal> &listavg) ;
 
 public slots:
-    void dataReceived(QString &);
+    void dataReceived(QString);
 
 private slots:
     void on_pushExit_clicked();

@@ -48,7 +48,7 @@ private:
     void setRpm(int);
 
 private slots:
-    void dataReceived(QString &);
+    void dataReceived(QString);
     void on_pushExit_clicked();
     void on_pushSim_clicked();
     void orientationChanged(Qt::ScreenOrientation );

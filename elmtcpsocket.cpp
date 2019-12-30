@@ -22,6 +22,7 @@ void ElmTcpSocket::connectTcp(const QString &ip, const quint16 &port)
     QString msg{};
     msg.append("Connecting to Wifi " + ip + " : " + QString::number(port));
     emit stateChanged(msg);
+    QCoreApplication::processEvents();
 
     this->socket = new QTcpSocket(this);
     if(socket)
@@ -231,7 +232,11 @@ QString ElmTcpSocket::statetoString(QAbstractSocket::SocketState socketState)
     QString statestring;
     switch(socketState)
     {
-    case QAbstractSocket::UnconnectedState : statestring="The socket is not connected";
+    case QAbstractSocket::UnconnectedState :
+    {
+        statestring="The Tcp socket is not connected";
+        emit disconnected();
+    }
         break;
     case QAbstractSocket::HostLookupState : statestring="The socket is performing a host name lookup";
         break;

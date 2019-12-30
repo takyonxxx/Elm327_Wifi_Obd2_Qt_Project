@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMutex>
+#include <QTimer>
 #include <QDataStream>
 #include <qbluetoothlocaldevice.h>
 #include <QBluetoothSocket>
@@ -25,7 +26,8 @@ public:
     explicit ElmBleSocket(QObject *parent=nullptr);
     ~ElmBleSocket();
     void run();
-    void scan();
+    void startScan();
+    void stopScan();
     bool send(const QString &);
     bool sendAsync(const QString &);
     QString readData(const QString &);
@@ -36,7 +38,7 @@ public:
 
 public slots:
     void addDevice(const QBluetoothDeviceInfo &);
-    void stateChange(QBluetoothSocket::SocketState);
+    void bleStateChanged(QBluetoothSocket::SocketState);
 
 private slots:
     void scanFinished();
@@ -49,8 +51,8 @@ private slots:
 
 
 signals:
-    void dataReceived(QString &);
-    void stateChanged(QString &);
+    void dataReceived(QString);
+    void stateChanged(QString);
     void bleConnected();
     void bleDisconnected();
     void addBleDevice(const QBluetoothAddress&, const QString&);
@@ -65,6 +67,8 @@ private:
     bool m_connected{false};
 
     void scanBle();
+    void handleDiscoveryTimeout();
+    QTimer m_scanTimer{};
 };
 
 

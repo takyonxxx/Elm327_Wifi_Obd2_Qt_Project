@@ -36,8 +36,8 @@ public slots:
     void stateChange(QAbstractSocket::SocketState);
     void socketError(QAbstractSocket::SocketError);
 signals:
-    void dataReceived(QString &);
-    void stateChanged(QString &);
+    void dataReceived(QString);
+    void stateChanged(QString);
     void tcpConnected();
     void tcpDisconnected();
 

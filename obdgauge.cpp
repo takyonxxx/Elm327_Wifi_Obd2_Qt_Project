@@ -286,7 +286,7 @@ void ObdGauge::analysData(const QString &dataReceived)
     }
 }
 
-void ObdGauge::dataReceived(QString &dataReceived)
+void ObdGauge::dataReceived(QString dataReceived)
 {
     if(!mRunning)return;
 

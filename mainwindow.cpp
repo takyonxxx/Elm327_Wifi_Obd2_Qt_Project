@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);   
+
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Elm327 Obd2");
 
@@ -19,47 +20,78 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "windows")
         ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
     else
-        ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+        ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;")
+;
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushSend->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px");
+    ui->pushClear->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px; spacing: 6px");
+    ui->pushDiagnostic->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px");
+    ui->pushScan->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushGauge->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushExit->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 6px; spacing: 6px");
 
-    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 2px;");
-    ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 2px;");
-    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px;");
-    ui->pushDiagnostic->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px;");
-    ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
-    ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px;");
-    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 2px;");
+    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
 
-    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->ipEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->wifiPortEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
 
-    ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
-    ui->wifiPortEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px;");
+    ui->radioBle->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; background-color: #1C2833; padding: 10px; spacing: 10px");
+    ui->radioWifi->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; background-color: #1C2833; padding: 10px; spacing: 10px");
 
-    ui->textSend->setStyleSheet("font-size: 18pt; font-weight: bold; color:black; background-color: #E7E0CD; padding: 2px;");
+    ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 16px; spacing: 16px;");
 
-    ui->radioBle->setStyleSheet("font-size: 18pt; font-weight: bold; color:darkblue; padding: 2px;");
-    ui->radioWifi->setStyleSheet("font-size: 18pt; font-weight: bold; color:darkblue; padding: 2px;");
-
-    ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 2px;");
-
-#ifdef Q_OS_ANDROID
-    ui->textSend->setMinimumHeight(100);
-#else
-    ui->textSend->setMaximumHeight(30);
-#endif
-
-    ui->textSend->setText(VOLTAGE);
+    ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->pushScan->setEnabled(true);
     ui->pushGauge->setEnabled(true);
-    ui->textTerminal->append("Plug ELM327 WIFI Scanner into vehicle's OBD2 port.");
-    ui->textTerminal->append("Turn ON ignition. (This is one step before engine is powered.)");
-    ui->textTerminal->append("On your device : go to Settings > Wi-Fi. ");
-    ui->textTerminal->append("Connect to the Wi-Fi signal with name similar to these examples:");
-    ui->textTerminal->append("WIFI ELM327, WiFiOBD, OBDDevice, V-Link.");
-    ui->textTerminal->append("Press Connect Button");
+
+#if defined (Q_OS_ANDROID)
+    //Request requiered permissions at runtime
+    for(const QString &permission : permissions){
+        auto result = QtAndroid::checkPermission(permission);
+
+        if(result == QtAndroid::PermissionResult::Denied)
+        {
+            auto resultHash = QtAndroid::requestPermissionsSync(QStringList({permission}));
+            if(resultHash[permission] == QtAndroid::PermissionResult::Denied)
+                ui->textTerminal->append(permission + " denied!");
+            else
+                ui->textTerminal->append(permission + " granted!");
+        }
+        else if(result == QtAndroid::PermissionResult::Granted)
+        {
+             ui->textTerminal->append(permission + " granted!");
+        }
+    }
+    keep_screen_on(true);
+#endif
+
+    m_settingsManager = SettingsManager::getInstance();
+    if(m_settingsManager)
+    {
+        saveSettings();
+    }
+
+    elm = new ELM();
+    elm->resetPids();
+
+    m_connectionManager = ConnectionManager::getInstance();
+    if(m_connectionManager)
+    {
+        connect(m_connectionManager,&ConnectionManager::connected,this, &MainWindow::connected);
+        connect(m_connectionManager,&ConnectionManager::disconnected,this,&MainWindow::disconnected);
+        connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);
+        connect(m_connectionManager, &ConnectionManager::addBleDevice, this, &MainWindow::addBleDeviceToList);
+        connect(m_connectionManager, &ConnectionManager::stateChanged, this, &MainWindow::stateChanged);
+        m_connectionManager->startScanBle();
+        m_connectionManager->setCType(ConnectionType::Wifi);
+        ui->radioWifi->setChecked(true);
+
+    }
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
@@ -71,48 +103,27 @@ MainWindow::MainWindow(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
 
-    m_settingsManager = SettingsManager::getInstance();
-    if(m_settingsManager)
-    {
-        saveSettings();
-    }
-
-    elm = new ELM();
-    elm->resetPids();
-    ui->radioWifi->setChecked(true);
+    ui->textTerminal->append("Press Connect Button");
     ui->pushConnect->setFocus();
-
-    m_connectionManager = ConnectionManager::getInstance();
-    if(m_connectionManager)
-    {
-        connect(m_connectionManager,&ConnectionManager::connected,this, &MainWindow::connected);
-        connect(m_connectionManager,&ConnectionManager::disconnected,this,&MainWindow::disconnected);
-        connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);
-        connect(m_connectionManager, &ConnectionManager::addBleDevice, this, &MainWindow::addBleDeviceToList);
-        connect(m_connectionManager, &ConnectionManager::stateChanged, this, &MainWindow::stateChanged);
-        m_connectionManager->setCType(ConnectionType::Wifi);
-    }
-
-
-#ifdef Q_OS_ANDROID
-    //setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
-    requestStorageWritePermission();
-    requestBlueToothPermission();
-    keep_screen_on(true);
-#endif
 
 }
 
 MainWindow::~MainWindow()
 {
     if(m_connectionManager)
+    {
         m_connectionManager->disConnectElm();
+        delete m_connectionManager;
+    }
 
-    delete m_connectionManager;
-    delete m_settingsManager;
-    delete elm;
+    if(m_settingsManager)
+    {
+        m_settingsManager->saveSettings();
+        delete m_settingsManager;
+    }
 
-    qDebug() << "exiting...";
+    if(elm)
+        delete elm;
 
     delete ui;
 }
@@ -124,7 +135,7 @@ void MainWindow::connectElm()
 }
 
 void MainWindow::disConnectElm()
-{
+{    
     if(m_connectionManager)
         m_connectionManager->disConnectElm();
 }
@@ -159,15 +170,9 @@ void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
     }
 }
 
-void MainWindow::stateChanged(QString &state)
+void MainWindow::stateChanged(QString state)
 {
     ui->textTerminal->append(state);
-}
-
-
-void MainWindow::errorAccrued(QString & error)
-{
-    ui->textTerminal->append("Error: " + error );
 }
 
 void MainWindow::on_pushConnect_clicked()
@@ -180,6 +185,9 @@ void MainWindow::on_pushConnect_clicked()
     if(ui->pushConnect->text() == "Connect")
     {
         ui->textTerminal->clear();
+        ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:darkgray; padding: 6px; spacing: 6px;");
+        QCoreApplication::processEvents();
+
         if(m_connectionManager)
             m_connectionManager->connectElm();
     }
@@ -197,7 +205,7 @@ void MainWindow::on_pushExit_clicked()
 
 void MainWindow::on_pushSend_clicked()
 {
-    QString command = ui->textSend->toPlainText();
+    QString command = ui->sendEdit->text();
     ui->textTerminal->append("-> " + command.trimmed()
                              .simplified()
                              .remove(QRegExp("[\\n\\t\\r]"))
@@ -256,6 +264,8 @@ void MainWindow::on_pushGauge_clicked()
 
 void MainWindow::connected()
 {
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+
     ui->pushSend->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
     //ui->pushScan->setEnabled(true);
@@ -275,17 +285,20 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     //ui->pushScan->setEnabled(false);
     //ui->pushGauge->setEnabled(false);
 
-    ui->textTerminal->clear();
     ui->pushConnect->setText(QString("Connect"));
 
     commandOrder = 0;
     m_initialized = false;
-    ui->textTerminal->append("Elm DisConnected");
+    //ui->textTerminal->append("Elm DisConnected");
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+
 }
 
 void MainWindow::analysData(const QString &dataReceived)
@@ -345,7 +358,7 @@ void MainWindow::analysData(const QString &dataReceived)
     }
 }
 
-void MainWindow::dataReceived(QString &dataReceived)
+void MainWindow::dataReceived(QString dataReceived)
 {
     if(!m_ConsoleEnable)
         return;
@@ -444,7 +457,7 @@ void MainWindow::addBleDeviceToList(const QBluetoothAddress & bleAddress, const 
 }
 
 void MainWindow::on_radioBle_clicked(bool checked)
-{
+{    
     if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
@@ -457,7 +470,7 @@ void MainWindow::on_radioBle_clicked(bool checked)
 }
 
 void MainWindow::on_radioWifi_clicked(bool checked)
-{
+{   
     if(checked && m_connectionManager)
     {
         ui->textTerminal->clear();
@@ -470,16 +483,7 @@ void MainWindow::on_radioWifi_clicked(bool checked)
     }
 }
 
-void MainWindow::on_radioSerial_clicked(bool checked)
+void MainWindow::on_comboBleList_activated(const QString &arg1)
 {
-    if(checked && m_connectionManager)
-    {
-        ui->textTerminal->clear();
-        m_connectionManager->disConnectElm();
-
-        ui->textTerminal->append("Ready for elm327 serial devices..");
-        ui->comboBleList->clear();
-
-        m_connectionManager->setCType(ConnectionType::Serial);
-    }
+    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
 }
