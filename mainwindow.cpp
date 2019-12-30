@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "pid.h"
-#include "methods.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

@@ -46,7 +46,6 @@ SOURCES += \
         elmtcpsocket.cpp \
         main.cpp \
         mainwindow.cpp \
-        methods.cpp \
         obdgauge.cpp \
         obdscan.cpp \
         qcgaugewidget.cpp \
@@ -58,7 +57,6 @@ HEADERS += \
         elmblesocket.h \
         elmtcpsocket.h \
         mainwindow.h \
-        methods.h \
         obdgauge.h \
         obdscan.h \
         pid.h \
