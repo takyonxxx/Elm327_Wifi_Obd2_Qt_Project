@@ -16,11 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    if(osName() == "windows")
-        ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
-    else
-        ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;")
-;
+    ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
+
     ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
     ui->pushSend->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px");
     ui->pushClear->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px; spacing: 6px");
@@ -41,6 +38,42 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->radioWifi->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; background-color: #1C2833; padding: 10px; spacing: 10px");
 
     ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 16px; spacing: 16px;");
+
+#if defined (Q_OS_IOS) || defined (Q_OS_MAC)
+    ui->horizontalSpacer->changeSize(0,0);
+    ui->horizontalSpacer_2->changeSize(0,0);
+    ui->horizontalSpacer_3->changeSize(0,0);
+    ui->horizontalSpacer_4->changeSize(0,0);
+
+    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+
+    ui->pushConnect->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color:#154360; padding: 2px; spacing: 2px;");
+    ui->pushSend->setStyleSheet("font-size: 28pt; font-weight: bold; color: white;background-color: #154360; padding: 2px; spacing: 2px");
+    ui->pushClear->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px; spacing: 2px");
+    ui->pushDiagnostic->setStyleSheet("font-size: 32pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 2px");
+    ui->pushScan->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px; spacing: 2px");
+    ui->pushGauge->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px; spacing: 2px");
+    ui->pushExit->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 2px; spacing: 2px");
+
+    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+
+    ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+    ui->wifiPortEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+    ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
+
+    ui->radioBle->setStyleSheet("font-size: 20pt; font-weight: bold; color:white; background-color: #1C2833; padding: 2px; spacing: 2px");
+    ui->radioWifi->setStyleSheet("font-size: 20pt; font-weight: bold; color:white; background-color: #1C2833; padding: 2px; spacing: 2px");
+
+    ui->comboBleList->setStyleSheet("font-size: 14pt; font-weight: bold; color:black; padding: 2px; spacing: 2px;");
+
+    ui->radioBle->setVisible(false);
+    ui->radioWifi->setVisible(false);
+    ui->labelBluetoothDevice->setVisible(false);
+    ui->comboBleList->setVisible(false);
+
+#endif
 
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
@@ -86,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);
         connect(m_connectionManager, &ConnectionManager::addBleDevice, this, &MainWindow::addBleDeviceToList);
         connect(m_connectionManager, &ConnectionManager::stateChanged, this, &MainWindow::stateChanged);
-        m_connectionManager->startScanBle();
+
         m_connectionManager->setCType(ConnectionType::Wifi);
         ui->radioWifi->setChecked(true);
 
