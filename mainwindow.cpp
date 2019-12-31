@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);   
+    ui->setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Elm327 Obd2");
@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         else if(result == QtAndroid::PermissionResult::Granted)
         {
-             ui->textTerminal->append(permission + " granted!");
+            ui->textTerminal->append(permission + " granted!");
         }
     }
     keep_screen_on(true);
@@ -244,7 +244,7 @@ void MainWindow::on_pushSend_clicked()
                              .remove(QRegExp("[^a-zA-Z0-9]+")));
 
 
-    m_connectionManager->readData(command);
+    m_connectionManager->send(command);
 }
 
 void MainWindow::on_pushClear_clicked()
@@ -260,7 +260,7 @@ void MainWindow::on_pushDiagnostic_clicked()
                              .remove(QRegExp("[\\n\\t\\r]"))
                              .remove(QRegExp("[^a-zA-Z0-9]+")));
 
-    m_connectionManager->readData(CLEAR_TROUBLE);
+    m_connectionManager->send(CLEAR_TROUBLE);
 }
 
 void MainWindow::on_close_dialog_triggered()
@@ -309,8 +309,7 @@ void MainWindow::connected()
     m_initialized = false;
 
     ui->textTerminal->append("Elm Connected");
-    m_connectionManager->readData(END_LINE);
-
+    send(END_LINE);
     send(RESET);
     QThread::msleep(800);
 }
@@ -403,23 +402,20 @@ void MainWindow::dataReceived(QString dataReceived)
         commandOrder = 0;
         m_initialized = true;
 
-        if(m_connectionManager->getCType() == ConnectionType::Wifi)
+        elm->resetPids();
+        ui->textTerminal->append("-> Searching available pids.");
+        QString supportedPIDs = elm->get_available_pids();
+
+        if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
         {
-            elm->resetPids();
-            ui->textTerminal->append("-> Searching available pids.");
-            QString supportedPIDs = elm->get_available_pids();
+            runtimeCommands.clear();
+            runtimeCommands.append(VOLTAGE);
+            if(supportedPIDs.contains(","))
+                runtimeCommands.append(supportedPIDs.split(","));
 
-            if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
-            {
-                runtimeCommands.clear();
-                runtimeCommands.append(VOLTAGE);
-                if(supportedPIDs.contains(","))
-                    runtimeCommands.append(supportedPIDs.split(","));
-
-                QString str = runtimeCommands.join("");
-                str = runtimeCommands.join(", ");
-                ui->textTerminal->append("<- Pids:  " + str);
-            }
+            QString str = runtimeCommands.join("");
+            str = runtimeCommands.join(", ");
+            ui->textTerminal->append("<- Pids:  " + str);
         }
     }
 

@@ -82,16 +82,6 @@ void ElmBleSocket::connectBle(const QBluetoothAddress & address)
     emit stateChanged(msg);
     QCoreApplication::processEvents();
 
-    if (localDevice->pairingStatus(address)== QBluetoothLocalDevice::Paired)
-    {
-        emit stateChanged(QString(address.toString()) + " Pairing is allready done");
-    }
-    else
-    {
-        emit bleDisconnected();
-        emit stateChanged(QString(address.toString()) + " Not paired. Please do pairing first!");
-        return;
-    }
 
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     connect(socket, &QBluetoothSocket::connected, this, &ElmBleSocket::connected);
@@ -193,6 +183,12 @@ void ElmBleSocket::scanFinished()
     }
 }
 
+QString ElmBleSocket::readData(const QString &command)
+{   
+    QString rt("NODATA");
+    return rt;
+}
+
 bool ElmBleSocket::send(const QString &string)
 {
     if(socket->isOpen())
@@ -218,113 +214,6 @@ bool ElmBleSocket::send(const QString &string)
     }
     else
         return false;
-}
-
-bool ElmBleSocket::sendAsync(const QString &command)
-{
-    if(socket->isOpen())
-    {
-        QByteArray dataToSend = command.toUtf8();
-
-        if (command.isEmpty())
-        {
-            // If toWrite is empty then just send a CR char.
-            dataToSend += ('\r');
-        }
-        else
-        {
-            // Check for CR at end.
-            if (dataToSend[dataToSend.size()] != '\r')
-                dataToSend += '\r';
-        }
-
-        socket->write(dataToSend);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-QString ElmBleSocket::checkData()
-{
-    QString strData{};
-
-    while (socket->bytesAvailable() > 0)
-    {
-        QByteArray data = socket->readAll();
-        byteblock += data;
-
-        strData = QString::fromStdString(byteblock.toStdString());
-        if(strData.contains("\r"))
-        {
-            byteblock.clear();
-            strData.remove("\r");
-            strData.remove(">");
-
-            strData = strData.trimmed()
-                    .simplified()
-                    .remove(QRegExp("[\\n\\t\\r]"))
-                    .remove(QRegExp("[^a-zA-Z0-9]+"));
-
-            // Some of these look like errors that ought to be handled..
-            strData.replace("OK","");
-            strData.replace("?","");
-            strData.replace(",","");
-            emit dataReceived(strData);
-            return strData;
-        }
-    }
-    return strData;
-}
-
-QString ElmBleSocket::readData(const QString &command)
-{
-    QString strData{};
-
-    if(sendAsync(command))
-    {
-        //if (socket->waitForReadyRead(-1)) //not implemented
-        {
-            while (socket->bytesAvailable() > 0)
-            {
-                QCoreApplication::processEvents(QEventLoop::AllEvents);
-
-                QByteArray data = socket->readAll();
-                byteblock += data;
-
-                strData = QString::fromStdString(byteblock.toStdString());
-
-                if(strData.contains("\r"))
-                {
-                    byteblock.clear();
-                    strData.remove("\r");
-                    strData.remove(">");
-
-                    strData = strData.trimmed()
-                            .simplified()
-                            .remove(QRegExp("[\\n\\t\\r]"))
-                            .remove(QRegExp("[^a-zA-Z0-9]+"));
-
-                    // Some of these look like errors that ought to be handled..
-                    strData.replace("?","");
-                    strData.replace(",","");
-                    if(!strData.isEmpty())
-                    {
-                        if(strData.contains("SEARCHING"))
-                        {
-                            QCoreApplication::processEvents();
-                            return  checkData();
-                        }
-                    }
-
-                    emit dataReceived(strData);
-                    return strData;
-                }
-            }
-        }
-    }
-    return strData;
 }
 
 void ElmBleSocket::readyRead()
