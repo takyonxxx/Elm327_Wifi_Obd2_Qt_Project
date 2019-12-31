@@ -28,6 +28,7 @@ public:
     void run();
     void startScan();
     void stopScan();
+    bool sendAsync(const QString &command);
     bool send(const QString &);
     QString readData(const QString &command);
     void connectBle(const QBluetoothAddress &);

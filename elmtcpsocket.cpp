@@ -126,6 +126,7 @@ void ElmTcpSocket::readyRead()
                     .remove(QRegExp("[^a-zA-Z0-9]+"));
 
             // Some of these look like errors that ought to be handled..
+            strData.replace(">","");
             strData.replace("?","");
             strData.replace(",","");
             if(!strData.isEmpty())
@@ -152,7 +153,6 @@ void ElmTcpSocket::disconnected()
 QString ElmTcpSocket::checkData()
 {
     QString strData{};
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
 
     if (socket->waitForReadyRead())
     {
@@ -188,11 +188,11 @@ QString ElmTcpSocket::readData(const QString &command)
 
     if(sendAsync(command))
     {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
         if (socket->waitForReadyRead())
-        {
-            QCoreApplication::processEvents(QEventLoop::AllEvents);
-            QByteArray data = socket->readAll();
+        {            
+            QByteArray data;
+            data.reserve(static_cast<qint16>(socket->bytesAvailable()));
+            data = socket->readAll();
             byteblock += data;
 
             strData = QString::fromStdString(byteblock.toStdString());
@@ -208,8 +208,10 @@ QString ElmTcpSocket::readData(const QString &command)
                         .remove(QRegExp("[^a-zA-Z0-9]+"));
 
                 // Some of these look like errors that ought to be handled..
+                strData.replace(">","");
                 strData.replace("?","");
                 strData.replace(",","");
+                strData.replace(command,"");
                 if(!strData.isEmpty())
                 {
                     if(strData.contains("SEARCHING"))

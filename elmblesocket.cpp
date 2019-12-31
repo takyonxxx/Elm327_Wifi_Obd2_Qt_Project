@@ -21,6 +21,7 @@ void ElmBleSocket::run()
 void ElmBleSocket::scanBle()
 {
     qRegisterMetaType<QBluetoothDeviceInfo>("QBluetoothDeviceInfo");
+    qRegisterMetaType<QBluetoothDeviceDiscoveryAgent::Error>();
     qRegisterMetaType<QString>("QString&");
 
     QMutexLocker locker(&m_mutex);
@@ -184,9 +185,77 @@ void ElmBleSocket::scanFinished()
 }
 
 QString ElmBleSocket::readData(const QString &command)
-{   
-    QString rt("NODATA");
-    return rt;
+{
+   QString strData{};
+
+    if(sendAsync(command))
+    {
+        int timeout(3);
+        while (timeout && !socket->bytesAvailable())
+        {
+            msleep(100);
+            timeout--;
+            QCoreApplication::processEvents(QEventLoop::AllEvents);
+        }
+
+        while(socket->bytesAvailable() > 0)
+        {
+            QByteArray data;
+            data.reserve(static_cast<qint16>(socket->bytesAvailable()));
+            data = socket->readAll();
+            byteblock += data;
+
+            strData = QString::fromStdString(byteblock.toStdString());
+
+            if(strData.contains("\r"))
+            {
+                byteblock.clear();
+                strData.remove("\r");
+                strData.remove(">");
+
+                strData = strData.trimmed()
+                        .simplified()
+                        .remove(QRegExp("[\\n\\t\\r]"))
+                        .remove(QRegExp("[^a-zA-Z0-9]+"));
+
+                // Some of these look like errors that ought to be handled..
+                strData.replace(">","");
+                strData.replace("?","");
+                strData.replace(",","");
+                strData.replace(command,"");
+                if(!strData.isEmpty())
+                {
+                    emit dataReceived(strData);
+                    return strData;
+                }
+            }
+        }
+    }
+    return strData;
+}
+
+bool ElmBleSocket::sendAsync(const QString &command)
+{
+    if(socket->isOpen())
+    {
+        QByteArray dataToSend = command.toUtf8();
+
+        if (command.isEmpty())
+        {
+            // If toWrite is empty then just send a CR char.
+            dataToSend += ('\r');
+        }
+        else
+        {
+            // Check for CR at end.
+            if (dataToSend[dataToSend.size()] != '\r')
+                dataToSend += '\r';
+        }
+
+        return socket->write(dataToSend);
+    }
+    else
+        return false;
 }
 
 bool ElmBleSocket::send(const QString &string)
@@ -238,6 +307,7 @@ void ElmBleSocket::readyRead()
                     .remove(QRegExp("[^a-zA-Z0-9]+"));
 
             // Some of these look like errors that ought to be handled..
+            strData.replace(">","");
             strData.replace("?","");
             strData.replace(",","");
             if(!strData.isEmpty())

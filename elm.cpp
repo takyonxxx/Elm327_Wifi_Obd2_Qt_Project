@@ -190,16 +190,15 @@ void ELM::update_available_pidset(quint8 set)
     //QString cmd = "4100983B0011";
 
     QString cmd{};
+
     while(cmd.isEmpty())
     {
-        cmd = ConnectionManager::getInstance()->readData(cmd1);
+        cmd = ConnectionManager::getInstance()->readData(cmd1).toUpper();
     }
 
-    if(cmd.isEmpty() || cmd.contains("UNABLETOCONNECT")
-            || cmd.contains("NODATA")
-            || cmd.contains("OK")
-            || cmd.contains("41FFFFFFFF"))
+    if(!cmd.startsWith(QString("41")))
     {
+        resetPids();
         available_pids[3]  = true;  //04  Calculated engine load
         available_pids[4]  = true;  //05  Engine coolant temperature
         available_pids[10] = true;  //0B  Intake manifold absolute pressure

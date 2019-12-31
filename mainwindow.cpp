@@ -238,13 +238,7 @@ void MainWindow::on_pushExit_clicked()
 void MainWindow::on_pushSend_clicked()
 {
     QString command = ui->sendEdit->text();
-    ui->textTerminal->append("-> " + command.trimmed()
-                             .simplified()
-                             .remove(QRegExp("[\\n\\t\\r]"))
-                             .remove(QRegExp("[^a-zA-Z0-9]+")));
-
-
-    m_connectionManager->send(command);
+    send(command);
 }
 
 void MainWindow::on_pushClear_clicked()
@@ -253,14 +247,9 @@ void MainWindow::on_pushClear_clicked()
 }
 
 void MainWindow::on_pushDiagnostic_clicked()
-{
+{        
     ui->textTerminal->append("-> Clearing the trouble codes.");
-    ui->textTerminal->append("-> " + CLEAR_TROUBLE
-                             .simplified()
-                             .remove(QRegExp("[\\n\\t\\r]"))
-                             .remove(QRegExp("[^a-zA-Z0-9]+")));
-
-    m_connectionManager->send(CLEAR_TROUBLE);
+    send(CLEAR_TROUBLE);
 }
 
 void MainWindow::on_close_dialog_triggered()
@@ -309,7 +298,7 @@ void MainWindow::connected()
     m_initialized = false;
 
     ui->textTerminal->append("Elm Connected");
-    send(END_LINE);
+    //send(END_LINE);
     send(RESET);
     QThread::msleep(800);
 }
@@ -406,7 +395,7 @@ void MainWindow::dataReceived(QString dataReceived)
         ui->textTerminal->append("-> Searching available pids.");
         QString supportedPIDs = elm->get_available_pids();
 
-        if(!supportedPIDs.isEmpty() && runtimeCommands.size() == 0)
+        if(!supportedPIDs.isEmpty())
         {
             runtimeCommands.clear();
             runtimeCommands.append(VOLTAGE);
