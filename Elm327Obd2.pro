@@ -7,24 +7,12 @@
 QT += core gui
 QT += bluetooth network
 QT += concurrent
+QT += androidextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Elm327Obd2
 TEMPLATE = app
-
-win32:RC_ICONS += $$PWD\icons\app_ico.ico
-
-ios {
-    message("* Using settings for Ios.")
-    QMAKE_INFO_PLIST = ios/Info.plist
-    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
-    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-}
-
-linux{
-
-}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -71,18 +59,13 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
-android{
-
-QT += androidextras
-
 DISTFILES += \
     android/AndroidManifest.xml \
-    android/gradle/wrapper/gradle-wrapper.jar \
-    android/gradlew \
-    android/res/values/libs.xml \
     android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.jar \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+    android/gradlew \
+    android/gradlew.bat \
+    android/res/values/libs.xml
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-}
