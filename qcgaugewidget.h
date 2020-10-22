@@ -26,6 +26,7 @@ class QcNeedleItem;
 class QcLabelItem;
 class QcGlassItem;
 class QcAttitudeMeter;
+#include <QPainterPath>
 
 class QCGAUGE_DECL QcGaugeWidget : public QWidget
 {

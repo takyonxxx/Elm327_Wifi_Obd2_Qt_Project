@@ -7,7 +7,7 @@
 QT += core gui
 QT += bluetooth network
 QT += concurrent
-QT += androidextras
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +24,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+macx-clang {
+    ICON =icons/obd.icns
+}
 
 CONFIG += c++11
 
@@ -59,6 +62,8 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
+win32{
+QT += androidextras
 DISTFILES += \
     android/AndroidManifest.xml \
     android/build.gradle \
@@ -69,3 +74,11 @@ DISTFILES += \
     android/res/values/libs.xml
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+}
+
+DISTFILES += \
+    icons/app.svg \
+    icons/app_ico.ico \
+    icons/app_ico.png \
+    icons/obd.icns \
+    icons/obd.jpg
