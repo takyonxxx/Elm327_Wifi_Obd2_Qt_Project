@@ -97,7 +97,7 @@ OBD_STANDARDS = "011C", //OBD standards this vehicle
 PEDAL_POSITION = "015A", //Relative accelerator pedal position 0 -100 % A*100/255
 DISTANCE_TRAVALED = "0131", //Distance traveled since codes cleared  256A+B
 ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
-REQUEST_TROUBLE = "03", //Request trouble codes
+READ_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 ONLY_ENGINE_ECU ="ATSH7E0";
 

@@ -137,7 +137,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->textTerminal->append("Press Connect Button");
     ui->pushConnect->setFocus();
-
 }
 
 MainWindow::~MainWindow()
@@ -248,13 +247,14 @@ void MainWindow::on_pushClear_clicked()
 
 void MainWindow::on_pushDiagnostic_clicked()
 {        
-    ui->textTerminal->append("-> Clearing the trouble codes.");
-    send(CLEAR_TROUBLE);
+    ui->textTerminal->append("-> Reading the trouble codes.");
+    m_requestClearDtc = true;
+    send(READ_TROUBLE);
 }
 
 void MainWindow::on_close_dialog_triggered()
 {
-    m_ConsoleEnable = true;
+    m_consoleEnable = true;
 }
 
 void MainWindow::on_pushScan_clicked()
@@ -262,7 +262,7 @@ void MainWindow::on_pushScan_clicked()
     /*if(runtimeCommands.size() == 0)
         return;*/
 
-    m_ConsoleEnable = false;
+    m_consoleEnable = false;
     ObdScan *obdScan = new ObdScan(runtimeCommands, this);
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
@@ -280,7 +280,7 @@ void MainWindow::on_pushGauge_clicked()
     connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
-    m_ConsoleEnable = false;
+    m_consoleEnable = false;
 }
 
 void MainWindow::connected()
@@ -300,7 +300,7 @@ void MainWindow::connected()
     ui->textTerminal->append("Elm Connected");
     //send(END_LINE);
     send(RESET);
-    QThread::msleep(800);
+    QThread::msleep(250);
 }
 
 void MainWindow::disconnected()
@@ -366,21 +366,40 @@ void MainWindow::analysData(const QString &dataReceived)
     //dtc codes
     if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
     {
-        vec.insert(vec.begin(),resp.begin()+1, resp.end());
+        /*
+        43 12 29 03 80 00 00
+        12 29 03 80=>
+        P1229
+        P0	380
+        */
+
+        vec.insert(vec.begin(),resp.begin()+1, resp.begin()+7);
         std::vector<QString> dtcCodes( elm->decodeDTC(vec));
         if(dtcCodes.size()>0)
         {
+            QString dtc_list{"Dtcs: "};
             for(auto &code : dtcCodes)
             {
-                ui->textTerminal->append(code);
+                dtc_list.append(code + " ");
             }
+            ui->textTerminal->append(dtc_list);
+        }
+
+        if(m_requestClearDtc)
+        {
+             if(dtcCodes.size()>0)
+                send(CLEAR_TROUBLE);
+             else
+                ui->textTerminal->append("There is no dtc.");
+
+             m_requestClearDtc = false;
         }
     }
 }
 
 void MainWindow::dataReceived(QString dataReceived)
 {
-    if(!m_ConsoleEnable)
+    if(!m_consoleEnable)
         return;
 
     if(dataReceived.isEmpty())
