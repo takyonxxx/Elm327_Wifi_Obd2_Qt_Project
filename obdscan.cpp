@@ -4,7 +4,7 @@
 #include "elm.h"
 #include "settingsmanager.h"
 
-ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
+ObdScan::ObdScan(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ObdScan)
 {
@@ -32,14 +32,14 @@ ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
     ui->labelStatus->setStyleSheet("font-size: 24pt; font-weight: bold; color: #D1F2EB; background-color:#154360 ;;  padding: 2px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: black; padding: 2px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 24pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 36pt; font-weight: bold; color: #F4F6F7; background-color: #154360;  padding: 2px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
-    ui->labelVoltage->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
-    ui->labelFuelConsumption->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
-    ui->labelFuel100->setStyleSheet("font: 42pt 'Trebuchet MS'; font-weight: bold; color: #D1F2EB ; background-color: #154360 ;  padding: 2px;");
+    ui->labelVoltage->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 2px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 2px;");
+    ui->labelFuel100->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 2px;");
 
-    ui->labelPids->setStyleSheet("font-size: 12pt; font-weight: bold; color: #1F618D; padding: 2px;");
+    ui->labelPids->setStyleSheet("font-size: 16pt; font-weight: bold; color: #1F618D; padding: 2px;");
 
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
     ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
@@ -54,17 +54,27 @@ ObdScan::ObdScan(QStringList runtimeCommands, QWidget *parent) :
     mAvarageFuelConsumption100.clear();
     mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
+    runtimeCommands.clear();
+    runtimeCommands.append(VOLTAGE);
+    runtimeCommands.append(VEHICLE_SPEED);
+    runtimeCommands.append(ENGINE_RPM);
+    runtimeCommands.append(ENGINE_LOAD);
+    runtimeCommands.append(COOLANT_TEMP);
+    runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
+    runtimeCommands.append(MAF_AIR_FLOW);
+
+    if(this->runtimeCommands.size() > 0)
+    {
+        QString str = this->runtimeCommands.join("");
+        str = this->runtimeCommands.join(", ");
+        ui->labelPids->setText(" Pids:  " + str);
+    }
+
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
-        if(this->runtimeCommands.size() > 0)
-        {
-            QString str = this->runtimeCommands.join("");
-            str = this->runtimeCommands.join(", ");
-            ui->labelPids->setText("Pids:  " + str);
-            mRunning = true;
-            send(VOLTAGE);
-        }
+        mRunning = true;
+        send(VOLTAGE);
     }
 }
 
@@ -258,7 +268,7 @@ void ObdScan::analysData(const QString &dataReceived)
         {
             auto AL = mMAF * mLoad;  // Airflow * Load
             auto coeff = (mEngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
-            auto FuelFlowLH = AL * coeff + 0.8;   // Fuel flow L/h
+            auto FuelFlowLH = AL * coeff + 1.0;   // Fuel flow L/h
 
             if(FuelFlowLH > 99)
                 FuelFlowLH = 99;

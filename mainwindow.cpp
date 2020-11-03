@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    ui->textTerminal->setStyleSheet("font: 10pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 14pt; color: #00cccc; background-color: #001a1a;");
 
     ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
     ui->pushSend->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px");
@@ -39,68 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 16px; spacing: 16px;");
 
-#if defined (Q_OS_IOS) || defined (Q_OS_MAC)
-    ui->horizontalSpacer->changeSize(0,0);
-    ui->horizontalSpacer_2->changeSize(0,0);
-    ui->horizontalSpacer_3->changeSize(0,0);
-    ui->horizontalSpacer_4->changeSize(0,0);
-
-    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
-
-    ui->pushConnect->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color:#154360; padding: 2px; spacing: 2px;");
-    ui->pushSend->setStyleSheet("font-size: 28pt; font-weight: bold; color: white;background-color: #154360; padding: 2px; spacing: 2px");
-    ui->pushClear->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px; spacing: 2px");
-    ui->pushDiagnostic->setStyleSheet("font-size: 32pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 2px");
-    ui->pushScan->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px; spacing: 2px");
-    ui->pushGauge->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 2px; spacing: 2px");
-    ui->pushExit->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 2px; spacing: 2px");
-
-    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-
-    ui->ipEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-    ui->wifiPortEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-    ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:#074666; padding: 2px; spacing: 2px");
-
-    ui->radioBle->setStyleSheet("font-size: 20pt; font-weight: bold; color:white; background-color: #1C2833; padding: 2px; spacing: 2px");
-    ui->radioWifi->setStyleSheet("font-size: 20pt; font-weight: bold; color:white; background-color: #1C2833; padding: 2px; spacing: 2px");
-
-    ui->comboBleList->setStyleSheet("font-size: 14pt; font-weight: bold; color:black; padding: 2px; spacing: 2px;");
-
-    ui->radioBle->setVisible(false);
-    ui->radioWifi->setVisible(false);
-    ui->labelBluetoothDevice->setVisible(false);
-    ui->comboBleList->setVisible(false);
-
-#endif
-
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->pushScan->setEnabled(true);
     ui->pushGauge->setEnabled(true);
-
-#if defined (Q_OS_ANDROID)
-    //Request requiered permissions at runtime
-    for(const QString &permission : permissions){
-        auto result = QtAndroid::checkPermission(permission);
-
-        if(result == QtAndroid::PermissionResult::Denied)
-        {
-            auto resultHash = QtAndroid::requestPermissionsSync(QStringList({permission}));
-            if(resultHash[permission] == QtAndroid::PermissionResult::Denied)
-                ui->textTerminal->append(permission + " denied!");
-            else
-                ui->textTerminal->append(permission + " granted!");
-        }
-        else if(result == QtAndroid::PermissionResult::Granted)
-        {
-            ui->textTerminal->append(permission + " granted!");
-        }
-    }
-    keep_screen_on(true);
-#endif
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -134,6 +77,28 @@ MainWindow::MainWindow(QWidget *parent) :
 
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
+
+#if defined (Q_OS_ANDROID)
+    //Request requiered permissions at runtime
+    for(const QString &permission : permissions){
+        auto result = QtAndroid::checkPermission(permission);
+
+        if(result == QtAndroid::PermissionResult::Denied)
+        {
+            auto resultHash = QtAndroid::requestPermissionsSync(QStringList({permission}));
+            if(resultHash[permission] == QtAndroid::PermissionResult::Denied)
+                ui->textTerminal->append(permission + " denied!");
+            else
+                ui->textTerminal->append(permission + " granted!");
+        }
+        else if(result == QtAndroid::PermissionResult::Granted)
+        {
+            ui->textTerminal->append(permission + " granted!");
+        }
+    }
+    keep_screen_on(true);
+    setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
+#endif
 
     ui->textTerminal->append("Press Connect Button");
     ui->pushConnect->setFocus();
@@ -263,7 +228,7 @@ void MainWindow::on_pushScan_clicked()
         return;*/
 
     m_consoleEnable = false;
-    ObdScan *obdScan = new ObdScan(runtimeCommands, this);
+    ObdScan *obdScan = new ObdScan(this);
     obdScan->setGeometry(this->rect());
     obdScan->move(this->x(), this->y());
     connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
@@ -352,7 +317,7 @@ void MainWindow::analysData(const QString &dataReceived)
             B = 0;
         }
 
-        ui->textTerminal->append("Pid: " + QString::number(PID) + "  A: " + QString::number(A)+ "  B: " + QString::number(B));
+        //ui->textTerminal->append("Pid: " + QString::number(PID) + "  A: " + QString::number(A)+ "  B: " + QString::number(B));
     }
 
     //number of dtc & mil
@@ -410,7 +375,7 @@ void MainWindow::dataReceived(QString dataReceived)
         commandOrder = 0;
         m_initialized = true;
 
-        elm->resetPids();
+        /*elm->resetPids();
         ui->textTerminal->append("-> Searching available pids.");
         QString supportedPIDs = elm->get_available_pids();
 
@@ -424,7 +389,7 @@ void MainWindow::dataReceived(QString dataReceived)
             QString str = runtimeCommands.join("");
             str = runtimeCommands.join(", ");
             ui->textTerminal->append("<- Pids:  " + str);
-        }
+        }*/
     }
 
     if(!m_initialized && commandOrder < initializeCommands.size())

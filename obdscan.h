@@ -15,7 +15,7 @@ class ObdScan : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ObdScan(QStringList runtimeCommands, QWidget *parent = nullptr);
+    explicit ObdScan(QWidget *parent = nullptr);
     ~ObdScan() override;
 
 private:

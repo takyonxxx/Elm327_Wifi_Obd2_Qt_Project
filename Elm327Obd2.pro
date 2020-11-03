@@ -25,12 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-ios {
-    QMAKE_INFO_PLIST = ios/Info.plist
-    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
-    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-}
-
 
 CONFIG += c++11
 
@@ -64,7 +58,13 @@ FORMS += \
         obdscan.ui
 
 RESOURCES += \
-    resources.qrc
+    resources.qrc    
+
+ios {
+    QMAKE_INFO_PLIST = ios/Info.plist
+    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
+    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+}
 
 android{
     QT += androidextras
@@ -102,3 +102,5 @@ DISTFILES += \
     ios/Images.xcassets/iTunesArtwork@1x.png \
     ios/Images.xcassets/iTunesArtwork@2x.png \
     ios/Images.xcassets/iTunesArtwork@3x.png
+
+ANDROID_ABIS = armeabi-v7a

@@ -371,7 +371,7 @@ void QcLabelItem::draw(QPainter *painter)
     float r = getRadius(rect());
 
 #ifdef Q_OS_ANDROID
-    QFont font("Meiryo UI", r/28.0, QFont::Bold);
+    QFont font("Meiryo UI", r/15.0, QFont::Bold);
 #else
     QFont font("Meiryo UI", r/8.0, QFont::Bold);
 #endif
@@ -784,7 +784,7 @@ void QcNeedleItem::createCompassNeedle(float r)
 QcValuesItem::QcValuesItem(QObject *parent) :
     QcScaleItem(parent)
 {
-    setPosition(70);
+    setPosition(0);
     mColor = Qt::white;
     mStep = 10;
 }
@@ -797,7 +797,7 @@ void QcValuesItem::draw(QPainter*painter)
     QFont font("Meiryo UI",0, QFont::Bold);
 
 #ifdef Q_OS_ANDROID
-    font.setPointSizeF(0.03*r);
+    font.setPointSizeF(0.06*r);
 #else
     font.setPointSizeF(0.1*r);
 #endif

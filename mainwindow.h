@@ -82,7 +82,6 @@ private:
     ELM *elm{};
 
     int commandOrder{0};
-    QStringList runtimeCommands{};
     bool m_initialized{false};
     bool m_requestClearDtc{false};
     bool m_consoleEnable{true};

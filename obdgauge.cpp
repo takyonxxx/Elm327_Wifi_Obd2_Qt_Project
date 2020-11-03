@@ -37,14 +37,14 @@ ObdGauge::ObdGauge(QWidget *parent) :
         {
             if(screen->orientation() == Qt::LandscapeOrientation)
             {
-                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 1);
+                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0);
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 1);
                 ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 2);
             }
             else if(screen->orientation() == Qt::PortraitOrientation)
             {
-                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-                ui->gridLayout_Gauges->addWidget(mRpmGauge, 1, 0);
+                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0);
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 1, 0);
                 ui->gridLayout_Gauges->addWidget(pushExit, 2, 0);
             }
 
@@ -57,14 +57,16 @@ ObdGauge::ObdGauge(QWidget *parent) :
         }
     }
 
+    mRpmGauge->update();
+    mSpeedGauge->update();
+
+    runtimeCommands.clear();
+    runtimeCommands.append(ENGINE_RPM);
+    runtimeCommands.append(VEHICLE_SPEED);
+
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
-
-        runtimeCommands.clear();
-        runtimeCommands.append(ENGINE_RPM);
-        runtimeCommands.append(VEHICLE_SPEED);
-
         mRunning = true;
         send(VOLTAGE);
     }
@@ -118,7 +120,7 @@ void ObdGauge::initGauges()
     values->setStep(20);
     values->setValueRange(0,220);
 
-    mSpeedGauge->addLabel(70)->setText("Km/h");
+    mSpeedGauge->addLabel(60)->setText("Km/h");
     QcLabelItem *labSpeed = mSpeedGauge->addLabel(40);
     labSpeed->setText("0");
     mSpeedNeedle = mSpeedGauge->addNeedle(60);
@@ -143,16 +145,16 @@ void ObdGauge::initGauges()
     bkgRpm2->addColor(1.0,Qt::darkGray);
 
     mRpmGauge->addArc(55);
-    mRpmGauge->addDegrees(65)->setValueRange(0,80);
+    mRpmGauge->addDegrees(65)->setValueRange(0,60);
     auto colorBandRpm = mRpmGauge->addColorBand(50);
     colors.clear();
 
     pair.first = Qt::darkGreen;
-    pair.second = 44;
+    pair.second = 33;
     colors.append(pair);
 
     pair.first = Qt::yellow;
-    pair.second = 75;
+    pair.second = 66;
     colors.append(pair);
 
     pair.first = Qt::red;
@@ -160,16 +162,16 @@ void ObdGauge::initGauges()
     colors.append(pair);
     colorBandRpm->setColors(colors);
 
-    mRpmGauge->addValues(74)->setValueRange(0,80);
+    mRpmGauge->addValues(74)->setValueRange(0,60);
 
-    mRpmGauge->addLabel(70)->setText("X100");
+    mRpmGauge->addLabel(60)->setText("X100");
     QcLabelItem *labRpm = mRpmGauge->addLabel(40);
     labRpm->setText("0");
-    mRpmNeedle = mRpmGauge->addNeedle(60);
+    mRpmNeedle = mRpmGauge->addNeedle(80);
     mRpmNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
     mRpmNeedle->setLabel(labRpm);
     mRpmNeedle->setColor(Qt::white);
-    mRpmNeedle->setValueRange(0,80);
+    mRpmNeedle->setValueRange(0,60);
     mRpmGauge->addBackground(7);
     mRpmGauge->addGlass(88);
 
