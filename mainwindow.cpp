@@ -16,34 +16,30 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    ui->textTerminal->setStyleSheet("font: 14pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
-    ui->pushSend->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px");
-    ui->pushClear->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F; padding: 2px; spacing: 6px");
-    ui->pushDiagnostic->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px");
-    ui->pushScan->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
-    ui->pushGauge->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
-    ui->pushExit->setStyleSheet("font-size: 32pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 6px; spacing: 6px");
+    ui->pushConnect->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushSend->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushClear->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F; padding: 6px; spacing: 6px");
+    ui->pushDiagnostic->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px");
+    ui->pushScan->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushGauge->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 6px; spacing: 6px");
 
-    ui->labelIp->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->labelWifiPort->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->labelBluetoothDevice->setStyleSheet("font-size: 16pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->labelWifiPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
 
-    ui->ipEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->wifiPortEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-
-    ui->radioBle->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; background-color: #1C2833; padding: 10px; spacing: 10px");
-    ui->radioWifi->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; background-color: #1C2833; padding: 10px; spacing: 10px");
-
-    ui->comboBleList->setStyleSheet("font-size: 16pt; font-weight: bold; color:black; padding: 16px; spacing: 16px;");
+    ui->ipEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->wifiPortEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->sendEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
 
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->pushScan->setEnabled(true);
     ui->pushGauge->setEnabled(true);
+    auto diag_size = int(ui->pushGauge->height() + ui->pushScan->height());
+    ui->pushDiagnostic->setMinimumHeight(2*diag_size);
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -59,13 +55,10 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         connect(m_connectionManager,&ConnectionManager::connected,this, &MainWindow::connected);
         connect(m_connectionManager,&ConnectionManager::disconnected,this,&MainWindow::disconnected);
-        connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);
-        connect(m_connectionManager, &ConnectionManager::addBleDevice, this, &MainWindow::addBleDeviceToList);
+        connect(m_connectionManager,&ConnectionManager::dataReceived,this,&MainWindow::dataReceived);       
         connect(m_connectionManager, &ConnectionManager::stateChanged, this, &MainWindow::stateChanged);
 
         m_connectionManager->setCType(ConnectionType::Wifi);
-        ui->radioWifi->setChecked(true);
-
     }
 
     foreach (QScreen *screen, QGuiApplication::screens())
@@ -97,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
     keep_screen_on(true);
-    setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT);
+    setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE);
 #endif
 
     ui->textTerminal->append("Press Connect Button");
@@ -153,6 +146,7 @@ bool MainWindow::setScreenOrientation(int orientation)
 void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
 {
     qDebug() << "Orientation:" << orientation;
+    ui->textTerminal->append("Orientation changed");
 
     switch (orientation) {
     case Qt::ScreenOrientation::PortraitOrientation:
@@ -439,52 +433,6 @@ void MainWindow::saveSettings()
     quint16 wifiPort = ui->wifiPortEdit->text().toUShort();
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
-    m_settingsManager->setSerialPort("/dev/pts/8");
-
-    auto text = ui->comboBleList->currentText();
-    if(!text.isEmpty())
-    {
-        auto strAddress = text.split(" ").at(0);
-        m_settingsManager->setBleAddress(QBluetoothAddress(strAddress));
-    }
-
+    m_settingsManager->setSerialPort("/dev/pts/8");  
     m_settingsManager->saveSettings();
-}
-
-void MainWindow::addBleDeviceToList(const QBluetoothAddress & bleAddress, const QString & bleName)
-{
-    QString item = bleAddress.toString() + QString(" ") + bleName;
-    ui->comboBleList->addItem(item);
-}
-
-void MainWindow::on_radioBle_clicked(bool checked)
-{    
-    if(checked && m_connectionManager)
-    {
-        ui->textTerminal->clear();
-        m_connectionManager->disConnectElm();
-
-        ui->textTerminal->append("Ready for elm327 bluetooth devices..");
-
-        m_connectionManager->setCType(ConnectionType::BlueTooth);
-    }
-}
-
-void MainWindow::on_radioWifi_clicked(bool checked)
-{   
-    if(checked && m_connectionManager)
-    {
-        ui->textTerminal->clear();
-        m_connectionManager->disConnectElm();
-
-        ui->textTerminal->append("Ready for elm327 wifi devices..");
-        ui->comboBleList->clear();
-
-        m_connectionManager->setCType(ConnectionType::Wifi);
-    }
-}
-
-void MainWindow::on_comboBleList_activated(const QString &arg1)
-{
-    ui->pushConnect->setStyleSheet("font-size: 36pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
 }

@@ -99,13 +99,8 @@ private slots:
     void on_pushDiagnostic_clicked();
     void on_pushScan_clicked();
     void on_pushGauge_clicked();
-    void orientationChanged(Qt::ScreenOrientation orientation);
-    void on_radioBle_clicked(bool checked);
-    void on_radioWifi_clicked(bool checked);
+    void orientationChanged(Qt::ScreenOrientation orientation);    
     void on_close_dialog_triggered();
-    void addBleDeviceToList(const QBluetoothAddress&, const QString&);
-
-    void on_comboBleList_activated(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;
