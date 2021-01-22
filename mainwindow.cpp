@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
     keep_screen_on(true);
-    setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE);
+    //setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE);
 #endif
 
     ui->textTerminal->append("Press Connect Button");
