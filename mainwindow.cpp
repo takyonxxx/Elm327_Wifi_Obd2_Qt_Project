@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->centralWidget()->setStyleSheet("background-color:#17202A ; border: none;");
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Elm327 Obd2");
@@ -18,20 +19,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
-    ui->pushSend->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
-    ui->pushClear->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F; padding: 6px; spacing: 6px");
-    ui->pushDiagnostic->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px");
-    ui->pushScan->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
-    ui->pushGauge->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
-    ui->pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 6px; spacing: 6px");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 6px; spacing: 6px");
+    ui->pushDiagnostic->setStyleSheet("font-size: 22pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px");
+    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushGauge->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 6px; spacing: 6px");
+    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 6px; spacing: 6px");
 
-    ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->labelWifiPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 6px; spacing: 6px");
+    ui->labelWifiPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 6px; spacing: 6px");
 
-    ui->ipEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->wifiPortEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
-    ui->sendEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:#074666; padding: 6px; spacing: 6px");
+    ui->ipEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 6px; spacing: 6px");
+    ui->wifiPortEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 6px; spacing: 6px");
+    ui->sendEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 6px; spacing: 6px");
 
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
@@ -146,7 +147,6 @@ bool MainWindow::setScreenOrientation(int orientation)
 void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
 {
     qDebug() << "Orientation:" << orientation;
-    ui->textTerminal->append("Orientation changed");
 
     switch (orientation) {
     case Qt::ScreenOrientation::PortraitOrientation:

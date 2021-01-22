@@ -19,8 +19,8 @@ ObdGauge::ObdGauge(QWidget *parent) :
     pushExit = new QPushButton;
     pushReset->setText("Reset");
     pushExit->setText("Exit");
-    pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #212F3C;");
-    pushReset->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #212F3C;");
+    pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #212F3C; padding: 6px; spacing: 6px;");
+    pushReset->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #212F3C; padding: 6px; spacing: 6px;");
 
     connect(pushReset, &QPushButton::clicked, this, &ObdGauge::on_pushReset_clicked);
     connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
@@ -28,13 +28,13 @@ ObdGauge::ObdGauge(QWidget *parent) :
     initGauges();
 
     lbl_fuel = new QLabel(this);
-    lbl_fuel->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #CACFD2  ; background-color: #212F3C ;  padding: 2px;");
+    lbl_fuel->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #CACFD2  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_fuel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     lbl_fuel->setText("Avg fuel cons:\n-- L / 100km");
     lbl_fuel->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     lbl_temp = new QLabel(this);
-    lbl_temp->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #CACFD2  ; background-color: #212F3C ;  padding: 2px;");
+    lbl_temp->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #CACFD2  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_temp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     lbl_temp->setText("Coolant temp:\n-- C°");
     lbl_temp->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
@@ -94,13 +94,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
         mRunning = true;
         send(VOLTAGE);
-    }
-
-    ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0, 2, 1);
-    ui->gridLayout_Gauges->addWidget(lbl_fuel,0, 1);
-    ui->gridLayout_Gauges->addWidget(lbl_temp,1, 1);
-    ui->gridLayout_Gauges->addWidget(pushReset, 2, 0);
-    ui->gridLayout_Gauges->addWidget(pushExit, 2, 1);
+    }  
 }
 
 ObdGauge::~ObdGauge()
