@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QLabel>
 #include "qcgaugewidget.h"
 #include "elm.h"
 #include "connectionmanager.h"
@@ -28,7 +29,7 @@ private:
     QTime m_time{};
     int valueGauge{0};
     bool mRunning{false};
-    QPushButton *pushSim;
+    QPushButton *pushReset;
     QPushButton *pushExit;
 
     QcGaugeWidget * mSpeedGauge{};
@@ -36,6 +37,15 @@ private:
 
     QcGaugeWidget * mRpmGauge{};
     QcNeedleItem *mRpmNeedle{};
+
+    QLabel *lbl_fuel{};
+    QLabel *lbl_temp{};
+    int mMAF{0};
+    int mLoad{0};
+    int mEngineDisplacement{0};
+    int mSpeed{0};
+    QVector<qreal> mAvarageFuelConsumption{};
+    QVector<qreal> mAvarageFuelConsumption100{};
 
     ELM *elm{};
 
@@ -46,11 +56,12 @@ private:
     void stopSim();
     void setSpeed(int);
     void setRpm(int);
+    qreal calculateAverage(QVector<qreal> &listavg);
 
 private slots:
     void dataReceived(QString);
     void on_pushExit_clicked();
-    void on_pushSim_clicked();
+    void on_pushReset_clicked();
     void orientationChanged(Qt::ScreenOrientation );
 
 signals:
