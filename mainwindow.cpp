@@ -19,28 +19,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
-    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
-    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
-    ui->pushDiagnostic->setStyleSheet("font-size: 22pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 12px; spacing: 12px");
-    ui->pushGauge->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 12px; spacing: 12px");
-    ui->pushExit->setStyleSheet("font-size: 28pt; font-weight: bold; color: white;background-color: #8F3A3A; padding: 12px; spacing: 12px");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
+    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
+    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px");
+    ui->pushDiagnostic->setStyleSheet("font-size: 22pt; font-weight: bold; color: white; background-color: #0B5345; padding: 24px; spacing: 24px");
+    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 24px; spacing: 24px");
+    ui->pushGauge->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 24px; spacing: 24px");
+    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px");
 
-    ui->labelIp->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->labelWifiPort->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-
-    ui->ipEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->wifiPortEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->sendEdit->setStyleSheet("font-size: 12pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 24px; spacing: 24px");
 
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
     ui->pushScan->setEnabled(true);
     ui->pushGauge->setEnabled(true);
-    auto diag_size = int(ui->pushGauge->height() + ui->pushScan->height());
-    ui->pushDiagnostic->setMinimumHeight(2*diag_size);
+    /*auto diag_size = int(ui->pushGauge->height() + ui->pushScan->height());
+    ui->pushDiagnostic->setMinimumHeight(2*diag_size);*/
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -243,7 +238,7 @@ void MainWindow::on_pushGauge_clicked()
 
 void MainWindow::connected()
 {
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
     ui->pushSend->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
@@ -263,7 +258,7 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
@@ -275,7 +270,7 @@ void MainWindow::disconnected()
     commandOrder = 0;
     m_initialized = false;
     //ui->textTerminal->append("Elm DisConnected");
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
 }
 
@@ -428,8 +423,8 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    QString ip = ui->ipEdit->text();
-    quint16 wifiPort = ui->wifiPortEdit->text().toUShort();
+    QString ip = "192.168.0.10";
+    quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
     m_settingsManager->setSerialPort("/dev/pts/8");  
