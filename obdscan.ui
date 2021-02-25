@@ -33,42 +33,7 @@
     </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="5" column="0">
-       <widget class="QLabel" name="labelManifoldTitle">
-        <property name="text">
-         <string>Map:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="labelCoolant">
-        <property name="text">
-         <string>0 C°</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labelCoolantTitle">
-        <property name="text">
-         <string>Coolant Temp:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLabel" name="labelManifold">
-        <property name="text">
-         <string>0 kPa</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="labelRpm">
-        <property name="text">
-         <string>0 rpm</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
+      <item row="7" column="1">
        <widget class="QComboBox" name="comboEngineDisplacement">
         <property name="currentText">
          <string> 800</string>
@@ -155,13 +120,6 @@
         </item>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="labelLoad">
-        <property name="text">
-         <string>0 %</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="labelSpeedTitle">
         <property name="text">
@@ -169,17 +127,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="labelEngineDisplacement">
+      <item row="2" column="1">
+       <widget class="QLabel" name="labelLoad">
         <property name="text">
-         <string>Displacement:</string>
+         <string>0 %</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labelLoadTitle">
+      <item row="7" column="0">
+       <widget class="QLabel" name="labelEngineDisplacement">
         <property name="text">
-         <string>Engine Load:</string>
+         <string>Displacement:</string>
         </property>
        </widget>
       </item>
@@ -190,6 +148,27 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="labelRpm">
+        <property name="text">
+         <string>0 rpm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labelCoolantTitle">
+        <property name="text">
+         <string>Coolant Temp:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelLoadTitle">
+        <property name="text">
+         <string>Engine Load:</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="labelSpeed">
         <property name="text">
@@ -197,26 +176,54 @@
         </property>
        </widget>
       </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labelManifoldTitle">
+        <property name="text">
+         <string>Map:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="labelCoolant">
+        <property name="text">
+         <string>0 C°</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="labelManifold">
+        <property name="text">
+         <string>0 kPa</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="labelVoltage">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>0 V</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="labelVoltageTitle">
+        <property name="text">
+         <string>Voltage:</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="4" column="0">
      <widget class="QLabel" name="labelFuel100">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>-</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="labelVoltage">
       <property name="maximumSize">
        <size>
         <width>16777215</width>

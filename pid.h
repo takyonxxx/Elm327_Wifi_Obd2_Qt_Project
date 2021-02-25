@@ -102,7 +102,7 @@ CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) /
 ONLY_ENGINE_ECU ="ATSH7E0";
 
 static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, ECHO_OFF,
-            TIMEOUT_DEFAULT, PROTOCOL_AUTO};
+            TIMEOUT_DEFAULT, PROTOCOL_AUTO, PIDS_SUPPORTED20};
 
 static long long currentTimeMillis()
 {

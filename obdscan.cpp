@@ -16,25 +16,27 @@ ObdScan::ObdScan(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     ui->labelRpmTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelRpm->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelRpm->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelLoadTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
+    ui->labelLoad->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
 
     ui->labelSpeedTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelSpeed->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelSpeed->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
     ui->labelCoolantTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelCoolant->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelCoolant->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelManifoldTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelManifold->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelManifold->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+
+    ui->labelVoltageTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelVoltage->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
-    ui->labelVoltage->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
     ui->labelFuelConsumption->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
     ui->labelFuel100->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
 

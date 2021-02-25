@@ -247,7 +247,7 @@ void MainWindow::connected()
 
     ui->textTerminal->append("Elm Connected");
     //send(END_LINE);
-    send(PIDS_SUPPORTED20);
+    send(RESET);
 }
 
 void MainWindow::disconnected()
