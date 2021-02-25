@@ -77,6 +77,7 @@ private:
     void analysData(const QString &);
     void saveSettings();
 
+    QRect desktopRect{};
     ConnectionManager *m_connectionManager{};
     SettingsManager *m_settingsManager{};
     ELM *elm{};

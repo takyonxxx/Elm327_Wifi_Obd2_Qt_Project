@@ -93,7 +93,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
         mRunning = true;
-        send(READ_TROUBLE);
+        send(PIDS_SUPPORTED20);
     }  
 }
 
@@ -344,9 +344,6 @@ void ObdGauge::analysData(const QString &dataReceived)
             if(mLoad == 0)
                 FuelFlowLH = 0;
 
-            mAvarageFuelConsumption.append(FuelFlowLH);
-            lbl_fuel->setText("Avg fuel cons:\n" + QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  L / h");
-
             if(mSpeed > 0)
             {
                 auto mFuelLPer100 = FuelFlowLH * 100 / mSpeed;   // FuelConsumption in l per 100km
@@ -354,7 +351,12 @@ void ObdGauge::analysData(const QString &dataReceived)
                     mFuelLPer100 = 99;
 
                 mAvarageFuelConsumption100.append(mFuelLPer100);
-                lbl_fuel->setText("Avg fuel cons:\n" + QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  L / 100km");
+                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
+            }
+            else
+            {
+                mAvarageFuelConsumption.append(FuelFlowLH);
+                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
             }
         }
     }

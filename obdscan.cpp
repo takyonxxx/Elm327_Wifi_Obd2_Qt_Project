@@ -15,23 +15,23 @@ ObdScan::ObdScan(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelRpm->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelRpmTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelRpm->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
+    ui->labelLoadTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelLoad->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
 
-    ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelSpeed->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelSpeedTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelSpeed->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
-    ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelCoolant->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelCoolantTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelCoolant->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelManifoldTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelManifold->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelManifoldTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelManifold->setStyleSheet("font-size: 26pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
-    ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->labelEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
     ui->labelVoltage->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
@@ -64,7 +64,7 @@ ObdScan::ObdScan(QWidget *parent) :
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
         mRunning = true;
-        send(READ_TROUBLE);
+        send(PIDS_SUPPORTED20);
     }
 }
 
@@ -263,10 +263,7 @@ void ObdScan::analysData(const QString &dataReceived)
                 FuelFlowLH = 99;
 
             if(mLoad == 0)
-                FuelFlowLH = 0;
-
-            mAvarageFuelConsumption.append(FuelFlowLH);
-            ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
+                FuelFlowLH = 0;           
 
             if(mSpeed > 0)
             {
@@ -276,7 +273,12 @@ void ObdScan::analysData(const QString &dataReceived)
 
                 mAvarageFuelConsumption100.append(mFuelLPer100);
                 ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
-            }            
+            }
+            else
+            {
+                mAvarageFuelConsumption.append(FuelFlowLH);
+                ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
+            }
         }
     }
 

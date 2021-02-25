@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Elm327 Obd2");
 
-    QRect desktopRect = QApplication::desktop()->availableGeometry(this);
+    desktopRect = QApplication::desktop()->availableGeometry(this);
 
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
@@ -215,7 +215,7 @@ void MainWindow::on_pushScan_clicked()
 
     m_consoleEnable = false;
     ObdScan *obdScan = new ObdScan(this);
-    obdScan->setGeometry(this->rect());
+    obdScan->setGeometry(desktopRect);
     obdScan->move(this->x(), this->y());
     connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
@@ -226,7 +226,7 @@ void MainWindow::on_pushScan_clicked()
 void MainWindow::on_pushGauge_clicked()
 {   
     ObdGauge *obdGauge = new ObdGauge(this);
-    obdGauge->setGeometry(this->rect());
+    obdGauge->setGeometry(desktopRect);
     obdGauge->move(this->x(), this->y());
     connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
@@ -240,9 +240,6 @@ void MainWindow::connected()
 
     ui->pushSend->setEnabled(true);
     ui->pushDiagnostic->setEnabled(true);
-    //ui->pushScan->setEnabled(true);
-    //ui->pushGauge->setEnabled(true);
-
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
@@ -250,8 +247,7 @@ void MainWindow::connected()
 
     ui->textTerminal->append("Elm Connected");
     //send(END_LINE);
-    send(RESET);
-    QThread::msleep(250);
+    send(PIDS_SUPPORTED20);
 }
 
 void MainWindow::disconnected()
@@ -260,14 +256,12 @@ void MainWindow::disconnected()
 
     ui->pushSend->setEnabled(false);
     ui->pushDiagnostic->setEnabled(false);
-    //ui->pushScan->setEnabled(false);
-    //ui->pushGauge->setEnabled(false);
-
     ui->pushConnect->setText(QString("Connect"));
 
     commandOrder = 0;
     m_initialized = false;
-    //ui->textTerminal->append("Elm DisConnected");
+
+    ui->textTerminal->append("Elm DisConnected");
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
 }
@@ -377,8 +371,7 @@ void MainWindow::dataReceived(QString dataReceived)
             ui->textTerminal->append("<- Pids:  " + str);
         }*/
     }
-
-    if(!m_initialized && commandOrder < initializeCommands.size())
+    else if(!m_initialized && commandOrder < initializeCommands.size())
     {
         send(initializeCommands[commandOrder]);
         commandOrder++;

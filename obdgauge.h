@@ -21,6 +21,7 @@ public:
     ~ObdGauge();
 
 private:
+    QRect rect{};
     int commandOrder{0};
     QStringList runtimeCommands{};
 
