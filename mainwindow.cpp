@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
 
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
-    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
+    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px;");
     ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px");
     ui->pushDiagnostic->setStyleSheet("font-size: 22pt; font-weight: bold; color: white; background-color: #0B5345; padding: 24px; spacing: 24px");
     ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 24px; spacing: 24px");
@@ -88,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     keep_screen_on(true);
     //setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE);
 #endif
-
+    ui->textTerminal->append("Resolution : " + QString::number(desktopRect.width()) + "x" +QString::number(desktopRect.height()));
     ui->textTerminal->append("Press Connect Button");
     ui->pushConnect->setFocus();
 }
@@ -141,9 +141,7 @@ bool MainWindow::setScreenOrientation(int orientation)
 
 void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
 {
-    qDebug() << "Orientation:" << orientation;
-
-    switch (orientation) {
+    /*switch (orientation) {
     case Qt::ScreenOrientation::PortraitOrientation:
 
         break;
@@ -152,7 +150,7 @@ void MainWindow::orientationChanged(Qt::ScreenOrientation orientation)
         break;
     default:
         break;
-    }
+    }*/
 }
 
 void MainWindow::stateChanged(QString state)

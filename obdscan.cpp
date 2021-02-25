@@ -15,40 +15,35 @@ ObdScan::ObdScan(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelRpm->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelRpmTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelRpm->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360;   padding: 6px; spacing: 6px;");
+    ui->labelLoadTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelLoad->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
 
-    ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelSpeed->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelSpeedTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelSpeed->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
-    ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelCoolant->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelCoolantTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelCoolant->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelManifoldTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelManifold->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelManifoldTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelManifold->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
-    ui->labelStatusTitle->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->labelStatus->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color:#154360 ; padding: 6px; spacing: 6px;");
-
-    ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: white; padding: 6px; spacing: 6px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color:white; background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->labelEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->comboEngineDisplacement->setStyleSheet("font-size: 16pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
-    ui->labelVoltage->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 6px; spacing: 6px;");
-    ui->labelFuelConsumption->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 6px; spacing: 6px;");
-    ui->labelFuel100->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #D2CD35 ; background-color: #373434 ;  padding: 6px; spacing: 6px;");
-
-    ui->labelPids->setStyleSheet("font: 12pt 'Trebuchet MS'; font-weight: bold; color: #1F618D; padding: 6px; spacing: 6px;");
+    ui->labelVoltage->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
+    ui->labelFuel100->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
 
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
     ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
 
-    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ;padding: 6px; spacing: 6px;");
-    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #8F3A3A;padding: 6px; spacing: 6px;");
+    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
+    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
 
     ui->labelFuelConsumption->setFocus();
 
@@ -65,18 +60,11 @@ ObdScan::ObdScan(QWidget *parent) :
     runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
     runtimeCommands.append(MAF_AIR_FLOW);
 
-    if(this->runtimeCommands.size() > 0)
-    {
-        QString str = this->runtimeCommands.join("");
-        str = this->runtimeCommands.join(", ");
-        ui->labelPids->setText(" Pids:  " + str);
-    }
-
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
         mRunning = true;
-        send(VOLTAGE);
+        send(READ_TROUBLE);
     }
 }
 
@@ -101,8 +89,7 @@ void ObdScan::on_pushExit_clicked()
 QString ObdScan::send(const QString &command)
 {
     if(mRunning && ConnectionManager::getInstance())
-    {
-        ui->labelStatus->setText(command);
+    {       
         ConnectionManager::getInstance()->send(command);
     }
 
