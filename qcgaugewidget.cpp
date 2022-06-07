@@ -61,6 +61,7 @@ QcLabelItem *QcGaugeWidget::addLabel(float position)
 {
     QcLabelItem * item = new QcLabelItem(this);
     item->setPosition(position);
+    item->setColor(Qt::lightGray);
     mItems.append(item);
     return item;
 }
@@ -371,9 +372,9 @@ void QcLabelItem::draw(QPainter *painter)
     float r = getRadius(rect());
 
 #ifdef Q_OS_ANDROID
-    QFont font("Meiryo UI", r/15.0, QFont::Bold);
+    QFont font("Meiryo UI", r/18.0, QFont::Bold);
 #else
-    QFont font("Meiryo UI", r/8.0, QFont::Bold);
+    QFont font("Meiryo UI", r/12.0, QFont::Bold);
 #endif
 
     painter->setFont(font);

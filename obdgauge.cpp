@@ -10,7 +10,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    mEngineDisplacement = 1500;
+    mEngineDisplacement = 650;
 
     //this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
     this->centralWidget()->setStyleSheet("background-color:#17202A ; border: none;");
@@ -27,48 +27,57 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     initGauges();
 
+    lbl_voltage = new QLabel(this);
+    lbl_voltage->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
+    lbl_voltage->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    lbl_voltage->setText("0.0 V");
+    lbl_voltage->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
+
     lbl_fuel = new QLabel(this);
-    lbl_fuel->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
+    lbl_fuel->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_fuel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lbl_fuel->setText("Avg fuel cons:\n-- L / 100km");
+    lbl_fuel->setText("0 L / 100km");
     lbl_fuel->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     lbl_temp = new QLabel(this);
-    lbl_temp->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
+    lbl_temp->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_temp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lbl_temp->setText("Coolant temp:\n-- C°");
+    lbl_temp->setText("0 C°");
     lbl_temp->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     if(osName() == "windows")
     {
-        ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0);
-        ui->gridLayout_Gauges->addWidget(lbl_fuel, 1, 0);
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+        ui->gridLayout_Gauges->addWidget(lbl_voltage, 1, 0);
         ui->gridLayout_Gauges->addWidget(lbl_temp, 2, 0);
-        ui->gridLayout_Gauges->addWidget(pushReset, 3, 0);
-        ui->gridLayout_Gauges->addWidget(pushExit, 4, 0);
+        ui->gridLayout_Gauges->addWidget(lbl_fuel, 3, 0);
+        ui->gridLayout_Gauges->addWidget(pushReset, 4, 0);
+        ui->gridLayout_Gauges->addWidget(pushExit, 5, 0);
     }
     else
     {
-        auto gauge_size = int(lbl_fuel->height() + lbl_temp->height());
-        mRpmGauge->setMinimumHeight(this->height() - 2*gauge_size);
+        auto gauge_size = int(lbl_voltage->height() + lbl_fuel->height() + lbl_temp->height());
+        mSpeedGauge->setMinimumHeight(this->height() - 2*gauge_size);
 
         foreach (QScreen *screen, QGuiApplication::screens())
         {
             if(screen->orientation() == Qt::LandscapeOrientation)
             {
-                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0, 2, 1);
-                ui->gridLayout_Gauges->addWidget(lbl_fuel,0, 1);
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0, 3, 1);
+                ui->gridLayout_Gauges->addWidget(lbl_voltage,0, 1);
                 ui->gridLayout_Gauges->addWidget(lbl_temp,1, 1);
-                ui->gridLayout_Gauges->addWidget(pushReset, 2, 0);
-                ui->gridLayout_Gauges->addWidget(pushExit, 2, 1);
+                ui->gridLayout_Gauges->addWidget(lbl_fuel,2, 1);
+                ui->gridLayout_Gauges->addWidget(pushReset, 3, 0);
+                ui->gridLayout_Gauges->addWidget(pushExit, 3, 1);
             }
             else if(screen->orientation() == Qt::PortraitOrientation)
             {
-                ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0);
-                ui->gridLayout_Gauges->addWidget(lbl_fuel, 1, 0);
+                ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+                ui->gridLayout_Gauges->addWidget(lbl_voltage, 1, 0);
                 ui->gridLayout_Gauges->addWidget(lbl_temp, 2, 0);
-                ui->gridLayout_Gauges->addWidget(pushReset, 3, 0);
-                ui->gridLayout_Gauges->addWidget(pushExit, 4, 0);
+                ui->gridLayout_Gauges->addWidget(lbl_fuel, 3, 0);
+                ui->gridLayout_Gauges->addWidget(pushReset, 4, 0);
+                ui->gridLayout_Gauges->addWidget(pushExit, 5, 0);
             }
 
             screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -81,6 +90,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
     }
 
     mRpmGauge->update();
+    mSpeedGauge->update();
 
     runtimeCommands.clear();
     runtimeCommands.append(VEHICLE_SPEED);
@@ -105,33 +115,33 @@ ObdGauge::~ObdGauge()
 void ObdGauge::initGauges()
 {
     //speed
-    /*mSpeedGauge = new QcGaugeWidget;
+    mSpeedGauge = new QcGaugeWidget;
     mSpeedGauge->addBackground(99);
     QcBackgroundItem *bkgSpeed1 = mSpeedGauge->addBackground(92);
     bkgSpeed1->clearrColors();
     bkgSpeed1->addColor(0.1,Qt::black);
-    bkgSpeed1->addColor(1.0,Qt::white);
+    bkgSpeed1->addColor(1.0,Qt::gray);
 
     QcBackgroundItem *bkgSpeed2 = mSpeedGauge->addBackground(88);
     bkgSpeed2->clearrColors();
     bkgSpeed2->addColor(0.1,Qt::black);
-    bkgSpeed2->addColor(1.0,Qt::darkGray);
+    bkgSpeed2->addColor(1.0,Qt::red);
 
     mSpeedGauge->addArc(55);
-    auto degrees = mSpeedGauge->addDegrees(65);
+    auto degrees = mSpeedGauge->addDegrees(60);
     degrees->setStep(20);
-    degrees->setValueRange(0,220);
+    degrees->setValueRange(0,180);
 
     auto colorBandSpeed = mSpeedGauge->addColorBand(50);
     QList<QPair<QColor, float> > colors;
     QPair<QColor,float> pair;
 
     pair.first = Qt::darkGreen;
-    pair.second = 37;
+    pair.second = 44;
     colors.append(pair);
 
     pair.first = Qt::yellow;
-    pair.second = 55;
+    pair.second = 67;
     colors.append(pair);
 
     pair.first = Qt::red;
@@ -141,21 +151,19 @@ void ObdGauge::initGauges()
 
     auto values = mSpeedGauge->addValues(74);
     values->setStep(20);
-    values->setValueRange(0,220);
+    values->setValueRange(0,180);
 
-    mSpeedGauge->addLabel(60)->setText("Km/h");
+    mSpeedGauge->addLabel(60)->setText("km/h");
     QcLabelItem *labSpeed = mSpeedGauge->addLabel(40);
+    labSpeed->setColor(Qt::lightGray);
     labSpeed->setText("0");
     mSpeedNeedle = mSpeedGauge->addNeedle(60);
     mSpeedNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
     mSpeedNeedle->setLabel(labSpeed);
     mSpeedNeedle->setColor(Qt::white);
-    mSpeedNeedle->setValueRange(0,220);
+    mSpeedNeedle->setValueRange(0,180);
     mSpeedGauge->addBackground(7);
-    mSpeedGauge->addGlass(88);*/
-
-    QList<QPair<QColor, float> > colors;
-    QPair<QColor,float> pair;
+    mSpeedGauge->addGlass(88);
 
     //rpm
     mRpmGauge = new QcGaugeWidget;
@@ -171,7 +179,7 @@ void ObdGauge::initGauges()
     bkgRpm2->addColor(1.0,Qt::blue);
 
     mRpmGauge->addArc(55);
-    mRpmGauge->addDegrees(65)->setValueRange(0,70);
+    mRpmGauge->addDegrees(65)->setValueRange(0,80);
     auto colorBandRpm = mRpmGauge->addColorBand(50);
     colors.clear();
 
@@ -188,7 +196,7 @@ void ObdGauge::initGauges()
     colors.append(pair);
     colorBandRpm->setColors(colors);
 
-    mRpmGauge->addValues(74)->setValueRange(0,70);
+    mRpmGauge->addValues(74)->setValueRange(0,80);
 
     mRpmGauge->addLabel(60)->setText("X100");
     QcLabelItem *labRpm = mRpmGauge->addLabel(40);
@@ -313,6 +321,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 13://PID(0D): KM Speed
             // A
             mSpeed = A;
+            setSpeed(mSpeed);
             break;
         case 16://PID(10): MAF air flow rate grams/sec
             // ((256*A)+B) / 100  [g/s]

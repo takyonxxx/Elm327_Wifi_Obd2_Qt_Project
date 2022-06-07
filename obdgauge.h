@@ -34,13 +34,15 @@ private:
     QPushButton *pushExit;
 
     QcGaugeWidget * mSpeedGauge{};
-    QcNeedleItem *mSpeedNeedle{};
+    QcNeedleItem * mSpeedNeedle{};
 
     QcGaugeWidget * mRpmGauge{};
-    QcNeedleItem *mRpmNeedle{};
+    QcNeedleItem * mRpmNeedle{};
 
     QLabel *lbl_fuel{};
     QLabel *lbl_temp{};
+    QLabel *lbl_voltage{};
+
     int mMAF{0};
     int mLoad{0};
     int mEngineDisplacement{0};
