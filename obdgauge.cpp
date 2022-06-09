@@ -28,22 +28,22 @@ ObdGauge::ObdGauge(QWidget *parent) :
     initGauges();
 
     lbl_voltage = new QLabel(this);
-    lbl_voltage->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
+    lbl_voltage->setStyleSheet("font: 52pt 'Trebuchet MS'; font-weight: bold; color: yellow  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_voltage->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     lbl_voltage->setText("0.0 V");
-    lbl_voltage->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
+    lbl_voltage->setAlignment(Qt::AlignCenter | Qt::AlignCenter);   
+
+    lbl_temp = new QLabel(this);
+    lbl_temp->setStyleSheet("font: 52pt 'Trebuchet MS'; font-weight: bold; color: yellow  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
+    lbl_temp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    lbl_temp->setText("0 C°");
+    lbl_temp->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     lbl_fuel = new QLabel(this);
     lbl_fuel->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_fuel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     lbl_fuel->setText("0 L / 100km");
     lbl_fuel->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
-
-    lbl_temp = new QLabel(this);
-    lbl_temp->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
-    lbl_temp->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lbl_temp->setText("0 C°");
-    lbl_temp->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     if(osName() == "windows")
     {
@@ -439,21 +439,22 @@ void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
 {  
     switch (orientation) {
     case Qt::ScreenOrientation::PortraitOrientation:
-        ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0);
-        ui->gridLayout_Gauges->addWidget(lbl_fuel, 1, 0);
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
+        ui->gridLayout_Gauges->addWidget(lbl_voltage, 1, 0);
         ui->gridLayout_Gauges->addWidget(lbl_temp, 2, 0);
-        ui->gridLayout_Gauges->addWidget(pushReset, 3, 0);
-        ui->gridLayout_Gauges->addWidget(pushExit, 4, 0);
+        ui->gridLayout_Gauges->addWidget(lbl_fuel, 3, 0);
+        ui->gridLayout_Gauges->addWidget(pushReset, 4, 0);
+        ui->gridLayout_Gauges->addWidget(pushExit, 5, 0);
         break;
     case Qt::ScreenOrientation::LandscapeOrientation:
-        ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 0, 2, 1);
-        ui->gridLayout_Gauges->addWidget(lbl_fuel,0, 1);
+        ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0, 3, 1);
+        ui->gridLayout_Gauges->addWidget(lbl_voltage,0, 1);
         ui->gridLayout_Gauges->addWidget(lbl_temp,1, 1);
-        ui->gridLayout_Gauges->addWidget(pushReset, 2, 0);
-        ui->gridLayout_Gauges->addWidget(pushExit, 2, 1);
+        ui->gridLayout_Gauges->addWidget(lbl_fuel,2, 1);
+        ui->gridLayout_Gauges->addWidget(pushReset, 3, 0);
+        ui->gridLayout_Gauges->addWidget(pushExit, 3, 1);
         break;
     default:
         break;
     }
-
 }

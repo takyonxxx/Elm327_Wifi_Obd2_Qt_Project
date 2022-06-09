@@ -49,8 +49,18 @@
       <item row="7" column="1">
        <widget class="QComboBox" name="comboEngineDisplacement">
         <property name="currentText">
-         <string> 800</string>
+         <string> 250</string>
         </property>
+        <item>
+         <property name="text">
+          <string> 250</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string> 650</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string> 800</string>
