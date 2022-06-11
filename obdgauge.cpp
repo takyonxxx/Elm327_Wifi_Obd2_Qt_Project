@@ -93,6 +93,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
     mSpeedGauge->update();
 
     runtimeCommands.clear();
+    runtimeCommands.append(VOLTAGE);
     runtimeCommands.append(VEHICLE_SPEED);
     runtimeCommands.append(ENGINE_RPM);
     runtimeCommands.append(ENGINE_LOAD);
@@ -311,7 +312,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 5://PID(05): Coolant Temperature
             // A-40
             value = A - 40;
-            lbl_temp->setText("Coolant temp:\n" + QString::number(value, 'f', 0) + " C°");
+            lbl_temp->setText(QString::number(value, 'f', 0) + " C°");
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
@@ -367,6 +368,16 @@ void ObdGauge::analysData(const QString &dataReceived)
                 mAvarageFuelConsumption.append(FuelFlowLH);
                 lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
             }
+        }
+    }
+
+    if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
+    {
+        auto voltData = dataReceived;
+        voltData.remove("ATRV").remove("atrv");
+        if(voltData.length() > 3)
+        {
+            lbl_voltage->setText(voltData.mid(0,2) + "." + voltData.mid(2,1) + " V");
         }
     }
 }

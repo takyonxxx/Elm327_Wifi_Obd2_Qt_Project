@@ -34,8 +34,8 @@ public:
 private:
     static SettingsManager* theInstance_;
     QString m_sSettingsFile{};
-    unsigned int EngineDisplacement{1500};
-    QString WifiIp{"192.168.0.10"};
+    unsigned int EngineDisplacement{650};
+    QString WifiIp{"192.168.0.11"};
     quint16 WifiPort{35000};
     QBluetoothAddress BleAddress{};
     QString SerialPort{};
