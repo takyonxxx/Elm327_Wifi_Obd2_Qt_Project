@@ -339,9 +339,9 @@ void QcGlassItem::draw(QPainter *painter)
     painter->setPen(Qt::NoPen);
 
     QColor clr1 = Qt::gray ;
-    QColor clr2 = Qt::white;
+    QColor clr2 = Qt::gray;
     clr1.setAlphaF(0.2);
-    clr2.setAlphaF(0.4);
+    clr2.setAlphaF(0.2);
 
     QLinearGradient linearGrad1(tmpRect1.topLeft(), tmpRect1.bottomRight());
     linearGrad1.setColorAt(0.1, clr1);

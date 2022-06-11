@@ -10,7 +10,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    mEngineDisplacement = 650;
+    mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
     //this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
     this->centralWidget()->setStyleSheet("background-color:#17202A ; border: none;");
@@ -42,7 +42,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
     lbl_fuel = new QLabel(this);
     lbl_fuel->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1  ; background-color: #212F3C ;  padding: 6px; spacing: 6px;");
     lbl_fuel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lbl_fuel->setText("0 L / 100km");
+    lbl_fuel->setText("0  L/100km");
     lbl_fuel->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
 
     if(osName() == "windows")
@@ -121,7 +121,7 @@ void ObdGauge::initGauges()
     QcBackgroundItem *bkgSpeed1 = mSpeedGauge->addBackground(92);
     bkgSpeed1->clearrColors();
     bkgSpeed1->addColor(0.1,Qt::black);
-    bkgSpeed1->addColor(1.0,Qt::gray);
+    bkgSpeed1->addColor(1.0,Qt::darkGray);
 
     QcBackgroundItem *bkgSpeed2 = mSpeedGauge->addBackground(88);
     bkgSpeed2->clearrColors();
@@ -209,6 +209,7 @@ void ObdGauge::initGauges()
     mRpmNeedle->setValueRange(0,70);
     mRpmGauge->addBackground(7);
     mRpmGauge->addGlass(88);
+    startSim();
 
     /*engine = new QQmlApplicationEngine;
     engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
@@ -221,7 +222,7 @@ void ObdGauge::startSim()
 {
     m_realTime = 0;
     m_timerId  = startTimer(0);
-    m_time.start();
+    m_timer.start();
 }
 
 void ObdGauge::stopSim()
@@ -253,11 +254,12 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 {
     Q_UNUSED(event)
 
-    auto timeStep = m_time.restart();
-    m_realTime = m_realTime + timeStep / 1000.0f;
-    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
+    auto timeStep = m_timer.restart();
+    m_realTime = m_realTime + timeStep / 100.0f;
+    valueGauge  =  180.0f * std::sin( m_realTime /  5.0f ) + 90.0f;
     setSpeed(static_cast<int>(valueGauge));
-    setRpm(static_cast<int>(valueGauge/2.75));
+    if (valueGauge <= 1.0f)
+        stopSim();
 }
 
 
@@ -361,12 +363,12 @@ void ObdGauge::analysData(const QString &dataReceived)
                     mFuelLPer100 = 99;
 
                 mAvarageFuelConsumption100.append(mFuelLPer100);
-                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
+                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  L/100km");
             }
             else
             {
                 mAvarageFuelConsumption.append(FuelFlowLH);
-                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
+                lbl_fuel->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  L/h");
             }
         }
     }
@@ -439,9 +441,9 @@ void ObdGauge::on_pushExit_clicked()
 
 void ObdGauge::on_pushReset_clicked()
 {
-    lbl_fuel->setText("Avg fuel cons:\n-- L / 100km");
-    lbl_temp->setText("Coolant temp:\n-- C°");
-    lbl_temp->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
+    lbl_fuel->setText("0  L/100km");
+    lbl_temp->setText("0 C°");
+    lbl_voltage->setText("0.0 V");
     mAvarageFuelConsumption.clear();
     mAvarageFuelConsumption100.clear();
 }

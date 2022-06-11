@@ -34,7 +34,7 @@ void ElmBleSocket::scanBle()
         // Make it visible to others
         localDevice->setHostMode(QBluetoothLocalDevice::HostDiscoverable);
         discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
-        discoveryAgent->setLowEnergyDiscoveryTimeout(1000);
+        discoveryAgent->setLowEnergyDiscoveryTimeout(3000);
 
         connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, &ElmBleSocket::addDevice);
         connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, this, &ElmBleSocket::scanFinished);

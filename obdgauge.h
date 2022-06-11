@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLabel>
+#include <QElapsedTimer>
 #include "qcgaugewidget.h"
 #include "elm.h"
 #include "connectionmanager.h"
@@ -27,7 +28,7 @@ private:
 
     int m_timerId{};
     float m_realTime{};
-    QTime m_time{};
+    QElapsedTimer m_timer{};
     int valueGauge{0};
     bool mRunning{false};
     QPushButton *pushReset;

@@ -245,7 +245,7 @@ void MainWindow::connected()
     commandOrder = 0;
     m_initialized = false;
 
-    ui->textTerminal->append("Elm Connected");
+    ui->textTerminal->append("Elm 327 connected");
     //send(END_LINE);
     send(RESET);
 }
@@ -419,5 +419,6 @@ void MainWindow::saveSettings()
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
     m_settingsManager->setSerialPort("/dev/pts/8");  
+    m_settingsManager->setEngineDisplacement(650);
     m_settingsManager->saveSettings();
 }

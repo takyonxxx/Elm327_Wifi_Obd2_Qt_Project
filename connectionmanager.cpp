@@ -93,7 +93,7 @@ void ConnectionManager::connectElm()
     if(cType == ConnectionType::None)
         return;
 
-    disConnectElm();
+//    disConnectElm();
 
     m_settingsManager = SettingsManager::getInstance();
 
