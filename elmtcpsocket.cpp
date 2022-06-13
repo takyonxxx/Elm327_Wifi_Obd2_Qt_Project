@@ -29,7 +29,7 @@ void ElmTcpSocket::connectTcp(const QString &ip, const quint16 &port)
     {
         connect(socket,&QTcpSocket::connected,this, &ElmTcpSocket::connected);
         connect(socket,&QTcpSocket::disconnected,this,&ElmTcpSocket::disconnected);
-//        connect(socket,&QTcpSocket::stateChanged,this,&ElmTcpSocket::stateChange);
+        connect(socket,&QTcpSocket::stateChanged,this,&ElmTcpSocket::stateChange);
 //        connect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
         connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(socketError(QAbstractSocket::SocketError)));
         socket->connectToHost(ip, port);
