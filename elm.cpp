@@ -194,6 +194,9 @@ void ELM::update_available_pidset(quint8 set)
     while(cmd.isEmpty())
     {
         cmd = ConnectionManager::getInstance()->readData(cmd1).toUpper();
+        cmd = cmd.trimmed().simplified();
+        cmd.remove(QRegExp("[\\n\\t\\r]"));
+        cmd.remove(QRegExp("[^a-zA-Z0-9]+"));
     }
 
     if(!cmd.startsWith(QString("41")))

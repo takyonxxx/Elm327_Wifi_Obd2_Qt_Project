@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "pid.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,23 +17,25 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    ui->textTerminal->setStyleSheet("font: 12pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 16pt; color: #00cccc; background-color: #001a1a;");
 
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
-    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px;");
-    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px");
-    ui->pushDiagnostic->setStyleSheet("font-size: 22pt; font-weight: bold; color: white; background-color: #0B5345; padding: 24px; spacing: 24px");
-    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 24px; spacing: 24px");
-    ui->pushGauge->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F ; padding: 24px; spacing: 24px");
-    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 24px; spacing: 24px");
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
+    ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
+    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
+    ui->checkSearchPids->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 24px; spacing: 24px");
+    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
     ui->sendEdit->setText("0100");
     ui->pushSend->setEnabled(false);
-    ui->pushDiagnostic->setEnabled(false);
-    ui->pushScan->setEnabled(true);
-    ui->pushGauge->setEnabled(true);
+    ui->pushReadFault->setEnabled(false);
+    ui->pushClearFault->setEnabled(false);
+    ui->pushScan->setEnabled(false);
+    ui->checkSearchPids->setEnabled(false);
     /*auto diag_size = int(ui->pushGauge->height() + ui->pushScan->height());
     ui->pushDiagnostic->setMinimumHeight(2*diag_size);*/
 
@@ -167,9 +169,9 @@ void MainWindow::on_pushConnect_clicked()
 
     if(ui->pushConnect->text() == "Connect")
     {
-        ui->textTerminal->clear();      
+        ui->pushConnect->setText(QString("Connecting"));
         QCoreApplication::processEvents();
-
+        ui->textTerminal->clear();
         if(m_connectionManager)
             m_connectionManager->connectElm();
     }
@@ -196,13 +198,6 @@ void MainWindow::on_pushClear_clicked()
     ui->textTerminal->clear();
 }
 
-void MainWindow::on_pushDiagnostic_clicked()
-{        
-    ui->textTerminal->append("-> Reading the trouble codes.");
-    m_requestClearDtc = true;
-    send(READ_TROUBLE);
-}
-
 void MainWindow::on_close_dialog_triggered()
 {
     m_consoleEnable = true;
@@ -222,31 +217,20 @@ void MainWindow::on_pushScan_clicked()
     obdScan->show();
 }
 
-
-void MainWindow::on_pushGauge_clicked()
-{   
-    ObdGauge *obdGauge = new ObdGauge(this);
-    obdGauge->setGeometry(desktopRect);
-    obdGauge->move(this->x(), this->y());
-    connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
-
-    obdGauge->show();
-    m_consoleEnable = false;
-}
-
 void MainWindow::connected()
 {
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
     ui->pushSend->setEnabled(true);
-    ui->pushDiagnostic->setEnabled(true);
+    ui->pushReadFault->setEnabled(true);
+    ui->pushClearFault->setEnabled(true);
+    ui->pushScan->setEnabled(true);
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
     m_initialized = false;
 
     ui->textTerminal->append("Elm 327 connected");
-    //send(END_LINE);
     send(RESET);
 }
 
@@ -255,7 +239,10 @@ void MainWindow::disconnected()
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
     ui->pushSend->setEnabled(false);
-    ui->pushDiagnostic->setEnabled(false);
+    ui->pushReadFault->setEnabled(false);
+    ui->pushClearFault->setEnabled(false);
+    ui->pushScan->setEnabled(false);
+    ui->checkSearchPids->setEnabled(false);
     ui->pushConnect->setText(QString("Connect"));
 
     commandOrder = 0;
@@ -297,7 +284,7 @@ void MainWindow::analysData(const QString &dataReceived)
             B = 0;
         }
 
-        //ui->textTerminal->append("Pid: " + QString::number(PID) + "  A: " + QString::number(A)+ "  B: " + QString::number(B));
+//        ui->textTerminal->append("Pid: " + QString::number(PID) + "  A: " + QString::number(A)+ "  B: " + QString::number(B));
     }
 
     //number of dtc & mil
@@ -328,48 +315,39 @@ void MainWindow::analysData(const QString &dataReceived)
                 dtc_list.append(code + " ");
             }
             ui->textTerminal->append(dtc_list);
-        }
-
-        if(m_requestClearDtc)
-        {
-             if(dtcCodes.size()>0)
-                send(CLEAR_TROUBLE);
-             else
-                ui->textTerminal->append("There is no dtc.");
-
-             m_requestClearDtc = false;
-        }
+        }      
     }
 }
 
 void MainWindow::dataReceived(QString dataReceived)
 {
-    if(!m_consoleEnable)
-        return;
+//    if(!m_consoleEnable)
+//        return;
 
-    if(dataReceived.isEmpty())
-        return;
+    dataReceived.remove("\r");
+    dataReceived.remove(">");
+    dataReceived.remove("?");
+    dataReceived.remove(",");
+
+    if(isError(dataReceived.toUpper().toStdString()))
+    {
+        ui->textTerminal->append("Error : " + dataReceived);
+    }
+    else if (!dataReceived.isEmpty())
+    {
+        ui->textTerminal->append("<- " + dataReceived);
+    }
 
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         commandOrder = 0;
         m_initialized = true;
+        ui->checkSearchPids->setEnabled(true);
 
-        /*elm->resetPids();
-        ui->textTerminal->append("-> Searching available pids.");
-        QString supportedPIDs = elm->get_available_pids();
-
-        if(!supportedPIDs.isEmpty())
+        if(m_searchPidsEnable)
         {
-            runtimeCommands.clear();
-            runtimeCommands.append(VOLTAGE);
-            if(supportedPIDs.contains(","))
-                runtimeCommands.append(supportedPIDs.split(","));
-
-            QString str = runtimeCommands.join("");
-            str = runtimeCommands.join(", ");
-            ui->textTerminal->append("<- Pids:  " + str);
-        }*/
+            getPids();
+        }
     }
     else if(!m_initialized && commandOrder < initializeCommands.size())
     {
@@ -379,13 +357,12 @@ void MainWindow::dataReceived(QString dataReceived)
 
     if(m_initialized && !dataReceived.isEmpty())
     {
-        ui->textTerminal->append("<- " + dataReceived);
-
-        if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
-            return;
 
         try
         {
+            dataReceived = dataReceived.trimmed().simplified();
+            dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+            dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
             analysData(dataReceived);
         }
         catch (const std::exception& e)
@@ -395,6 +372,34 @@ void MainWindow::dataReceived(QString dataReceived)
         {
         }
     }
+}
+
+void MainWindow::getPids()
+{
+    runtimeCommands.clear();
+    elm->resetPids();
+    ui->textTerminal->append("-> Searching available pids.");
+    QString supportedPIDs = elm->get_available_pids();
+    ui->textTerminal->append("<- Pids:  " + supportedPIDs);
+
+    if(!supportedPIDs.isEmpty())
+    {
+        if(supportedPIDs.contains(","))
+        {
+            runtimeCommands.append(supportedPIDs.split(","));
+            QString str = runtimeCommands.join("");
+            str = runtimeCommands.join(", ");
+        }
+    }
+}
+
+bool MainWindow::isError(std::string msg) {
+    std::vector<std::string> errors(ERROR, ERROR + 18);
+    for(unsigned int i=0; i < errors.size(); i++) {
+        if(msg.find(errors[i]) != std::string::npos)
+        return true;
+    }
+    return false;
 }
 
 QString MainWindow::send(const QString &command)
@@ -407,6 +412,7 @@ QString MainWindow::send(const QString &command)
                                  .remove(QRegExp("[^a-zA-Z0-9]+")));
 
         m_connectionManager->send(command);
+        QThread::msleep(5);
     }
 
     return QString();
@@ -415,10 +421,43 @@ QString MainWindow::send(const QString &command)
 void MainWindow::saveSettings()
 {
     QString ip = "192.168.0.10";
+    // python3 -m elm -n 35000
+    // QString ip = "0.0.0.0";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
-    m_settingsManager->setSerialPort("/dev/pts/8");  
-    m_settingsManager->setEngineDisplacement(650);
+    m_settingsManager->setSerialPort("/dev/ttys001");
+    m_settingsManager->setEngineDisplacement(1600);
     m_settingsManager->saveSettings();
 }
+
+void MainWindow::on_pushReadFault_clicked()
+{
+    ui->textTerminal->append("-> Reading the trouble codes.");
+    QThread::msleep(60);
+    send(READ_TROUBLE);
+}
+
+
+void MainWindow::on_pushClearFault_clicked()
+{
+    ui->textTerminal->append("-> Clearing the trouble codes.");
+    QThread::msleep(60);
+    send(CLEAR_TROUBLE);
+}
+
+
+void MainWindow::on_checkSearchPids_toggled(bool checked)
+{
+    if(checked)
+    {
+        m_searchPidsEnable = true;
+        getPids();
+    }
+    else
+    {
+        m_searchPidsEnable = false;
+        runtimeCommands.clear();
+    }
+}
+

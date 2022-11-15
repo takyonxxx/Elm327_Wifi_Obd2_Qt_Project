@@ -1,5 +1,5 @@
 #include "qcgaugewidget.h"
-#include "pid.h"
+#include "global.h"
 
 QcGaugeWidget::QcGaugeWidget(QWidget *parent) :
     QWidget(parent)

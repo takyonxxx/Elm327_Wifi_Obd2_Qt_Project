@@ -117,18 +117,6 @@ void ElmTcpSocket::readyRead()
         if(!strData.isEmpty())
         {           
             byteblock.clear();
-            strData.remove("\r");
-            strData.remove(">");
-
-            strData = strData.trimmed()
-                    .simplified()
-                    .remove(QRegExp("[\\n\\t\\r]"))
-                    .remove(QRegExp("[^a-zA-Z0-9]+"));
-
-            // Some of these look like errors that ought to be handled..
-            strData.replace(">","");
-            strData.replace("?","");
-            strData.replace(",","");
             if(!strData.isEmpty())
             {
                 disconnect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
@@ -162,19 +150,7 @@ QString ElmTcpSocket::checkData()
         strData = QString::fromStdString(byteblock.toStdString());
         if(strData.contains("\r"))
         {
-            byteblock.clear();
-            strData.remove("\r");
-            strData.remove(">");
-
-            strData = strData.trimmed()
-                    .simplified()
-                    .remove(QRegExp("[\\n\\t\\r]"))
-                    .remove(QRegExp("[^a-zA-Z0-9]+"));
-
-            // Some of these look like errors that ought to be handled..
-            strData.replace("OK","");
-            strData.replace("?","");
-            strData.replace(",","");
+            byteblock.clear();            
             emit dataReceived(strData);
             return strData;
         }
@@ -199,26 +175,14 @@ QString ElmTcpSocket::readData(const QString &command)
             if(strData.contains("\r"))
             {
                 byteblock.clear();
-                strData.remove("\r");
-                strData.remove(">");
 
-                strData = strData.trimmed()
-                        .simplified()
-                        .remove(QRegExp("[\\n\\t\\r]"))
-                        .remove(QRegExp("[^a-zA-Z0-9]+"));
-
-                // Some of these look like errors that ought to be handled..
-                strData.replace(">","");
-                strData.replace("?","");
-                strData.replace(",","");
-                strData.replace(command,"");
-                if(!strData.isEmpty())
-                {
-                    if(strData.contains("SEARCHING"))
-                    {
-                        return  checkData();
-                    }
-                }
+//                if(!strData.isEmpty())
+//                {
+//                    if(strData.contains("SEARCHING"))
+//                    {
+//                        return  checkData();
+//                    }
+//                }
 
                 disconnect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
                 emit dataReceived(strData);

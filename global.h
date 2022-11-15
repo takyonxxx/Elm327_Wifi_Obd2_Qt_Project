@@ -1,43 +1,29 @@
-#ifndef PID_H
-#define PID_H
+#ifndef GLOBAL_H
+#define GLOBAL_H
+#include <QMainWindow>
 #include <QtCore>
-#include <QScreen>
+#include <QVector>
+extern QStringList runtimeCommands;
 
-/*
-PID Description  Renault / Dacia
-00 PIDs supported [01 - 20]
-01 Monitor status since DTCs cleared. (Includes malfunction indicator lamp (MIL) status and number of DTCs.)
-05 Engine coolant temperature
-0B Intake manifold absolute pressure
-0C Engine RPM
-0D Vehicle speed
-0F Intake air temperature
-10 MAF air flow rate
-11 Throttle position (this one seems wonky as it fluctuates all over the place)
-1C OBD standards this vehicle conforms to
-20 PIDs supported [21 - 40]
-21 Distance travelled with malfunction indicator lamp (MIL) on (yes)
-23 Fuel rail Pressure (diesel, or gasoline direct inject)
-31 Distance traveled since codes cleared (yes, available, but most / “no” stealership has been reported “looking”)
-42 Control module voltage ((A*256)+B)/1000
-4D Time run with MIL on (yes) ((A*256)+B)
-4E Time since trouble codes cleared (yes, available, but most / “no” stealership has been reported “looking”)((A*256)+B)
-50 Maximum value for air flow rate from mass air flow sensor A*10
-61 Driver's demand engine - percent torque A-125
-62 Actual engine - percent torque A-125
-*/
-
-template <typename T>
-typename std::enable_if<std::is_unsigned<T>::value, int>::type
-inline constexpr signum(T x) {
-    return T(0) < x;
-}
-
-template <typename T>
-typename std::enable_if<std::is_signed<T>::value, int>::type
-inline constexpr signum(T x) {
-    return (T(0) < x) - (x < T(0));
-}
+static std::string ERROR[] = {
+    "ACT ALERT",
+    "!ACT ALERT",
+    "BUFFER FULL",
+    "BUS BUSY",
+    "BUS ERROR",
+    "CAN ERROR",
+    "DATA ERROR",
+    "<DATA ERROR",
+    "ERR",
+    "FB ERROR",
+    "LP ALERT",
+    "!LP ALERT",
+    "LV RESET",
+    "NO DATA",
+    "<RX ERROR",
+    "STOPPED",
+    "UNABLE TO CONNECT",
+    "SEARCHING"};
 
 static QString DEFAULT = "ATD",
 RESET = "ATZ",
@@ -101,8 +87,20 @@ READ_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
 ONLY_ENGINE_ECU ="ATSH7E0";
 
-static QStringList initializeCommands{LINEFEED_OFF, HEADERS_OFF, SPACES_OFF, ECHO_OFF,
-            TIMEOUT_DEFAULT, PROTOCOL_AUTO, PIDS_SUPPORTED20};
+template <typename T>
+typename std::enable_if<std::is_unsigned<T>::value, int>::type
+inline constexpr signum(T x) {
+    return T(0) < x;
+}
+
+template <typename T>
+typename std::enable_if<std::is_signed<T>::value, int>::type
+inline constexpr signum(T x) {
+    return (T(0) < x) - (x < T(0));
+}
+
+static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF,
+            ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL, PIDS_SUPPORTED20};
 
 static long long currentTimeMillis()
 {
@@ -135,6 +133,30 @@ static QString osName()
     return QLatin1String("unknown");
 #endif
 }
+
+/*
+PID Description  Renault / Dacia
+00 PIDs supported [01 - 20]
+01 Monitor status since DTCs cleared. (Includes malfunction indicator lamp (MIL) status and number of DTCs.)
+05 Engine coolant temperature
+0B Intake manifold absolute pressure
+0C Engine RPM
+0D Vehicle speed
+0F Intake air temperature
+10 MAF air flow rate
+11 Throttle position (this one seems wonky as it fluctuates all over the place)
+1C OBD standards this vehicle conforms to
+20 PIDs supported [21 - 40]
+21 Distance travelled with malfunction indicator lamp (MIL) on (yes)
+23 Fuel rail Pressure (diesel, or gasoline direct inject)
+31 Distance traveled since codes cleared (yes, available, but most / “no” stealership has been reported “looking”)
+42 Control module voltage ((A*256)+B)/1000
+4D Time run with MIL on (yes) ((A*256)+B)
+4E Time since trouble codes cleared (yes, available, but most / “no” stealership has been reported “looking”)((A*256)+B)
+50 Maximum value for air flow rate from mass air flow sensor A*10
+61 Driver's demand engine - percent torque A-125
+62 Actual engine - percent torque A-125
+*/
 
 //v1.0 ;AC P; ATZ                   ; Z                  ; reset all
 //v1.0 ;AC P; ATE1                  ; E0, E1             ; Echo off, or on*
@@ -251,4 +273,4 @@ static QString osName()
 //v2.1 ;AC  ; ATCTM5                ; CTM5               ; set Timer Multiplier to 5
 //v2.1 ;ACH ; ATZ                   ; Z                  ; reset all
 
-#endif // PID_H
+#endif // GLOBAL_H

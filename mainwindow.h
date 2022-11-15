@@ -4,10 +4,11 @@
 #include <QMainWindow>
 #include <QDesktopWidget>
 #include <QTimer>
+#include <QScreen>
 #include "connectionmanager.h"
 #include "settingsmanager.h"
 #include "obdscan.h"
-#include "obdgauge.h"
+#include "elm.h"
 
 #define SCREEN_ORIENTATION_LANDSCAPE 0
 #define SCREEN_ORIENTATION_PORTRAIT 1
@@ -17,7 +18,7 @@
 #include <QAndroidJniObject>
 #include <QtAndroid>
 #endif
-#include "elm.h"
+
 
 #if defined (Q_OS_ANDROID)
 #include <QtAndroid>
@@ -39,6 +40,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
 
 #ifdef Q_OS_ANDROID
     void keep_screen_on(bool on)
@@ -71,11 +73,14 @@ public:
 #endif
 
 private:
+
     void connectElm();
     void disConnectElm();
     QString send(const QString &);
     void analysData(const QString &);
     void saveSettings();
+    bool isError(std::string msg);
+    void getPids();
 
     QRect desktopRect{};
     ConnectionManager *m_connectionManager{};
@@ -84,8 +89,8 @@ private:
 
     int commandOrder{0};
     bool m_initialized{false};
-    bool m_requestClearDtc{false};
     bool m_consoleEnable{true};
+    bool m_searchPidsEnable{false};
     std::vector<uint32_t> cmds{};
 
 private slots:
@@ -97,11 +102,13 @@ private slots:
     void on_pushExit_clicked();
     void on_pushSend_clicked();
     void on_pushClear_clicked();
-    void on_pushDiagnostic_clicked();
     void on_pushScan_clicked();
-    void on_pushGauge_clicked();
     void orientationChanged(Qt::ScreenOrientation orientation);    
     void on_close_dialog_triggered();
+
+    void on_pushReadFault_clicked();
+    void on_pushClearFault_clicked();
+    void on_checkSearchPids_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;

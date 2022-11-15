@@ -33,9 +33,9 @@ SOURCES += \
         elm.cpp \
         elmblesocket.cpp \
         elmtcpsocket.cpp \
+        global.cpp \
         main.cpp \
         mainwindow.cpp \
-        obdgauge.cpp \
         obdscan.cpp \
         qcgaugewidget.cpp \
         settingsmanager.cpp
@@ -45,16 +45,14 @@ HEADERS += \
         elm.h \
         elmblesocket.h \
         elmtcpsocket.h \
+        global.h \
         mainwindow.h \
-        obdgauge.h \
         obdscan.h \
-        pid.h \
         qcgaugewidget.h \
         settingsmanager.h
 
 FORMS += \
         mainwindow.ui \
-        obdgauge.ui \
         obdscan.ui
 
 RESOURCES += \

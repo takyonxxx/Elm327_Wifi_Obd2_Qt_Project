@@ -1,9 +1,7 @@
 #ifndef OBDSCAN_H
 #define OBDSCAN_H
 
-#include <QMainWindow>
-#include <QVector>
-#include "connectionmanager.h"
+#include "global.h"
 #include "elm.h"
 
 namespace Ui {
@@ -26,7 +24,6 @@ private:
     int mLoad{0};
     int commandOrder{0};
     unsigned int mEngineDisplacement{0};
-    QStringList runtimeCommands{};
     QVector<qreal> mAvarageFuelConsumption{};
     QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};

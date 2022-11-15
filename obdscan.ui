@@ -15,8 +15,8 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="4" column="0">
-     <widget class="QLabel" name="labelFuelConsumption">
+    <item row="0" column="0">
+     <widget class="QLabel" name="labelVoltage">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
@@ -24,27 +24,32 @@
        </size>
       </property>
       <property name="text">
-       <string>-</string>
+       <string>0 V</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
+    <item row="6" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="pushClear">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushExit">
+        <property name="text">
+         <string>Exit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0">
+    <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout">
       <item row="7" column="1">
        <widget class="QComboBox" name="comboEngineDisplacement">
@@ -74,6 +79,11 @@
         <item>
          <property name="text">
           <string> 1500</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string> 1600</string>
          </property>
         </item>
         <item>
@@ -222,25 +232,23 @@
       </item>
      </layout>
     </item>
-    <item row="6" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="pushClear">
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushExit">
-        <property name="text">
-         <string>Exit</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <item row="3" column="0">
+     <widget class="QLabel" name="labelFuelConsumption">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>-</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </item>
-    <item row="5" column="0">
+    <item row="4" column="0">
      <widget class="QLabel" name="labelFuel100">
       <property name="maximumSize">
        <size>
@@ -256,29 +264,10 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="0">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="labelVoltage">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>100</height>
-       </size>
-      </property>
+    <item row="5" column="0">
+     <widget class="QLabel" name="labelCommand">
       <property name="text">
-       <string>0 V</string>
+       <string>-</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -293,7 +282,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

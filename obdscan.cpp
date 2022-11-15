@@ -1,6 +1,5 @@
 #include "obdscan.h"
 #include "ui_obdscan.h"
-#include "pid.h"
 #include "elm.h"
 #include "settingsmanager.h"
 
@@ -10,8 +9,6 @@ ObdScan::ObdScan(QWidget *parent) :
 {
     ui->setupUi(this);
     this->centralWidget()->setStyleSheet("background-color:#17202A ; border: none;");
-
-    this->runtimeCommands = runtimeCommands;
 
     setWindowTitle("Elm327 Obd2");
 
@@ -31,13 +28,14 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelManifold->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelVoltage->setStyleSheet("font-size: 36pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelCommand->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setStyleSheet("font-size: 18pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
     ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
 
-    ui->labelFuelConsumption->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
-    ui->labelFuel100->setStyleSheet("font: 32pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
+    ui->labelFuelConsumption->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
+    ui->labelFuel100->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
 
     ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
     ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
@@ -52,20 +50,22 @@ ObdScan::ObdScan(QWidget *parent) :
     mAvarageFuelConsumption100.clear();
     mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
-    runtimeCommands.clear();
-    runtimeCommands.append(VOLTAGE);
-    runtimeCommands.append(VEHICLE_SPEED);
-    runtimeCommands.append(ENGINE_RPM);
-    runtimeCommands.append(ENGINE_LOAD);
-    runtimeCommands.append(COOLANT_TEMP);
-    runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
-    runtimeCommands.append(MAF_AIR_FLOW);
+    if(runtimeCommands.isEmpty())
+    {
+        runtimeCommands.append(VOLTAGE);
+        runtimeCommands.append(VEHICLE_SPEED);
+        runtimeCommands.append(ENGINE_RPM);
+        runtimeCommands.append(ENGINE_LOAD);
+        runtimeCommands.append(COOLANT_TEMP);
+        runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
+        runtimeCommands.append(MAF_AIR_FLOW);
+    }
 
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     {
         connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
         mRunning = true;
-        send(PIDS_SUPPORTED20);
+        send(VOLTAGE);
     }
 }
 
@@ -105,21 +105,21 @@ void ObdScan::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
+        ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
+        ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
         commandOrder++;
     }
 
-    if(dataReceived.isEmpty())return;
-
-    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
-        return;
-
     try
     {
+        dataReceived = dataReceived.trimmed().simplified();
+        dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+        dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
         analysData(dataReceived);
     }
     catch (const std::exception& e)
