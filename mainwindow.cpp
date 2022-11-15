@@ -26,18 +26,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
     ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
     ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
-    ui->checkSearchPids->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->checkSearchPids->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
 
     ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
-    ui->sendEdit->setText("0100");
+    ui->sendEdit->setText("0101");
     ui->pushSend->setEnabled(false);
     ui->pushReadFault->setEnabled(false);
     ui->pushClearFault->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->checkSearchPids->setEnabled(false);
-    /*auto diag_size = int(ui->pushGauge->height() + ui->pushScan->height());
-    ui->pushDiagnostic->setMinimumHeight(2*diag_size);*/
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -90,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     keep_screen_on(true);
     //setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE);
 #endif
-    ui->textTerminal->append("Resolution : " + QString::number(desktopRect.width()) + "x" +QString::number(desktopRect.height()));
+    ui->textTerminal->append("Resolution : " + QString::number(desktopRect.width()) + "x" + QString::number(desktopRect.height()));
     ui->textTerminal->append("Press Connect Button");
     ui->pushConnect->setFocus();
 }
@@ -168,8 +166,7 @@ void MainWindow::on_pushConnect_clicked()
     }
 
     if(ui->pushConnect->text() == "Connect")
-    {
-        ui->pushConnect->setText(QString("Connecting"));
+    {        
         QCoreApplication::processEvents();
         ui->textTerminal->clear();
         if(m_connectionManager)
@@ -205,9 +202,6 @@ void MainWindow::on_close_dialog_triggered()
 
 void MainWindow::on_pushScan_clicked()
 {
-    /*if(runtimeCommands.size() == 0)
-        return;*/
-
     m_consoleEnable = false;
     ObdScan *obdScan = new ObdScan(this);
     obdScan->setGeometry(desktopRect);
@@ -236,20 +230,15 @@ void MainWindow::connected()
 
 void MainWindow::disconnected()
 {
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
-
     ui->pushSend->setEnabled(false);
     ui->pushReadFault->setEnabled(false);
     ui->pushClearFault->setEnabled(false);
     ui->pushScan->setEnabled(false);
     ui->checkSearchPids->setEnabled(false);
     ui->pushConnect->setText(QString("Connect"));
-
     commandOrder = 0;
     m_initialized = false;
-
     ui->textTerminal->append("Elm DisConnected");
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
 
 }
 
@@ -260,7 +249,7 @@ void MainWindow::analysData(const QString &dataReceived)
     unsigned PID = 0;
 
     std::vector<QString> vec;
-    auto resp= elm->prepareResponseToDecode(dataReceived);
+    auto resp= elm->prepareResponseToDecode(dataReceived);   
 
     if(resp.size()>2 && !resp[0].compare("41",Qt::CaseInsensitive))
     {
@@ -293,19 +282,13 @@ void MainWindow::analysData(const QString &dataReceived)
         vec.insert(vec.begin(),resp.begin()+2, resp.end());
         std::pair<int,bool> dtcNumber = elm->decodeNumberOfDtc(vec);
         QString milText = dtcNumber.second ? "true" : "false";
-        ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + " Mil on: " + milText);
+        ui->textTerminal->append("Number of Dtcs: " +  QString::number(dtcNumber.first) + ",  Mil on: " + milText);
     }
     //dtc codes
-    if(resp.size()>2 && !resp[0].compare("43",Qt::CaseInsensitive))
+    if(resp.size()>1 && !resp[0].compare("43",Qt::CaseInsensitive))
     {
-        /*
-        43 12 29 03 80 00 00
-        12 29 03 80=>
-        P1229
-        P0	380
-        */
-
-        vec.insert(vec.begin(),resp.begin()+1, resp.begin()+7);
+        //auto resp= elm->prepareResponseToDecode("486B104303000302030314486B10430304000000000D");
+        vec.insert(vec.begin(),resp.begin()+1, resp.end());
         std::vector<QString> dtcCodes( elm->decodeDTC(vec));
         if(dtcCodes.size()>0)
         {
@@ -315,7 +298,9 @@ void MainWindow::analysData(const QString &dataReceived)
                 dtc_list.append(code + " ");
             }
             ui->textTerminal->append(dtc_list);
-        }      
+        }
+        else
+            ui->textTerminal->append("Number of Dtcs: 0");
     }
 }
 
@@ -420,8 +405,8 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    QString ip = "192.168.0.10";
-    // python3 -m elm -n 35000
+     QString ip = "192.168.0.10";
+    // python3 -m elm -n 35000 -s car
     // QString ip = "0.0.0.0";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
