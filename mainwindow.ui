@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>906</width>
-    <height>657</height>
+    <height>865</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -165,9 +165,6 @@
         </item>
         <item row="9" column="0">
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="sendEdit"/>
-          </item>
           <item row="1" column="1">
            <widget class="QPushButton" name="pushSetProtocol">
             <property name="sizePolicy">
@@ -181,7 +178,30 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="protocolEdit">
+            <property name="text">
+             <string>3</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="pushGetProtocol">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Get Protocol</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
            <widget class="QPushButton" name="pushSend">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -200,15 +220,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="protocolEdit">
-            <property name="text">
-             <string>3</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLineEdit" name="sendEdit"/>
           </item>
          </layout>
         </item>

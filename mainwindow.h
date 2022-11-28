@@ -112,6 +112,8 @@ private slots:
 
     void on_pushSetProtocol_clicked();
 
+    void on_pushGetProtocol_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
     ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushSetProtocol->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushGetProtocol->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
     ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
     ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
@@ -448,7 +449,13 @@ void MainWindow::on_checkSearchPids_toggled(bool checked)
 
 void MainWindow::on_pushSetProtocol_clicked()
 {
-    QString command = "ATSP" + ui->protocolEdit->text();
+    QString command = "ATTP" + ui->protocolEdit->text();
     send(command);
+}
+
+
+void MainWindow::on_pushGetProtocol_clicked()
+{
+    send(GET_PROTOCOL);
 }
 
