@@ -110,6 +110,8 @@ private slots:
     void on_pushClearFault_clicked();
     void on_checkSearchPids_toggled(bool checked);
 
+    void on_pushSetProtocol_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

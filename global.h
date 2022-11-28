@@ -38,10 +38,10 @@ INFO = "ATI",
 MONITOR_ALL = "ATMA",
 ALLOW_LONG_MESSAGE = "ATAL",
 VOLTAGE = "ATRV",
-GET_PROTOCOL = "ATDP",
 GET_PP_SUMMARY= "ATPPS",
 GET_ELM_INFO = "ATI",
-PROTOCOL_AUTO = "ATSPA0",
+PROTOCOL_AUTO = "ATSP0",
+GET_PROTOCOL = "ATDP",
 PROTOCOL_SEARCH_ORDER= "ATSS",
 ECHO_OFF = "ATE0",
 ECHO_ON = "ATE1",
@@ -85,7 +85,8 @@ DISTANCE_TRAVALED = "0131", //Distance traveled since codes cleared  256A+B
 ACTUAL_TORQUE = "0162", //Actual engine - percent torque % A-125
 READ_TROUBLE = "03", //Request trouble codes
 CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) / Check engine light
-ONLY_ENGINE_ECU ="ATSH7E0";
+ONLY_ENGINE_ECU = "ATSH7E0",
+PROTOCOL_ISO_9141_2 = "ATSP3";
 
 template <typename T>
 typename std::enable_if<std::is_unsigned<T>::value, int>::type
@@ -135,6 +136,21 @@ static QString osName()
 }
 
 /*
+ATSP
+Usage: ATSPn, where n is 0 to 9.
+Set desired communication protocol.
+
+0	Automatic protocol detection
+1	SAE J1850 PWM (41.6 kbaud)
+2	SAE J1850 VPW (10.4 kbaud)
+3	ISO 9141-2 (5 baud init, 10.4 kbaud)
+4	ISO 14230-4 KWP (5 baud init, 10.4 kbaud)
+5	ISO 14230-4 KWP (fast init, 10.4 kbaud)
+6	ISO 15765-4 CAN (11 bit ID, 500 kbaud)
+7	ISO 15765-4 CAN (29 bit ID, 500 kbaud)
+8	ISO 15765-4 CAN (11 bit ID, 250 kbaud) - used mainly on utility vehicles and Volvo
+9	ISO 15765-4 CAN (29 bit ID, 250 kbaud) - used mainly on utility vehicles and Volvo
+
 PID Description  Renault / Dacia
 00 PIDs supported [01 - 20]
 01 Monitor status since DTCs cleared. (Includes malfunction indicator lamp (MIL) status and number of DTCs.)

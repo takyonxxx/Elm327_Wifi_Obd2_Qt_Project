@@ -102,3 +102,5 @@ DISTFILES += \
     ios/Images.xcassets/iTunesArtwork@3x.png
 
 ANDROID_ABIS = armeabi-v7a
+
+#  python3 -m elm -s car -n 35000

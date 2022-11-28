@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
     ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushSetProtocol->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
     ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
     ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
@@ -29,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checkSearchPids->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
 
     ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->protocolEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
     ui->sendEdit->setText("0101");
     ui->pushSend->setEnabled(false);
@@ -59,10 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
-        screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
-                                         Qt::PortraitOrientation |
-                                         Qt::InvertedLandscapeOrientation |
-                                         Qt::InvertedPortraitOrientation);
+        screen->setOrientationUpdateMask(Qt::PortraitOrientation);
 
         QObject::connect(screen, &QScreen::orientationChanged, this, &MainWindow::orientationChanged);
     }
@@ -405,9 +404,9 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-     QString ip = "192.168.0.10";
+    //QString ip = "192.168.0.10";
     // python3 -m elm -n 35000 -s car
-    // QString ip = "0.0.0.0";
+    QString ip = "0.0.0.0";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
@@ -444,5 +443,12 @@ void MainWindow::on_checkSearchPids_toggled(bool checked)
         m_searchPidsEnable = false;
         runtimeCommands.clear();
     }
+}
+
+
+void MainWindow::on_pushSetProtocol_clicked()
+{
+    QString command = "ATSP" + ui->protocolEdit->text();
+    send(command);
 }
 
