@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 8.0.2, 2022-11-28T17:19:33. -->
+<!-- Written by QtCreator 8.0.2, 2022-11-28T18:31:09. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -415,7 +415,6 @@
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/turkaybiliyor/Desktop/build-Elm327Obd2-Desktop/Elm327Obd2.app/Contents/MacOS</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
@@ -579,7 +578,7 @@
      <value type="QString" key="identifier"></value>
      <value type="int" key="type">0</value>
     </valuemap>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run Elm327Obd2 on tbiphone</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run  on tbiphone</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosRunConfiguration:/Users/turkaybiliyor/Desktop/Projects/Elm327_Wifi_Obd2_Qt_Project/Elm327Obd2.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/turkaybiliyor/Desktop/Projects/Elm327_Wifi_Obd2_Qt_Project/Elm327Obd2.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
@@ -750,7 +749,7 @@
      <value type="QString" key="identifier"></value>
      <value type="int" key="type">0</value>
     </valuemap>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run Elm327Obd2 on tbiphone</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run  on tbiphone</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosRunConfiguration:/Users/turkaybiliyor/Desktop/Projects/Elm327_Wifi_Obd2_Qt_Project/Elm327Obd2.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/turkaybiliyor/Desktop/Projects/Elm327_Wifi_Obd2_Qt_Project/Elm327Obd2.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>

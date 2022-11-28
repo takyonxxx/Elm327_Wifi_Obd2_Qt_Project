@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //    protocols.append("B User1 CAN (11* bit ID, 125* kbaud)\n");
 //    protocols.append("C User2 CAN (11* bit ID, 50* kbaud)\n");
 
-//    ui->textTerminal->append(protocols);
 
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
     ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
@@ -62,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(m_settingsManager)
     {
         saveSettings();
+        ui->textTerminal->append("Wifi Ip: " + m_settingsManager->getWifiIp() + " : " + QString::number(m_settingsManager->getWifiPort()));
     }
 
     elm = new ELM();
@@ -423,9 +423,9 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    //QString ip = "192.168.0.10";
+    QString ip = "192.168.0.10";
     // python3 -m elm -n 35000 -s car
-    QString ip = "0.0.0.0";
+    //QString ip = "0.0.0.0";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
