@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(osName() == "android" || osName() == "ios")
         setGeometry(desktopRect);
 
-    ui->textTerminal->setStyleSheet("font: 16pt; color: #00cccc; background-color: #001a1a;");
+    ui->textTerminal->setStyleSheet("font: 14pt; color: #00cccc; background-color: #001a1a;");
 
 //    QString protocols;
 
@@ -36,25 +36,27 @@ MainWindow::MainWindow(QWidget *parent) :
 //    protocols.append("C User2 CAN (11* bit ID, 50* kbaud)\n");
 
 
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
-    ui->pushSend->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushSetProtocol->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushGetProtocol->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
-    ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushScan->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
-    ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
-    ui->checkSearchPids->setStyleSheet("font-size: 20pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
+    ui->pushConnect->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushSend->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushSetProtocol->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushGetProtocol->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushClear->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
+    ui->pushReadFault->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushClearFault->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushScan->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
+    ui->pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
+    ui->checkSearchPids->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
 
-    ui->sendEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->protocolEdit->setStyleSheet("font-size: 22pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->sendEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->protocolEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
     ui->sendEdit->setText("0101");
     ui->pushSend->setEnabled(false);
     ui->pushReadFault->setEnabled(false);
     ui->pushClearFault->setEnabled(false);
     ui->pushScan->setEnabled(false);
+    ui->pushSetProtocol->setEnabled(false);
+    ui->pushGetProtocol->setEnabled(false);
     ui->checkSearchPids->setEnabled(false);
 
     m_settingsManager = SettingsManager::getInstance();
@@ -237,6 +239,8 @@ void MainWindow::connected()
     ui->pushReadFault->setEnabled(true);
     ui->pushClearFault->setEnabled(true);
     ui->pushScan->setEnabled(true);
+    ui->pushSetProtocol->setEnabled(true);
+    ui->pushGetProtocol->setEnabled(true);
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
