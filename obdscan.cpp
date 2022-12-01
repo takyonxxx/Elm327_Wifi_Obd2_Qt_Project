@@ -24,9 +24,6 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelCoolantTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelCoolant->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelManifoldTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelManifold->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
-
     ui->labelVoltage->setStyleSheet("font-size: 36pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
     ui->labelCommand->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
@@ -57,7 +54,6 @@ ObdScan::ObdScan(QWidget *parent) :
         runtimeCommands.append(ENGINE_RPM);
         runtimeCommands.append(ENGINE_LOAD);
         runtimeCommands.append(COOLANT_TEMP);
-        runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
         runtimeCommands.append(MAF_AIR_FLOW);
     }
 
@@ -183,7 +179,6 @@ void ObdScan::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            ui->labelManifold->setText(QString::number(value) + " kPa");
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4

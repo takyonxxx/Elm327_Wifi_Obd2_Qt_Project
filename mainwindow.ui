@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>724</width>
-    <height>652</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,7 +52,7 @@
         </item>
         <item row="7" column="0">
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0" colspan="2">
+          <item row="1" column="0" colspan="2">
            <widget class="QLineEdit" name="sendEdit">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -188,22 +188,6 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
-         <widget class="QLineEdit" name="protocolEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>3</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="9" column="1">
          <widget class="QPushButton" name="pushSetProtocol">
           <property name="sizePolicy">
@@ -247,6 +231,75 @@
           <property name="text">
            <string>Exit</string>
           </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QComboBox" name="protocolCombo">
+          <item>
+           <property name="text">
+            <string>Automatic protocol detection</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SAE J1850 PWM (41.6 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SAE J1850 VPW (10.4 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 9141-2 (5 baud init, 10.4 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 14230-4 KWP (5 baud init, 10.4 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 14230-4 KWP (fast init, 10.4 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 15765-4 CAN (11 bit ID, 500 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 15765-4 CAN (29 bit ID, 500 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 15765-4 CAN (11 bit ID, 250 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ISO 15765-4 CAN (29 bit ID, 250 kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SAE J1939 CAN (29 bit ID, 250* kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>User1 CAN (11* bit ID, 125* kbaud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>User2 CAN (11* bit ID, 50* kbaud)</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

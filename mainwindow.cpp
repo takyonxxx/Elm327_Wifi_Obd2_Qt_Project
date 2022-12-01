@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checkSearchPids->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
 
     ui->sendEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->protocolEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->protocolCombo->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
     ui->sendEdit->setText("0101");
     ui->pushSend->setEnabled(false);
@@ -471,7 +471,14 @@ void MainWindow::on_checkSearchPids_toggled(bool checked)
 
 void MainWindow::on_pushSetProtocol_clicked()
 {
-    QString command = "ATTP" + ui->protocolEdit->text();
+    QString index = QString::number(ui->protocolCombo->currentIndex());
+    if(ui->protocolCombo->currentIndex() == 10)
+        index = "A";
+    else if(ui->protocolCombo->currentIndex() == 11)
+        index = "B";
+    else if(ui->protocolCombo->currentIndex() == 12)
+        index = "C";
+    QString command = "ATTP" + index;
     send(command);
 }
 
