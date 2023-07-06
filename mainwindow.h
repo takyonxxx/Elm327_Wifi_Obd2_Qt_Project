@@ -8,6 +8,7 @@
 #include "connectionmanager.h"
 #include "settingsmanager.h"
 #include "obdscan.h"
+#include "obdgauge.h"
 #include "elm.h"
 
 #define SCREEN_ORIENTATION_LANDSCAPE 0
@@ -88,6 +89,7 @@ private:
     ELM *elm{};
 
     int commandOrder{0};
+    bool m_connected{false};
     bool m_initialized{false};
     bool m_consoleEnable{true};
     bool m_searchPidsEnable{false};
@@ -113,6 +115,8 @@ private slots:
     void on_pushSetProtocol_clicked();
 
     void on_pushGetProtocol_clicked();
+
+    void on_pushGauge_clicked();
 
 private:
     Ui::MainWindow *ui;

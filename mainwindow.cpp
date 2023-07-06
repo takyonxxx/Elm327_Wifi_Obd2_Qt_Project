@@ -36,28 +36,28 @@ MainWindow::MainWindow(QWidget *parent) :
 //    protocols.append("C User2 CAN (11* bit ID, 50* kbaud)\n");
 
 
-    ui->pushConnect->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
-    ui->pushSend->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushSetProtocol->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushGetProtocol->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushClear->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
-    ui->pushReadFault->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushClearFault->setStyleSheet("font-size: 18pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushScan->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
-    ui->pushExit->setStyleSheet("font-size: 18pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
-    ui->checkSearchPids->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
+    ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
+    ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushSetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushGetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
+    ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
+    ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
+    ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
+    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
+    ui->checkSearchPids->setStyleSheet("font-size: 24pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 12px; spacing: 12px;");
 
-    ui->sendEdit->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->protocolCombo->setStyleSheet("font-size: 18pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->protocolCombo->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
 
     ui->sendEdit->setText("0101");
     ui->pushSend->setEnabled(false);
     ui->pushReadFault->setEnabled(false);
     ui->pushClearFault->setEnabled(false);
-    ui->pushScan->setEnabled(false);
+//    ui->pushScan->setEnabled(false);
     ui->pushSetProtocol->setEnabled(false);
     ui->pushGetProtocol->setEnabled(false);
-    ui->checkSearchPids->setEnabled(false);
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -220,17 +220,6 @@ void MainWindow::on_close_dialog_triggered()
     m_consoleEnable = true;
 }
 
-void MainWindow::on_pushScan_clicked()
-{
-    m_consoleEnable = false;
-    ObdScan *obdScan = new ObdScan(this);
-    obdScan->setGeometry(desktopRect);
-    obdScan->move(this->x(), this->y());
-    connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
-
-    obdScan->show();
-}
-
 void MainWindow::connected()
 {
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
@@ -245,6 +234,7 @@ void MainWindow::connected()
 
     commandOrder = 0;
     m_initialized = false;
+    m_connected = true;
 
     ui->textTerminal->append("Elm 327 connected");
     send(RESET);
@@ -256,10 +246,10 @@ void MainWindow::disconnected()
     ui->pushReadFault->setEnabled(false);
     ui->pushClearFault->setEnabled(false);
     ui->pushScan->setEnabled(false);
-    ui->checkSearchPids->setEnabled(false);
     ui->pushConnect->setText(QString("Connect"));
     commandOrder = 0;
     m_initialized = false;
+    m_connected = false;
     ui->textTerminal->append("Elm DisConnected");
 
 }
@@ -349,8 +339,6 @@ void MainWindow::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         m_initialized = true;
-        ui->checkSearchPids->setEnabled(true);
-
         if(m_searchPidsEnable)
         {
             getPids();
@@ -434,7 +422,7 @@ void MainWindow::saveSettings()
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
     m_settingsManager->setSerialPort("/dev/ttys001");
-    m_settingsManager->setEngineDisplacement(1600);
+    m_settingsManager->setEngineDisplacement(2700);
     m_settingsManager->saveSettings();
 }
 
@@ -456,6 +444,9 @@ void MainWindow::on_pushClearFault_clicked()
 
 void MainWindow::on_checkSearchPids_toggled(bool checked)
 {
+    if(!m_connected)
+        return;
+
     if(checked)
     {
         m_searchPidsEnable = true;
@@ -486,5 +477,29 @@ void MainWindow::on_pushSetProtocol_clicked()
 void MainWindow::on_pushGetProtocol_clicked()
 {
     send(GET_PROTOCOL);
+}
+
+void MainWindow::on_pushScan_clicked()
+{
+    m_consoleEnable = false;
+
+    ObdScan *obdScan = new ObdScan(this);
+    obdScan->setGeometry(desktopRect);
+    obdScan->move(this->x(), this->y());
+    connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
+
+    obdScan->show();
+}
+
+void MainWindow::on_pushGauge_clicked()
+{
+    m_consoleEnable = false;
+
+    ObdGauge *obdGauge = new ObdGauge(this);
+    obdGauge->setGeometry(desktopRect);
+    obdGauge->move(this->x(), this->y());
+    connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
+
+    obdGauge->show();
 }
 

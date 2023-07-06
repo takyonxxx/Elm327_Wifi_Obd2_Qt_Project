@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "elm.h"
+#include "settingsmanager.h"
 
 namespace Ui {
 class ObdScan;
@@ -20,23 +21,16 @@ private:
     QMutex m_mutex{};
     bool mRunning{false};    
     int mSpeed{0};
-    int mMAF{0};
     int mLoad{0};
     int commandOrder{0};
-    unsigned int mEngineDisplacement{0};
-    QVector<qreal> mAvarageFuelConsumption{};
-    QVector<qreal> mAvarageFuelConsumption100{};
     ELM *elm{};
     QString send(const QString &);
-    void analysData(const QString &);    
-    qreal calculateAverage(QVector<qreal> &listavg) ;
-
+    void analysData(const QString &);
 public slots:
     void dataReceived(QString);
 
 private slots:
     void on_pushExit_clicked();
-    void on_pushClear_clicked();
     void on_comboEngineDisplacement_currentIndexChanged(const QString &arg1);
 
 signals:

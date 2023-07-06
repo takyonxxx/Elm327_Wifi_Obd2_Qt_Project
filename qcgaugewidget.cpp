@@ -372,9 +372,9 @@ void QcLabelItem::draw(QPainter *painter)
     float r = getRadius(rect());
 
 #ifdef Q_OS_ANDROID
-    QFont font("Meiryo UI", r/18.0, QFont::Bold);
+    QFont font("Meiryo UI", r/6.0, QFont::Bold);
 #else
-    QFont font("Meiryo UI", r/12.0, QFont::Bold);
+    QFont font("Meiryo UI", r/6.0, QFont::Bold);
 #endif
 
     painter->setFont(font);
@@ -1081,4 +1081,3 @@ void QcAttitudeMeter::drawHandle(QPainter *painter)
     painter->drawPolygon(trapPoly);
     painter->drawChord(tmpRct,-16*70,-16*40);
 }
-

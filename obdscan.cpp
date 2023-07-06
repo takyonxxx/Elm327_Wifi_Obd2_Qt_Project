@@ -1,7 +1,5 @@
 #include "obdscan.h"
 #include "ui_obdscan.h"
-#include "elm.h"
-#include "settingsmanager.h"
 
 ObdScan::ObdScan(QWidget *parent) :
     QMainWindow(parent),
@@ -12,40 +10,22 @@ ObdScan::ObdScan(QWidget *parent) :
 
     setWindowTitle("Elm327 Obd2");
 
-    ui->labelRpmTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelRpm->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelRpmTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelRpm->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
+    ui->labelLoadTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelLoad->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
 
-    ui->labelSpeedTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelSpeed->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
+    ui->labelSpeedTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelSpeed->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
-    ui->labelCoolantTitle->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelCoolant->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->labelCoolantTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelCoolant->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelVoltage->setStyleSheet("font-size: 36pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
-    ui->labelCommand->setStyleSheet("font-size: 18pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
-
-    ui->labelEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->comboEngineDisplacement->setStyleSheet("font-size: 22pt; font-weight: bold; color:#ECF0F1; background-color: #154360; padding: 6px; spacing: 6px;");
-    ui->comboEngineDisplacement->setCurrentText(" " + QString::number(SettingsManager::getInstance()->getEngineDisplacement()));
-
-    ui->labelFuelConsumption->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
-    ui->labelFuel100->setStyleSheet("font: 36pt 'Trebuchet MS'; font-weight: bold; color: #ECF0F1 ; background-color: #2E4053 ;  padding: 6px; spacing: 6px;");
-
-    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
-    ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
+    ui->labelVoltage->setStyleSheet("font-size: 36pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");   
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
 
-    ui->pushClear->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
     ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
-
-    ui->labelFuelConsumption->setFocus();
-
-    mAvarageFuelConsumption.clear();
-    mAvarageFuelConsumption100.clear();
-    mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 
     if(runtimeCommands.isEmpty())
     {
@@ -54,7 +34,6 @@ ObdScan::ObdScan(QWidget *parent) :
         runtimeCommands.append(ENGINE_RPM);
         runtimeCommands.append(ENGINE_LOAD);
         runtimeCommands.append(COOLANT_TEMP);
-        runtimeCommands.append(MAF_AIR_FLOW);
     }
 
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
@@ -101,13 +80,13 @@ void ObdScan::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
-        ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
+        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
-        ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
+        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
         commandOrder++;
     }
 
@@ -195,8 +174,7 @@ void ObdScan::analysData(const QString &dataReceived)
             value = A - 40;
             break;
         case 16://PID(10): MAF air flow rate grams/sec
-            // ((256*A)+B) / 100  [g/s]
-            mMAF = ((256 * A) + B) / 100;
+            // ((256*A)+B) / 100  [g/s]           
             break;
         case 17://PID(11): Throttle position
             // (100 * A) / 255 %
@@ -247,35 +225,7 @@ void ObdScan::analysData(const QString &dataReceived)
             //A
             value = A;
             break;
-        }
-
-        if(PID == 4 || PID == 12 || PID == 13) // LOAD, RPM, SPEED
-        {
-            auto AL = mMAF * mLoad;  // Airflow * Load
-            auto coeff = (mEngineDisplacement / 1000.0) / 714.0; // Fuel flow coefficient
-            auto FuelFlowLH = AL * coeff + 1.0;   // Fuel flow L/h
-
-            if(FuelFlowLH > 99)
-                FuelFlowLH = 99;
-
-            if(mLoad == 0)
-                FuelFlowLH = 0;           
-
-            if(mSpeed > 0)
-            {
-                auto mFuelLPer100 = FuelFlowLH * 100 / mSpeed;   // FuelConsumption in l per 100km
-                if(mFuelLPer100 > 99)
-                    mFuelLPer100 = 99;
-
-                mAvarageFuelConsumption100.append(mFuelLPer100);
-                ui->labelFuel100->setText(QString::number(calculateAverage(mAvarageFuelConsumption100), 'f', 1) + "  l / 100km");
-            }
-            else
-            {
-                mAvarageFuelConsumption.append(FuelFlowLH);
-                ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + "  l / h");
-            }
-        }
+        }       
     }
 
     if (dataReceived.contains(QRegExp("\\s*[0-9]{1,2}([.][0-9]{1,2})?V\\s*")))
@@ -289,27 +239,9 @@ void ObdScan::analysData(const QString &dataReceived)
     }
 }
 
-qreal ObdScan::calculateAverage(QVector<qreal> &listavg)
-{
-    qreal sum = 0.0;
-    for (auto &val : listavg) {
-        sum += val;
-    }
-    return sum / listavg.size();
-}
-
-void ObdScan::on_pushClear_clicked()
-{
-    ui->labelFuelConsumption->setText(QString::number(0, 'f', 1) + "  l / h");
-    ui->labelFuel100->setText(QString::number(0, 'f', 1) + "  l / 100km");
-    ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
-    mAvarageFuelConsumption.clear();
-    mAvarageFuelConsumption100.clear();
-}
-
 void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
 {
     SettingsManager::getInstance()->setEngineDisplacement(arg1.trimmed().toInt());
     SettingsManager::getInstance()->saveSettings();
-    mEngineDisplacement = SettingsManager::getInstance()->getEngineDisplacement();
 }
+
