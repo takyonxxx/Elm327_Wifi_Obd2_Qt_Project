@@ -50,14 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
     ui->protocolCombo->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->protocolCombo->setCurrentIndex(3);
 
     ui->sendEdit->setText("0101");
-    ui->pushSend->setEnabled(false);
-    ui->pushReadFault->setEnabled(false);
-    ui->pushClearFault->setEnabled(false);
-//    ui->pushScan->setEnabled(false);
-    ui->pushSetProtocol->setEnabled(false);
-    ui->pushGetProtocol->setEnabled(false);
 
     m_settingsManager = SettingsManager::getInstance();
     if(m_settingsManager)
@@ -222,14 +217,7 @@ void MainWindow::on_close_dialog_triggered()
 
 void MainWindow::connected()
 {
-    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");
-
-    ui->pushSend->setEnabled(true);
-    ui->pushReadFault->setEnabled(true);
-    ui->pushClearFault->setEnabled(true);
-    ui->pushScan->setEnabled(true);
-    ui->pushSetProtocol->setEnabled(true);
-    ui->pushGetProtocol->setEnabled(true);
+    ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");   
     ui->pushConnect->setText(QString("Disconnect"));
 
     commandOrder = 0;
@@ -241,11 +229,7 @@ void MainWindow::connected()
 }
 
 void MainWindow::disconnected()
-{
-    ui->pushSend->setEnabled(false);
-    ui->pushReadFault->setEnabled(false);
-    ui->pushClearFault->setEnabled(false);
-    ui->pushScan->setEnabled(false);
+{  
     ui->pushConnect->setText(QString("Connect"));
     commandOrder = 0;
     m_initialized = false;
@@ -338,7 +322,8 @@ void MainWindow::dataReceived(QString dataReceived)
     if(!m_initialized && initializeCommands.size() == commandOrder)
     {
         commandOrder = 0;
-        m_initialized = true;
+        m_initialized = true;        
+
         if(m_searchPidsEnable)
         {
             getPids();
@@ -399,7 +384,7 @@ bool MainWindow::isError(std::string msg) {
 
 QString MainWindow::send(const QString &command)
 {
-    if(m_connectionManager)
+    if(m_connectionManager && m_connected)
     {
         ui->textTerminal->append("-> " + command.trimmed()
                                  .simplified()
@@ -416,8 +401,8 @@ QString MainWindow::send(const QString &command)
 void MainWindow::saveSettings()
 {
     QString ip = "192.168.0.10";
-    // python3 -m elm -n 35000 -s car
-    //QString ip = "0.0.0.0";
+    // python -m elm -n 35000 -s car
+    //QString ip = "192.168.0.9";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);

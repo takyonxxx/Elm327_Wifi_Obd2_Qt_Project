@@ -6,7 +6,6 @@
 #include "qcgaugewidget.h"
 #include "global.h"
 #include "elm.h"
-#include "settingsmanager.h"
 
 namespace Ui {
 class ObdGauge;
@@ -22,7 +21,6 @@ public:
 
 private:
     int commandOrder{0};
-    QStringList runtimeCommands{};
 
     int m_timerId{};
     float m_realTime{};
@@ -41,6 +39,9 @@ private:
     QcGaugeWidget * mCoolentGauge{};
     QcNeedleItem *mCoolentNeedle{};
 
+    QcGaugeWidget * mBoostGauge{};
+    QcNeedleItem *mBoostNeedle{};
+
     ELM *elm{};
 
     QString send(const QString &);
@@ -51,6 +52,7 @@ private:
     void setSpeed(int);
     void setRpm(int);
     void setCoolent(int);
+    void setBoost(int);
 
 private slots:
     void dataReceived(QString);

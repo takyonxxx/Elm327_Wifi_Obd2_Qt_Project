@@ -24,20 +24,22 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if (screen->orientation() == Qt::LandscapeOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 1);
+            ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 1);
+             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 1, 1);
             ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 2);
-            ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 3);
+            ui->gridLayout_Gauges->addWidget(pushExit, 0, 0, 0, 0);
 
             ui->gridLayout_Gauges->setColumnStretch(0, 2);
-            ui->gridLayout_Gauges->setColumnStretch(1, 1.5f);
+            ui->gridLayout_Gauges->setColumnStretch(1, 1.75f);
             ui->gridLayout_Gauges->setColumnStretch(2, 2);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(mCoolentGauge, 1, 0);
-            ui->gridLayout_Gauges->addWidget(mRpmGauge, 2, 0);
-            ui->gridLayout_Gauges->addWidget(pushExit, 3, 0);
+            ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
+             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 2, 0);
+            ui->gridLayout_Gauges->addWidget(mRpmGauge, 3, 0);
+            ui->gridLayout_Gauges->addWidget(pushExit, 4, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -54,6 +56,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         runtimeCommands.append(VEHICLE_SPEED);
         runtimeCommands.append(ENGINE_RPM);
         runtimeCommands.append(COOLANT_TEMP);
+        runtimeCommands.append(INTAKE_MAN_PRESSURE);
     }
 
     if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
@@ -85,11 +88,11 @@ void ObdGauge::initGauges()
     bkgSpeed2->addColor(1.0,Qt::darkGray);
 
     mSpeedGauge->addArc(55);
-    auto degrees = mSpeedGauge->addDegrees(65);
-    degrees->setStep(20);
-    degrees->setValueRange(0,220);
+    auto speed_degrees = mSpeedGauge->addDegrees(65);
+    speed_degrees->setStep(20);
+    speed_degrees->setValueRange(0,220);
 
-    auto colorBandSpeed = mSpeedGauge->addColorBand(50);
+    auto speed_ColorBand = mSpeedGauge->addColorBand(50);
     QList<QPair<QColor, float> > colors;
     QColor tmpColor;
     tmpColor.setAlphaF(0.1);
@@ -106,11 +109,11 @@ void ObdGauge::initGauges()
     pair.first = Qt::red;
     pair.second = 100;
     colors.append(pair);
-    colorBandSpeed->setColors(colors);
+    speed_ColorBand->setColors(colors);
 
-    auto values = mSpeedGauge->addValues(74);
-    values->setStep(20);
-    values->setValueRange(0,220);
+    auto speed_values = mSpeedGauge->addValues(74);
+    speed_values->setStep(20);
+    speed_values->setValueRange(0,220);
 
     mSpeedGauge->addLabel(70)->setText("Km/h");
     QcLabelItem *labSpeed = mSpeedGauge->addLabel(40);
@@ -138,7 +141,7 @@ void ObdGauge::initGauges()
 
     mRpmGauge->addArc(55);
     mRpmGauge->addDegrees(65)->setValueRange(0,80);
-    auto colorBandRpm = mRpmGauge->addColorBand(50);
+    auto rpm_ColorBand= mRpmGauge->addColorBand(50);
     colors.clear();
 
     pair.first = Qt::darkGreen;
@@ -152,7 +155,7 @@ void ObdGauge::initGauges()
     pair.first = Qt::red;
     pair.second = 100;
     colors.append(pair);
-    colorBandRpm->setColors(colors);
+    rpm_ColorBand->setColors(colors);
 
     mRpmGauge->addValues(74)->setValueRange(0,80);
 
@@ -185,7 +188,7 @@ void ObdGauge::initGauges()
     QcDegreesItem *deg = mCoolentGauge->addDegrees(65);
     deg->setStep(10);
     deg->setValueRange(40,120);
-    auto colorBandCoolent = mCoolentGauge->addColorBand(50);
+    auto coolent_ColorBandCoolent = mCoolentGauge->addColorBand(50);
     colors.clear();
 
     pair.first = Qt::yellow;
@@ -203,11 +206,11 @@ void ObdGauge::initGauges()
     pair.first = Qt::red;
     pair.second = 100;
     colors.append(pair);
-    colorBandCoolent->setColors(colors);
+    coolent_ColorBandCoolent->setColors(colors);
 
-    QcValuesItem *_values = mCoolentGauge->addValues(74);
-    _values->setStep(10);
-    _values->setValueRange(40,120);
+    QcValuesItem *coolent_values = mCoolentGauge->addValues(74);
+    coolent_values->setStep(10);
+    coolent_values->setValueRange(40,120);
 
     mCoolentGauge->addLabel(70)->setText("C°");
     QcLabelItem *labCoolent = mCoolentGauge->addLabel(40);
@@ -223,6 +226,57 @@ void ObdGauge::initGauges()
 
     //startSim();
     setCoolent(static_cast<int>(40));
+
+
+    //turbo boost
+    mBoostGauge = new QcGaugeWidget;
+    mBoostGauge->addBackground(99);
+    QcBackgroundItem *bkgBoost1 = mBoostGauge->addBackground(92);
+    bkgBoost1->clearrColors();
+    bkgBoost1->addColor(0.1,Qt::black);
+    bkgBoost1->addColor(1.0,Qt::white);
+
+    QcBackgroundItem *bkgBoost2 = mBoostGauge->addBackground(88);
+    bkgBoost2->clearrColors();
+    bkgBoost2->addColor(0.1,Qt::black);
+    bkgBoost2->addColor(1.0,Qt::darkGray);
+
+    mBoostGauge->addArc(55);
+
+    QcDegreesItem *boost_deg = mBoostGauge->addDegrees(65);
+    boost_deg->setStep(5);
+    boost_deg->setValueRange(0,30);
+    auto boost_ColorBand = mBoostGauge->addColorBand(50);
+    colors.clear();
+
+    pair.first = Qt::darkGreen;
+    pair.second = 30;
+    colors.append(pair);
+
+    pair.first = Qt::yellow;
+    pair.second = 60;
+    colors.append(pair);
+
+    pair.first = Qt::red;
+    pair.second = 100;
+    colors.append(pair);
+    boost_ColorBand->setColors(colors);
+
+    QcValuesItem *boost_values = mBoostGauge->addValues(74);
+    boost_values->setStep(5);
+    boost_values->setValueRange(0,30);
+
+    mBoostGauge->addLabel(70)->setText("psi");
+    QcLabelItem *labBoost = mBoostGauge->addLabel(40);
+    labBoost->setColor(Qt::white);
+    labBoost->setText("0");
+    mBoostNeedle = mBoostGauge->addNeedle(60);
+    mBoostNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
+    mBoostNeedle->setLabel(labCoolent);
+    mBoostNeedle->setColor(Qt::white);
+    mBoostNeedle->setValueRange(0,30);
+    mBoostGauge->addBackground(7);
+    mBoostGauge->addGlass(88);
 
     /*engine = new QQmlApplicationEngine;
     engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
@@ -256,6 +310,11 @@ void ObdGauge::setRpm(int rpm)
 void ObdGauge::setCoolent(int degree)
 {
     mCoolentNeedle->setCurrentValue(degree);
+}
+
+void ObdGauge::setBoost(int atm)
+{
+    mBoostNeedle->setCurrentValue(atm);
 }
 
 void ObdGauge::timerEvent( QTimerEvent *event )
@@ -328,6 +387,11 @@ void ObdGauge::analysData(const QString &dataReceived)
             // A-40
             value = A - 40;
             setCoolent(value);
+            break;
+        case 11://PID(0B): Manifold Absolute Pressure
+            // A
+            value = A;
+            setBoost(int((value -1) * 0.1450377377));
             break;
         default:
             //A

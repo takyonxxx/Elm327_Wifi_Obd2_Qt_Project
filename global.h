@@ -101,7 +101,7 @@ inline constexpr signum(T x) {
 }
 
 static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF,
-            ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, GET_PROTOCOL};
+            ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, PROTOCOL_ISO_9141_2, GET_PROTOCOL};
 
 static long long currentTimeMillis()
 {
