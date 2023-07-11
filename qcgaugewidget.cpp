@@ -798,8 +798,12 @@ void QcValuesItem::draw(QPainter*painter)
     QFont font("Meiryo UI",0, QFont::Bold);
 
 #ifdef Q_OS_ANDROID
-    font.setPointSizeF(0.06*r);
-#else
+    font.setPointSizeF(0.1*r);
+#elif defined Q_OS_LINUX
+    font.setPointSizeF(0.1*r);
+#elif defined Q_OS_WIN32
+    font.setPointSizeF(0.1*r);
+#elif defined Q_OS_MAC
     font.setPointSizeF(0.1*r);
 #endif
 

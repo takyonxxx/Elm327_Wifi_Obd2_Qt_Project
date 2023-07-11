@@ -11,13 +11,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
 
-    pushExit = new QPushButton("Exit");
-    pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: rgba(0, 0, 255, 128);");
-
-    connect(pushExit, &QPushButton::clicked, this, &ObdGauge::on_pushExit_clicked);
-
     initGauges();
-
 
     foreach (QScreen *screen, QGuiApplication::screens())
     {
@@ -27,11 +21,10 @@ ObdGauge::ObdGauge(QWidget *parent) :
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 1);
              ui->gridLayout_Gauges->addWidget(mCoolentGauge, 1, 1);
             ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 2);
-            ui->gridLayout_Gauges->addWidget(pushExit, 0, 0, 0, 0);
 
-            ui->gridLayout_Gauges->setColumnStretch(0, 2);
-            ui->gridLayout_Gauges->setColumnStretch(1, 1.75f);
-            ui->gridLayout_Gauges->setColumnStretch(2, 2);
+//            ui->gridLayout_Gauges->setColumnStretch(0, 2);
+//            ui->gridLayout_Gauges->setColumnStretch(1, 2);
+//            ui->gridLayout_Gauges->setColumnStretch(2, 2);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
@@ -39,7 +32,6 @@ ObdGauge::ObdGauge(QWidget *parent) :
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
              ui->gridLayout_Gauges->addWidget(mCoolentGauge, 2, 0);
             ui->gridLayout_Gauges->addWidget(mRpmGauge, 3, 0);
-            ui->gridLayout_Gauges->addWidget(pushExit, 4, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -250,11 +242,11 @@ void ObdGauge::initGauges()
     colors.clear();
 
     pair.first = Qt::darkGreen;
-    pair.second = 30;
+    pair.second = 50;
     colors.append(pair);
 
     pair.first = Qt::yellow;
-    pair.second = 60;
+    pair.second = 66.5;
     colors.append(pair);
 
     pair.first = Qt::red;
@@ -266,13 +258,13 @@ void ObdGauge::initGauges()
     boost_values->setStep(5);
     boost_values->setValueRange(0,30);
 
-    mBoostGauge->addLabel(70)->setText("psi");
+    mBoostGauge->addLabel(70)->setText("PSI");
     QcLabelItem *labBoost = mBoostGauge->addLabel(40);
     labBoost->setColor(Qt::white);
     labBoost->setText("0");
     mBoostNeedle = mBoostGauge->addNeedle(60);
     mBoostNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
-    mBoostNeedle->setLabel(labCoolent);
+    mBoostNeedle->setLabel(labBoost);
     mBoostNeedle->setColor(Qt::white);
     mBoostNeedle->setValueRange(0,30);
     mBoostGauge->addBackground(7);
@@ -376,7 +368,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
             value = ((A * 256) + B) / 4;
-            setRpm(static_cast<int>(value / 100));
+            setRpm(static_cast<int>(value / 100));            
             break;
         case 13://PID(0D): KM Speed
             // A
@@ -409,21 +401,21 @@ void ObdGauge::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
+        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
+        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
         commandOrder++;
     }
 
-    if(dataReceived.isEmpty())return;
-
-    if(dataReceived.toUpper().startsWith("UNABLETOCONNECT"))
-        return;
-
     try
     {
+        dataReceived = dataReceived.trimmed().simplified();
+        dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+        dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
         analysData(dataReceived);
     }
     catch (const std::exception& e)
@@ -438,14 +430,8 @@ void ObdGauge::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
     mRunning = false;
-    emit on_close_gauge();
 }
 
-void ObdGauge::on_pushExit_clicked()
-{
-    mRunning = false;
-    close();
-}
 
 void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
 {  
@@ -454,15 +440,20 @@ void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
         ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
         ui->gridLayout_Gauges->addWidget(mCoolentGauge, 1, 0);
         ui->gridLayout_Gauges->addWidget(mRpmGauge, 2, 0);
-        ui->gridLayout_Gauges->addWidget(pushExit, 3, 0);
         break;
     case Qt::ScreenOrientation::LandscapeOrientation:
         ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
         ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 1);
         ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 2);
-        ui->gridLayout_Gauges->addWidget(pushExit, 1, 0, 1, 3);
         break;
     default:
         break;
     }    
 }
+
+void ObdGauge::on_pushExit_clicked()
+{
+    mRunning = false;
+    close();
+}
+

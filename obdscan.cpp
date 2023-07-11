@@ -238,10 +238,3 @@ void ObdScan::analysData(const QString &dataReceived)
         }
     }
 }
-
-void ObdScan::on_comboEngineDisplacement_currentIndexChanged(const QString &arg1)
-{
-    SettingsManager::getInstance()->setEngineDisplacement(arg1.trimmed().toInt());
-    SettingsManager::getInstance()->saveSettings();
-}
-

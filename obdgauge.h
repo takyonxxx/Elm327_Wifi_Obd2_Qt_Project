@@ -27,8 +27,6 @@ private:
     QTime m_time{};
     int valueGauge{0};
     bool mRunning{false};
-    QPushButton *pushSim;
-    QPushButton *pushExit;
 
     QcGaugeWidget * mSpeedGauge{};
     QcNeedleItem *mSpeedNeedle{};
@@ -56,11 +54,9 @@ private:
 
 private slots:
     void dataReceived(QString);
-    void on_pushExit_clicked();
     void orientationChanged(Qt::ScreenOrientation );
 
-signals:
-    void on_close_gauge();
+    void on_pushExit_clicked();
 
 protected:
     void closeEvent (QCloseEvent *) override;

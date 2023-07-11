@@ -91,7 +91,6 @@ private:
     int commandOrder{0};
     bool m_connected{false};
     bool m_initialized{false};
-    bool m_consoleEnable{true};
     bool m_searchPidsEnable{false};
     std::vector<uint32_t> cmds{};
 
@@ -105,8 +104,7 @@ private slots:
     void on_pushSend_clicked();
     void on_pushClear_clicked();
     void on_pushScan_clicked();
-    void orientationChanged(Qt::ScreenOrientation orientation);    
-    void on_close_dialog_triggered();
+    void orientationChanged(Qt::ScreenOrientation orientation);
 
     void on_pushReadFault_clicked();
     void on_pushClearFault_clicked();

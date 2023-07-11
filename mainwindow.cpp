@@ -210,11 +210,6 @@ void MainWindow::on_pushClear_clicked()
     ui->textTerminal->clear();
 }
 
-void MainWindow::on_close_dialog_triggered()
-{
-    m_consoleEnable = true;
-}
-
 void MainWindow::connected()
 {
     ui->pushConnect->setStyleSheet("font-size: 22pt; font-weight: bold; color: white;background-color:#154360; padding: 24px; spacing: 24px;");   
@@ -302,8 +297,6 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::dataReceived(QString dataReceived)
 {
-//    if(!m_consoleEnable)
-//        return;
 
     dataReceived.remove("\r");
     dataReceived.remove(">");
@@ -400,7 +393,8 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    QString ip = "192.168.0.10";
+    //QString ip = "192.168.0.10";
+    QString ip = "0.0.0.0";
     // python -m elm -n 35000 -s car
     //QString ip = "192.168.0.9";
     quint16 wifiPort = 35000;
@@ -466,24 +460,18 @@ void MainWindow::on_pushGetProtocol_clicked()
 
 void MainWindow::on_pushScan_clicked()
 {
-    m_consoleEnable = false;
-
     ObdScan *obdScan = new ObdScan(this);
     obdScan->setGeometry(desktopRect);
     obdScan->move(this->x(), this->y());
-    connect(obdScan, &ObdScan::on_close_scan, this, &MainWindow::on_close_dialog_triggered);
 
     obdScan->show();
 }
 
 void MainWindow::on_pushGauge_clicked()
 {
-    m_consoleEnable = false;
-
     ObdGauge *obdGauge = new ObdGauge(this);
     obdGauge->setGeometry(desktopRect);
     obdGauge->move(this->x(), this->y());
-    connect(obdGauge, &ObdGauge::on_close_gauge, this, &MainWindow::on_close_dialog_triggered);
 
     obdGauge->show();
 }
