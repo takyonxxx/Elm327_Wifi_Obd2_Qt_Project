@@ -10,6 +10,9 @@ ObdGauge::ObdGauge(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
+    labelCommand = new QLabel(this);
+    labelCommand->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    labelCommand->setAlignment(Qt::AlignCenter);
 
     initGauges();
 
@@ -17,21 +20,19 @@ ObdGauge::ObdGauge(QWidget *parent) :
     {
         if (screen->orientation() == Qt::LandscapeOrientation)
         {
-            ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 1);
-             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 1, 1);
-            ui->gridLayout_Gauges->addWidget(mRpmGauge, 0, 2);
+            ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 0);
+            ui->gridLayout_Gauges->addWidget(labelCommand, 0, 1);
+            ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 2);
 
-//            ui->gridLayout_Gauges->setColumnStretch(0, 2);
-//            ui->gridLayout_Gauges->setColumnStretch(1, 2);
-//            ui->gridLayout_Gauges->setColumnStretch(2, 2);
+            ui->gridLayout_Gauges->setColumnStretch(0, 1);
+            ui->gridLayout_Gauges->setColumnStretch(1, 0);
+            ui->gridLayout_Gauges->setColumnStretch(2, 1);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
-             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 2, 0);
-            ui->gridLayout_Gauges->addWidget(mRpmGauge, 3, 0);
+            ui->gridLayout_Gauges->addWidget(labelCommand, 2, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -383,7 +384,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost(int((value -1) * 0.1450377377));
+            setBoost((value * 0.145) - 14.7);
             break;
         default:
             //A
@@ -401,13 +402,13 @@ void ObdGauge::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
-        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
+//        labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
-        //ui->labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
+        labelCommand->setText(runtimeCommands[commandOrder]);
         commandOrder++;
     }
 

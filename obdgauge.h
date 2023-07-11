@@ -3,6 +3,7 @@
 
 #include <QPushButton>
 #include <QScreen>
+#include <QLabel>
 #include "qcgaugewidget.h"
 #include "global.h"
 #include "elm.h"
@@ -21,6 +22,8 @@ public:
 
 private:
     int commandOrder{0};
+
+    QLabel *labelCommand;
 
     int m_timerId{};
     float m_realTime{};

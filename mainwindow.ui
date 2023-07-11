@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>546</height>
+    <height>582</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,26 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="6" column="1">
+        <item row="6" column="0">
+         <widget class="QPushButton" name="pushScan">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Scan</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
          <widget class="QPushButton" name="pushClearFault">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -44,7 +63,89 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0">
+        <item row="17" column="0" colspan="2">
+         <widget class="QTextBrowser" name="textTerminal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="0">
+         <widget class="QPushButton" name="pushClear">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>  Clear  </string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QPushButton" name="pushGauge">
+          <property name="text">
+           <string>Gauge</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="1">
+         <widget class="QPushButton" name="pushGetProtocol">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Get Protocol</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0" colspan="2">
+           <widget class="QLineEdit" name="sendEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="12" column="1">
+         <widget class="QPushButton" name="pushSetProtocol">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Set Protocol</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
          <widget class="QComboBox" name="protocolCombo">
           <item>
            <property name="text">
@@ -113,24 +214,8 @@
           </item>
          </widget>
         </item>
-        <item row="16" column="0" colspan="2">
-         <widget class="QTextBrowser" name="textTerminal">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0">
-         <widget class="QPushButton" name="pushClear">
+        <item row="18" column="0" colspan="2">
+         <widget class="QPushButton" name="pushExit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -144,11 +229,11 @@
            </size>
           </property>
           <property name="text">
-           <string>  Clear  </string>
+           <string>Exit</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="7" column="0">
          <widget class="QPushButton" name="pushReadFault">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -173,27 +258,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
-         <widget class="QPushButton" name="pushGauge">
-          <property name="text">
-           <string>Gauge</string>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="1">
-         <widget class="QPushButton" name="pushGetProtocol">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Get Protocol</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
+        <item row="10" column="1">
          <widget class="QPushButton" name="pushSend">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -212,75 +277,7 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
-         <widget class="QPushButton" name="pushSetProtocol">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Set Protocol</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QCheckBox" name="checkSearchPids">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Search Pids</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0" colspan="2">
-           <widget class="QLineEdit" name="sendEdit">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="5" column="0">
-         <widget class="QPushButton" name="pushScan">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Scan</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
          <widget class="QPushButton" name="pushConnect">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -299,22 +296,28 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="pushExit">
+        <item row="5" column="1">
+         <widget class="QCheckBox" name="checkSearchPids">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="maximumSize">
+          <property name="text">
+           <string>Search Pids</string>
+          </property>
+          <property name="iconSize">
            <size>
-            <width>16777215</width>
-            <height>16777215</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
-          <property name="text">
-           <string>Exit</string>
+          <property name="checked">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
