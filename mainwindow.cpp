@@ -393,10 +393,8 @@ QString MainWindow::send(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    //QString ip = "192.168.0.10";
-    QString ip = "0.0.0.0";
+    QString ip = "192.168.0.10";
     // python -m elm -n 35000 -s car
-    //QString ip = "192.168.0.9";
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
     m_settingsManager->setWifiPort(wifiPort);
