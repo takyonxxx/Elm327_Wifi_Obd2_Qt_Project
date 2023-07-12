@@ -27,21 +27,23 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
 
-    if(runtimeCommands.isEmpty())
-    {
-        runtimeCommands.append(VOLTAGE);
-        runtimeCommands.append(VEHICLE_SPEED);
-        runtimeCommands.append(ENGINE_RPM);
-        runtimeCommands.append(ENGINE_LOAD);
-        runtimeCommands.append(COOLANT_TEMP);
-    }
+    startQueue();
 
-    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
-    {
-        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
-        mRunning = true;
-        send(VOLTAGE);
-    }
+//    if(runtimeCommands.isEmpty())
+//    {
+//        runtimeCommands.append(VOLTAGE);
+//        runtimeCommands.append(VEHICLE_SPEED);
+//        runtimeCommands.append(ENGINE_RPM);
+//        runtimeCommands.append(ENGINE_LOAD);
+//        runtimeCommands.append(COOLANT_TEMP);
+//    }
+
+//    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
+//    {
+//        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
+//        mRunning = true;
+//        send(VOLTAGE);
+//    }
 }
 
 ObdScan::~ObdScan()
@@ -49,11 +51,23 @@ ObdScan::~ObdScan()
     delete ui;
 }
 
+void ObdScan::startQueue()
+{
+    m_realTime = 0;
+    m_timerId  = startTimer(10);
+    m_time.start();
+}
+
+void ObdScan::stopQueue()
+{
+    if ( m_timerId ) killTimer( m_timerId );
+}
+
 void ObdScan::closeEvent (QCloseEvent *event)
 {
     Q_UNUSED(event);
     mRunning = false;
-    emit on_close_scan();
+    stopQueue();
 }
 
 void ObdScan::on_pushExit_clicked()
@@ -71,6 +85,40 @@ QString ObdScan::send(const QString &command)
 
     return QString();
 }
+
+
+QString ObdScan::getData(const QString &command)
+{
+    auto dataReceived =ConnectionManager::getInstance()->readData(command);
+    dataReceived = dataReceived.trimmed().simplified();
+    dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+    dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
+    return dataReceived;
+}
+
+void ObdScan::timerEvent( QTimerEvent *event )
+{
+    Q_UNUSED(event)
+
+    if(!ConnectionManager::getInstance()->isConnected())
+        return;
+
+    auto dataReceived = getData(VOLTAGE);
+    analysData(dataReceived);
+
+    dataReceived = getData(VEHICLE_SPEED);
+    analysData(dataReceived);
+
+    dataReceived = getData(ENGINE_RPM);
+    analysData(dataReceived);
+
+    dataReceived = getData(ENGINE_LOAD);
+    analysData(dataReceived);
+
+    dataReceived = getData(COOLANT_TEMP);
+    analysData(dataReceived);
+}
+
 
 void ObdScan::dataReceived(QString dataReceived)
 {

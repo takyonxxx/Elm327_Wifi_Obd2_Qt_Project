@@ -1,11 +1,13 @@
 #ifndef OBDGAUGE_H
 #define OBDGAUGE_H
 
+#include <QMainWindow>
 #include <QPushButton>
 #include <QScreen>
 #include <QLabel>
-#include "qcgaugewidget.h"
 #include "global.h"
+
+#include "qcgaugewidget.h"
 #include "elm.h"
 
 namespace Ui {
@@ -23,11 +25,12 @@ public:
 private:
     int commandOrder{0};
 
-    QLabel *labelCommand;
-
     int m_timerId{};
     float m_realTime{};
     QTime m_time{};
+
+    QLabel *labelCommand;
+
     int valueGauge{0};
     bool mRunning{false};
 
@@ -45,11 +48,14 @@ private:
 
     ELM *elm{};
 
+    void startQueue();
+    void stopQueue();
+
     QString send(const QString &);
+    QString getData(const QString &);
+
     void analysData(const QString &);
     void initGauges();
-    void startSim();
-    void stopSim();
     void setSpeed(int);
     void setRpm(int);
     void setCoolent(int);
@@ -58,8 +64,6 @@ private:
 private slots:
     void dataReceived(QString);
     void orientationChanged(Qt::ScreenOrientation );
-
-    void on_pushExit_clicked();
 
 protected:
     void closeEvent (QCloseEvent *) override;

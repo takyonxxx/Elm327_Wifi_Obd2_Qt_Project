@@ -19,23 +19,33 @@ public:
 
 private:
     QMutex m_mutex{};
+
+    int m_timerId{};
+    float m_realTime{};
+    QTime m_time{};
+
     bool mRunning{false};    
     int mSpeed{0};
     int mLoad{0};
     int commandOrder{0};
+
     ELM *elm{};
+
     QString send(const QString &);
+    QString getData(const QString &);
     void analysData(const QString &);
+    void startQueue();
+    void stopQueue();
+
 public slots:
     void dataReceived(QString);
 
 private slots:
     void on_pushExit_clicked();
-signals:
-    void on_close_scan();
 
 protected:
     void closeEvent (QCloseEvent *) override;
+    void timerEvent( QTimerEvent * ) override;
 
 private:
     Ui::ObdScan *ui;

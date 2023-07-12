@@ -10,9 +10,9 @@ ObdGauge::ObdGauge(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
-    labelCommand = new QLabel(this);
-    labelCommand->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
-    labelCommand->setAlignment(Qt::AlignCenter);
+//    labelCommand = new QLabel(this);
+//    labelCommand->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
+//    labelCommand->setAlignment(Qt::AlignCenter);
 
     initGauges();
 
@@ -21,18 +21,20 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if (screen->orientation() == Qt::LandscapeOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 0);
-            ui->gridLayout_Gauges->addWidget(labelCommand, 0, 1);
+            //ui->gridLayout_Gauges->addWidget(labelCommand, 0, 1);
             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 2);
 
-            ui->gridLayout_Gauges->setColumnStretch(0, 1);
-            ui->gridLayout_Gauges->setColumnStretch(1, 0);
-            ui->gridLayout_Gauges->setColumnStretch(2, 1);
+            //labelCommand->setFixedWidth(100);
+
+//            ui->gridLayout_Gauges->setColumnStretch(0, 1);
+//            ui->gridLayout_Gauges->setColumnStretch(1, 0);
+//            ui->gridLayout_Gauges->setColumnStretch(2, 1);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
-            ui->gridLayout_Gauges->addWidget(labelCommand, 2, 0);
+            //ui->gridLayout_Gauges->addWidget(labelCommand, 2, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -43,26 +45,40 @@ ObdGauge::ObdGauge(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &ObdGauge::orientationChanged);
     }
 
+    startQueue();
 
-    if(runtimeCommands.isEmpty())
-    {
-        runtimeCommands.append(VEHICLE_SPEED);
-        runtimeCommands.append(ENGINE_RPM);
-        runtimeCommands.append(COOLANT_TEMP);
-        runtimeCommands.append(INTAKE_MAN_PRESSURE);
-    }
+//    if(runtimeCommands.isEmpty())
+//    {
+//        runtimeCommands.append(VEHICLE_SPEED);
+//        runtimeCommands.append(ENGINE_RPM);
+//        runtimeCommands.append(COOLANT_TEMP);
+//        runtimeCommands.append(INTAKE_MAN_PRESSURE);
+//    }
 
-    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
-    {
-        QObject::connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
-        mRunning = true;
-        send(VOLTAGE);
-    }
+//    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
+//    {
+//        QObject::connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
+//        mRunning = true;
+//        send(VOLTAGE);
+//    }
 }
 
 ObdGauge::~ObdGauge()
 {
+    stopQueue();
     delete ui;
+}
+
+void ObdGauge::startQueue()
+{
+    m_realTime = 0;
+    m_timerId  = startTimer(10);
+    m_time.start();
+}
+
+void ObdGauge::stopQueue()
+{
+    if ( m_timerId ) killTimer( m_timerId );
 }
 
 void ObdGauge::initGauges()
@@ -278,18 +294,6 @@ void ObdGauge::initGauges()
     ui->verticalLayout->addWidget(container);*/
 }
 
-void ObdGauge::startSim()
-{
-    m_realTime = 0;
-    m_timerId  = startTimer(0);
-    m_time.start();
-}
-
-void ObdGauge::stopSim()
-{
-    if ( m_timerId ) killTimer( m_timerId );
-}
-
 void ObdGauge::setSpeed(int speed)
 {
     mSpeedNeedle->setCurrentValue(speed);
@@ -314,11 +318,20 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 {
     Q_UNUSED(event)
 
-    auto timeStep = m_time.restart();
-    m_realTime = m_realTime + timeStep / 100.0f;
-    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
-    setSpeed(static_cast<int>(valueGauge));
-    setRpm(static_cast<int>(valueGauge/2.75));
+    if(!ConnectionManager::getInstance()->isConnected())
+        return;
+
+    auto dataReceived = getData(COOLANT_TEMP);
+    analysData(dataReceived);
+
+    dataReceived = getData(INTAKE_MAN_PRESSURE);
+    analysData(dataReceived);
+
+//    auto timeStep = m_time.restart();
+//    m_realTime = m_realTime + timeStep / 100.0f;
+//    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
+//    setSpeed(static_cast<int>(valueGauge));
+//    setRpm(static_cast<int>(valueGauge/2.75));
 }
 
 
@@ -330,6 +343,15 @@ QString ObdGauge::send(const QString &command)
     }
 
     return QString();
+}
+
+QString ObdGauge::getData(const QString &command)
+{
+    auto dataReceived = ConnectionManager::getInstance()->readData(command);
+    dataReceived = dataReceived.trimmed().simplified();
+    dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+    dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
+    return dataReceived;
 }
 
 void ObdGauge::analysData(const QString &dataReceived)
@@ -384,7 +406,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost((value * 0.145) - 14.7);
+            setBoost((value * 0.49) - 14.7);
             break;
         default:
             //A
@@ -431,6 +453,7 @@ void ObdGauge::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
     mRunning = false;
+    stopQueue();
 }
 
 
@@ -450,11 +473,5 @@ void ObdGauge::orientationChanged(Qt::ScreenOrientation orientation)
     default:
         break;
     }    
-}
-
-void ObdGauge::on_pushExit_clicked()
-{
-    mRunning = false;
-    close();
 }
 
