@@ -31,8 +31,8 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="6" column="0">
-         <widget class="QPushButton" name="pushScan">
+        <item row="10" column="1">
+         <widget class="QPushButton" name="pushSend">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -46,75 +46,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Scan</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QPushButton" name="pushClearFault">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Clear Fault</string>
-          </property>
-         </widget>
-        </item>
-        <item row="17" column="0" colspan="2">
-         <widget class="QTextBrowser" name="textTerminal">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
-         <widget class="QPushButton" name="pushClear">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>  Clear  </string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QPushButton" name="pushGauge">
-          <property name="text">
-           <string>Gauge</string>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="1">
-         <widget class="QPushButton" name="pushGetProtocol">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Get Protocol</string>
+           <string>    Send    </string>
           </property>
          </widget>
         </item>
@@ -132,16 +64,28 @@
           </item>
          </layout>
         </item>
-        <item row="12" column="1">
-         <widget class="QPushButton" name="pushSetProtocol">
+        <item row="7" column="0">
+         <widget class="QPushButton" name="pushReadFault">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Set Protocol</string>
+           <string>Read Fault</string>
           </property>
          </widget>
         </item>
@@ -214,6 +158,19 @@
           </item>
          </widget>
         </item>
+        <item row="12" column="1">
+         <widget class="QPushButton" name="pushSetProtocol">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Set Protocol</string>
+          </property>
+         </widget>
+        </item>
         <item row="18" column="0" colspan="2">
          <widget class="QPushButton" name="pushExit">
           <property name="sizePolicy">
@@ -233,33 +190,8 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
-         <widget class="QPushButton" name="pushReadFault">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Read Fault</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QPushButton" name="pushSend">
+        <item row="6" column="0">
+         <widget class="QPushButton" name="pushScan">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -273,30 +205,18 @@
            </size>
           </property>
           <property name="text">
-           <string>    Send    </string>
+           <string>Scan</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QPushButton" name="pushConnect">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
+        <item row="6" column="1" colspan="2">
+         <widget class="QPushButton" name="pushGauge">
           <property name="text">
-           <string>Connect</string>
+           <string>Gauge</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="5" column="2">
          <widget class="QCheckBox" name="checkSearchPids">
           <property name="enabled">
            <bool>true</bool>
@@ -318,6 +238,93 @@
           </property>
           <property name="checked">
            <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <widget class="QPushButton" name="pushConnect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="2">
+         <widget class="QPushButton" name="pushRead">
+          <property name="text">
+           <string>Read</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="2">
+         <widget class="QPushButton" name="pushGetProtocol">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Get Protocol</string>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="2">
+         <widget class="QPushButton" name="pushClear">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>  Clear  </string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0" colspan="3">
+         <widget class="QTextBrowser" name="textTerminal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1" colspan="2">
+         <widget class="QPushButton" name="pushClearFault">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Clear Fault</string>
           </property>
          </widget>
         </item>

@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
     ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
+    ui->pushRead->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushSetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushGetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
     ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
@@ -297,6 +298,8 @@ void MainWindow::analysData(const QString &dataReceived)
 
 void MainWindow::dataReceived(QString dataReceived)
 {
+    if(m_reading)
+        return;
 
     dataReceived.remove("\r");
     dataReceived.remove(">");
@@ -391,10 +394,20 @@ QString MainWindow::send(const QString &command)
     return QString();
 }
 
+
+QString MainWindow::getData(const QString &command)
+{
+    auto dataReceived = ConnectionManager::getInstance()->readData(command);
+    dataReceived = dataReceived.trimmed().simplified();
+    dataReceived.remove(QRegExp("[\\n\\t\\r]"));
+    dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
+    return dataReceived;
+}
+
 void MainWindow::saveSettings()
 {
-    QString ip = "192.168.0.10";
-    //QString ip = "0.0.0.0";
+    //QString ip = "192.168.0.10";
+    QString ip = "0.0.0.0";
     // python3 -m elm -n 35000 -s car
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
@@ -473,5 +486,15 @@ void MainWindow::on_pushGauge_clicked()
     obdGauge->move(this->x(), this->y());
 
     obdGauge->show();
+}
+
+
+void MainWindow::on_pushRead_clicked()
+{
+    m_reading = true;
+    QString command = ui->sendEdit->text();
+    auto dataReceived = getData(command);
+    ui->textTerminal->append("<- " + dataReceived);
+    m_reading = false;
 }
 

@@ -72,7 +72,7 @@ ObdGauge::~ObdGauge()
 void ObdGauge::startQueue()
 {
     m_realTime = 0;
-    m_timerId  = startTimer(10);
+    m_timerId  = startTimer(100);
     m_time.start();
 }
 
@@ -406,7 +406,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost((value * 0.49) - 14.7);
+            setBoost((value * 0.145) - 14.7);
             break;
         default:
             //A

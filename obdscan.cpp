@@ -16,6 +16,9 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelLoadTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelLoad->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
 
+    ui->labelMapTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelMap->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+
     ui->labelSpeedTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelSpeed->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
@@ -54,7 +57,7 @@ ObdScan::~ObdScan()
 void ObdScan::startQueue()
 {
     m_realTime = 0;
-    m_timerId  = startTimer(10);
+    m_timerId  = startTimer(100);
     m_time.start();
 }
 
@@ -110,6 +113,9 @@ void ObdScan::timerEvent( QTimerEvent *event )
     analysData(dataReceived);
 
     dataReceived = getData(ENGINE_RPM);
+    analysData(dataReceived);
+
+    dataReceived = getData(MAN_ABSOLUTE_PRESSURE);
     analysData(dataReceived);
 
     dataReceived = getData(ENGINE_LOAD);
@@ -206,6 +212,7 @@ void ObdScan::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
+            ui->labelMap->setText(QString::number(value, 'f', 0) + " kPa");
             break;
         case 12: //PID(0C): RPM
             //((A*256)+B)/4

@@ -78,6 +78,7 @@ private:
     void connectElm();
     void disConnectElm();
     QString send(const QString &);
+    QString getData(const QString &);
     void analysData(const QString &);
     void saveSettings();
     bool isError(std::string msg);
@@ -91,6 +92,7 @@ private:
     int commandOrder{0};
     bool m_connected{false};
     bool m_initialized{false};
+    bool m_reading{false};
     bool m_searchPidsEnable{false};
     std::vector<uint32_t> cmds{};
 
@@ -115,6 +117,8 @@ private slots:
     void on_pushGetProtocol_clicked();
 
     void on_pushGauge_clicked();
+
+    void on_pushRead_clicked();
 
 private:
     Ui::MainWindow *ui;
