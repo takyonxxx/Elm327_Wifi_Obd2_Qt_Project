@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checkSearchPids->setStyleSheet("font-size: 24pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 12px; spacing: 12px;");
 
     ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->intervalEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
     ui->protocolCombo->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
     ui->protocolCombo->setCurrentIndex(3);
 
@@ -219,6 +220,7 @@ void MainWindow::connected()
     commandOrder = 0;
     m_initialized = false;
     m_connected = true;
+    interval = ui->intervalEdit->text().toInt();
 
     ui->textTerminal->append("Elm 327 connected");
     send(RESET);
@@ -398,6 +400,18 @@ QString MainWindow::send(const QString &command)
 QString MainWindow::getData(const QString &command)
 {
     auto dataReceived = ConnectionManager::getInstance()->readData(command);
+
+    dataReceived.remove("\r");
+    dataReceived.remove(">");
+    dataReceived.remove("?");
+    dataReceived.remove(",");
+
+    if(isError(dataReceived.toUpper().toStdString()))
+    {
+        QThread::msleep(500);
+        return "error";
+    }
+
     dataReceived = dataReceived.trimmed().simplified();
     dataReceived.remove(QRegExp("[\\n\\t\\r]"));
     dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));

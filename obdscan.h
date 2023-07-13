@@ -33,6 +33,8 @@ private:
 
     QString send(const QString &);
     QString getData(const QString &);
+    bool isError(std::string);
+
     void analysData(const QString &);
     void startQueue();
     void stopQueue();

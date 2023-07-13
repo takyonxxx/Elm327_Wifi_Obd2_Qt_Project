@@ -176,14 +176,6 @@ QString ElmTcpSocket::readData(const QString &command)
             {
                 byteblock.clear();
 
-//                if(!strData.isEmpty())
-//                {
-//                    if(strData.contains("SEARCHING"))
-//                    {
-//                        return  checkData();
-//                    }
-//                }
-
                 disconnect(socket,&QTcpSocket::readyRead,this,&ElmTcpSocket::readyRead);
                 emit dataReceived(strData);
                 return strData;

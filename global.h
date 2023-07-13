@@ -4,6 +4,7 @@
 #include <QtCore>
 #include <QVector>
 extern QStringList runtimeCommands;
+extern int interval;
 
 static std::string ERROR[] = {
     "ACT ALERT",

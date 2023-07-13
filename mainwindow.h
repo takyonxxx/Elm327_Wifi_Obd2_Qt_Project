@@ -81,7 +81,7 @@ private:
     QString getData(const QString &);
     void analysData(const QString &);
     void saveSettings();
-    bool isError(std::string msg);
+    bool isError(std::string);
     void getPids();
 
     QRect desktopRect{};

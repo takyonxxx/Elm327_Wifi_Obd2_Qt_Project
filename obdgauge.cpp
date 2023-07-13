@@ -47,13 +47,11 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     startQueue();
 
-//    if(runtimeCommands.isEmpty())
-//    {
-//        runtimeCommands.append(VEHICLE_SPEED);
-//        runtimeCommands.append(ENGINE_RPM);
-//        runtimeCommands.append(COOLANT_TEMP);
-//        runtimeCommands.append(INTAKE_MAN_PRESSURE);
-//    }
+    if(runtimeCommands.isEmpty())
+    {
+        runtimeCommands.append(COOLANT_TEMP);
+        runtimeCommands.append(INTAKE_MAN_PRESSURE);
+    }
 
 //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
 //    {
@@ -72,7 +70,7 @@ ObdGauge::~ObdGauge()
 void ObdGauge::startQueue()
 {
     m_realTime = 0;
-    m_timerId  = startTimer(100);
+    m_timerId  = startTimer(interval);
     m_time.start();
 }
 
@@ -321,11 +319,22 @@ void ObdGauge::timerEvent( QTimerEvent *event )
     if(!ConnectionManager::getInstance()->isConnected())
         return;
 
-    auto dataReceived = getData(COOLANT_TEMP);
-    analysData(dataReceived);
+    if(runtimeCommands.size() == 0)
+        return;
 
-    dataReceived = getData(INTAKE_MAN_PRESSURE);
-    analysData(dataReceived);
+    if(runtimeCommands.size() == commandOrder)
+    {
+        commandOrder = 0;
+    }
+
+    if(commandOrder < runtimeCommands.size())
+    {
+        auto dataReceived = getData(runtimeCommands[commandOrder]);
+        if(dataReceived != "error")
+            analysData(dataReceived);
+        //ui->labelCommand->setText(runtimeCommands[commandOrder]);
+        commandOrder++;
+    }
 
 //    auto timeStep = m_time.restart();
 //    m_realTime = m_realTime + timeStep / 100.0f;
@@ -345,9 +354,29 @@ QString ObdGauge::send(const QString &command)
     return QString();
 }
 
+bool ObdGauge::isError(std::string msg) {
+    std::vector<std::string> errors(ERROR, ERROR + 18);
+    for(unsigned int i=0; i < errors.size(); i++) {
+        if(msg.find(errors[i]) != std::string::npos)
+            return true;
+    }
+    return false;
+}
+
 QString ObdGauge::getData(const QString &command)
 {
     auto dataReceived = ConnectionManager::getInstance()->readData(command);
+
+    dataReceived.remove("\r");
+    dataReceived.remove(">");
+    dataReceived.remove("?");
+    dataReceived.remove(",");
+
+    if(isError(dataReceived.toUpper().toStdString()))
+    {
+        return "error";
+    }
+
     dataReceived = dataReceived.trimmed().simplified();
     dataReceived.remove(QRegExp("[\\n\\t\\r]"));
     dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));

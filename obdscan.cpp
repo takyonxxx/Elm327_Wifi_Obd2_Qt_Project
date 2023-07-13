@@ -27,26 +27,28 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->labelVoltage->setStyleSheet("font-size: 36pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");   
     ui->labelVoltage->setText(QString::number(0, 'f', 1) + " V");
+    ui->labelCommand->setStyleSheet("font-size: 24pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
 
     startQueue();
 
-//    if(runtimeCommands.isEmpty())
-//    {
-//        runtimeCommands.append(VOLTAGE);
-//        runtimeCommands.append(VEHICLE_SPEED);
-//        runtimeCommands.append(ENGINE_RPM);
-//        runtimeCommands.append(ENGINE_LOAD);
-//        runtimeCommands.append(COOLANT_TEMP);
-//    }
+    if(runtimeCommands.isEmpty())
+    {
+        runtimeCommands.append(VOLTAGE);
+        runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
+        runtimeCommands.append(VEHICLE_SPEED);
+        runtimeCommands.append(ENGINE_RPM);
+        runtimeCommands.append(ENGINE_LOAD);
+        runtimeCommands.append(COOLANT_TEMP);
+    }
 
-//    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
-//    {
-//        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
-//        mRunning = true;
-//        send(VOLTAGE);
-//    }
+    //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
+    //    {
+    //        connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdScan::dataReceived);
+    //        mRunning = true;
+    //        send(VOLTAGE);
+    //    }
 }
 
 ObdScan::~ObdScan()
@@ -57,7 +59,7 @@ ObdScan::~ObdScan()
 void ObdScan::startQueue()
 {
     m_realTime = 0;
-    m_timerId  = startTimer(100);
+    m_timerId  = startTimer(interval);
     m_time.start();
 }
 
@@ -90,9 +92,29 @@ QString ObdScan::send(const QString &command)
 }
 
 
+bool ObdScan::isError(std::string msg) {
+    std::vector<std::string> errors(ERROR, ERROR + 18);
+    for(unsigned int i=0; i < errors.size(); i++) {
+        if(msg.find(errors[i]) != std::string::npos)
+            return true;
+    }
+    return false;
+}
+
 QString ObdScan::getData(const QString &command)
 {
     auto dataReceived =ConnectionManager::getInstance()->readData(command);
+
+    dataReceived.remove("\r");
+    dataReceived.remove(">");
+    dataReceived.remove("?");
+    dataReceived.remove(",");
+
+    if(isError(dataReceived.toUpper().toStdString()))
+    {
+        return "error";
+    }
+
     dataReceived = dataReceived.trimmed().simplified();
     dataReceived.remove(QRegExp("[\\n\\t\\r]"));
     dataReceived.remove(QRegExp("[^a-zA-Z0-9]+"));
@@ -106,23 +128,22 @@ void ObdScan::timerEvent( QTimerEvent *event )
     if(!ConnectionManager::getInstance()->isConnected())
         return;
 
-    auto dataReceived = getData(VOLTAGE);
-    analysData(dataReceived);
+    if(runtimeCommands.size() == 0)
+        return;
 
-    dataReceived = getData(VEHICLE_SPEED);
-    analysData(dataReceived);
+    if(runtimeCommands.size() == commandOrder)
+    {
+        commandOrder = 0;
+    }
 
-    dataReceived = getData(ENGINE_RPM);
-    analysData(dataReceived);
-
-    dataReceived = getData(MAN_ABSOLUTE_PRESSURE);
-    analysData(dataReceived);
-
-    dataReceived = getData(ENGINE_LOAD);
-    analysData(dataReceived);
-
-    dataReceived = getData(COOLANT_TEMP);
-    analysData(dataReceived);
+    if(commandOrder < runtimeCommands.size())
+    {
+        auto dataReceived = getData(runtimeCommands[commandOrder]);
+        if(dataReceived != "error")
+            analysData(dataReceived);
+        ui->labelCommand->setText(runtimeCommands[commandOrder]);
+        commandOrder++;
+    }
 }
 
 
@@ -204,7 +225,7 @@ void ObdScan::analysData(const QString &dataReceived)
             // A-40
             value = A - 40;
             ui->labelCoolant->setText(QString::number(value, 'f', 0) + " C°");
-            break;
+                break;
         case 10://PID(0A): Fuel Pressure
             // A * 3
             value = A * 3;
@@ -265,11 +286,11 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 94://PID(5E) Fuel rate
             // ((A*256)+B) / 20
-        {
-            value = ((A*256)+B) / 20;
-            /*mAvarageFuelConsumption.append(value);
+            {
+                value = ((A*256)+B) / 20;
+                /*mAvarageFuelConsumption.append(value);
             ui->labelFuelConsumption->setText(QString::number(calculateAverage(mAvarageFuelConsumption), 'f', 1) + " l / h");*/
-        }
+            }
 
             break;
         case 98://PID(62) Actual engine - percent torque
