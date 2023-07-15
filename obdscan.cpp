@@ -13,11 +13,11 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelRpmTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelRpm->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelLoadTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelLoad->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1;background-color: #154360;   padding: 6px; spacing: 6px;");
-
     ui->labelMapTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelMap->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
+
+    ui->labelBaroTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
+    ui->labelBaro->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
     ui->labelSpeedTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelSpeed->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
@@ -37,10 +37,12 @@ ObdScan::ObdScan(QWidget *parent) :
     {
         runtimeCommands.append(VOLTAGE);
         runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
+        runtimeCommands.append(BAROMETRIC_PRESSURE);
         runtimeCommands.append(VEHICLE_SPEED);
         runtimeCommands.append(ENGINE_RPM);
         runtimeCommands.append(ENGINE_LOAD);
         runtimeCommands.append(COOLANT_TEMP);
+        //0104, 0105, 010B, 010C, 010D, 010F, 0110, 0111, 011C
     }
 
     //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
@@ -218,8 +220,7 @@ void ObdScan::analysData(const QString &dataReceived)
 
         case 4://PID(04): Engine Load
             // A*100/255
-            mLoad = A * 100 / 255;
-            ui->labelLoad->setText(QString::number(mLoad) + " %");
+            value = A * 100 / 255;
             break;
         case 5://PID(05): Coolant Temperature
             // A-40
@@ -242,8 +243,8 @@ void ObdScan::analysData(const QString &dataReceived)
             break;
         case 13://PID(0D): KM Speed
             // A
-            mSpeed = A;
-            ui->labelSpeed->setText(QString::number(mSpeed) + " km/h");
+            value = A;
+            ui->labelSpeed->setText(QString::number(value) + " km/h");
             break;
         case 15://PID(0F): Intake Air Temperature
             // A - 40
@@ -271,6 +272,11 @@ void ObdScan::analysData(const QString &dataReceived)
         case 49://PID(31) Distance traveled since codes cleared
             //((A*256)+B) km
             value = ((A*256)+B);
+            break;
+        case 51://PID(33) Absolute Barometric Pressure
+            //A kPa
+            value = A;
+            ui->labelBaro->setText(QString::number(value, 'f', 0) + " kPa");
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]

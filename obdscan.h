@@ -24,9 +24,7 @@ private:
     float m_realTime{};
     QTime m_time{};
 
-    bool mRunning{false};    
-    int mSpeed{0};
-    int mLoad{0};
+    bool mRunning{false};
     int commandOrder{0};
 
     ELM *elm{};

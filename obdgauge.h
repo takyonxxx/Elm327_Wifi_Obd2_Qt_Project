@@ -32,6 +32,8 @@ private:
     QLabel *labelCommand;
 
     int valueGauge{0};
+    int map{0};
+    int barometric_pressure{0};
     bool mRunning{false};
 
     QcGaugeWidget * mSpeedGauge{};

@@ -68,13 +68,13 @@ ENGINE_LOAD = "0104",  // A*100/255
 VEHICLE_SPEED = "010D",  //A
 INTAKE_AIR_TEMP = "010F",  //A-40
 MAN_ABSOLUTE_PRESSURE = "010B", // A  Manifold Absolute Pressure
+BAROMETRIC_PRESSURE = "0133", // A  Absolute Barometric Pressure
 MAF_AIR_FLOW = "0110", //MAF air flow rate 0 - 655.35	grams/sec ((256*A)+B) / 100  [g/s]
 ENGINE_OIL_TEMP = "015C",  //A-40
 FUEL_PRESSURE = "010A",  // A*3
 FUEL_RAIL_LOW_PRESSURE = "0122", // ((A*256)+B)*0.079
 FUEL_RAIL_HIGH_PRESSURE = "0123", // ((A*256)+B) * 10
 FUEL_RATE = "015E", // (A*256 + B) / 20  -->L/h
-INTAKE_MAN_PRESSURE = "010B", //Intake manifold absolute pressure 0 - 255 kPa
 CONT_MODULE_VOLT = "0142",  //((A*256)+B)/1000
 AMBIENT_AIR_TEMP = "0146",  //A-40
 CATALYST_TEMP_B1S1 = "013C",  //(((A*256)+B)/10)-40
@@ -89,6 +89,8 @@ CLEAR_TROUBLE = "04", //Clear trouble codes / Malfunction indicator lamp (MIL) /
 ONLY_ENGINE_ECU = "ATSH7E0",
 PROTOCOL_ISO_9141_2 = "ATSP3";
 
+//0104, 0105, 010B, 010C, 010D, 010F, 0110, 0111, 011C
+
 template <typename T>
 typename std::enable_if<std::is_unsigned<T>::value, int>::type
 inline constexpr signum(T x) {
@@ -101,8 +103,7 @@ inline constexpr signum(T x) {
     return (T(0) < x) - (x < T(0));
 }
 
-static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF,
-            ADAPTIF_TIMING_AUTO1, TIMEOUT_DEFAULT, PROTOCOL_AUTO, PROTOCOL_ISO_9141_2, GET_PROTOCOL};
+static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, ADAPTIF_TIMING_AUTO2, PROTOCOL_ISO_9141_2};
 
 static long long currentTimeMillis()
 {

@@ -50,7 +50,8 @@ ObdGauge::ObdGauge(QWidget *parent) :
     if(runtimeCommands.isEmpty())
     {
         runtimeCommands.append(COOLANT_TEMP);
-        runtimeCommands.append(INTAKE_MAN_PRESSURE);
+        runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
+        runtimeCommands.append(BAROMETRIC_PRESSURE);
     }
 
 //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
@@ -416,26 +417,31 @@ void ObdGauge::analysData(const QString &dataReceived)
         }
 
         switch (PID)
-        {
+        {        
+        case 5://PID(05): Coolant Temperature
+            // A-40
+            value = A - 40;
+            setCoolent(value);
+            break;        
         case 12: //PID(0C): RPM
             //((A*256)+B)/4
             value = ((A * 256) + B) / 4;
-            setRpm(static_cast<int>(value / 100));            
+            setRpm(static_cast<int>(value / 100));
             break;
         case 13://PID(0D): KM Speed
             // A
             value = A;
             setSpeed(static_cast<int>(value));
             break;
-        case 5://PID(05): Coolant Temperature
-            // A-40
-            value = A - 40;
-            setCoolent(value);
+        case 51://PID(33) Absolute Barometric Pressure
+            //A kPa
+            value = A;
+            barometric_pressure = value;
             break;
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost((value * 0.145) - 14.7);
+            setBoost((value - barometric_pressure) * 0.1450377377);
             break;
         default:
             //A
