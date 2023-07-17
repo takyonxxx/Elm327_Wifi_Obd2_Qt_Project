@@ -16,9 +16,6 @@ ObdScan::ObdScan(QWidget *parent) :
     ui->labelMapTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelMap->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
 
-    ui->labelBaroTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
-    ui->labelBaro->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;");
-
     ui->labelSpeedTitle->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; padding: 6px; spacing: 6px;");
     ui->labelSpeed->setStyleSheet("font-size: 32pt; font-weight: bold; color: #ECF0F1; background-color: #154360 ; padding: 6px; spacing: 6px;;");
 
@@ -37,7 +34,6 @@ ObdScan::ObdScan(QWidget *parent) :
     {
         runtimeCommands.append(VOLTAGE);
         runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
-        runtimeCommands.append(BAROMETRIC_PRESSURE);
         runtimeCommands.append(VEHICLE_SPEED);
         runtimeCommands.append(ENGINE_RPM);
         runtimeCommands.append(ENGINE_LOAD);
@@ -276,7 +272,6 @@ void ObdScan::analysData(const QString &dataReceived)
         case 51://PID(33) Absolute Barometric Pressure
             //A kPa
             value = A;
-            ui->labelBaro->setText(QString::number(value, 'f', 0) + " kPa");
             break;
         case 70://PID(46) Ambient Air Temperature
             // A-40 [DegC]

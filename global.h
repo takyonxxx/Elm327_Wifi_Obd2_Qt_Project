@@ -62,6 +62,7 @@ PIDS_SUPPORTED40 = "0120", //PIDs supported [21 - 40]
 PIDS_SUPPORTED60 = "0140", //PIDs supported [41 - 60]
 PIDS_SUPPORTED80 = "0160", //PIDs supported [61 - 80]
 PIDS_SUPPORTEDA0 = "0180", //PIDs supported [81 - A0]
+MONITOR_STATUS = "0101",
 COOLANT_TEMP = "0105",  //A-40
 ENGINE_RPM = "010C",  //((A*256)+B)/4
 ENGINE_LOAD = "0104",  // A*100/255
@@ -103,7 +104,7 @@ inline constexpr signum(T x) {
     return (T(0) < x) - (x < T(0));
 }
 
-static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, ADAPTIF_TIMING_AUTO2, PROTOCOL_ISO_9141_2};
+static QStringList initializeCommands{LINEFEED_OFF, ECHO_OFF, HEADERS_OFF, ADAPTIF_TIMING_AUTO2, PROTOCOL_ISO_9141_2, MONITOR_STATUS};
 
 static long long currentTimeMillis()
 {

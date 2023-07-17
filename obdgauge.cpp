@@ -51,7 +51,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
     {
         runtimeCommands.append(COOLANT_TEMP);
         runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
-        runtimeCommands.append(BAROMETRIC_PRESSURE);
+        //runtimeCommands.append(BAROMETRIC_PRESSURE);
     }
 
 //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
@@ -253,7 +253,7 @@ void ObdGauge::initGauges()
 
     QcDegreesItem *boost_deg = mBoostGauge->addDegrees(65);
     boost_deg->setStep(5);
-    boost_deg->setValueRange(0,30);
+    boost_deg->setValueRange(-10,30);
     auto boost_ColorBand = mBoostGauge->addColorBand(50);
     colors.clear();
 
@@ -272,7 +272,7 @@ void ObdGauge::initGauges()
 
     QcValuesItem *boost_values = mBoostGauge->addValues(74);
     boost_values->setStep(5);
-    boost_values->setValueRange(0,30);
+    boost_values->setValueRange(-10,30);
 
     mBoostGauge->addLabel(70)->setText("PSI");
     QcLabelItem *labBoost = mBoostGauge->addLabel(40);
@@ -282,7 +282,7 @@ void ObdGauge::initGauges()
     mBoostNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
     mBoostNeedle->setLabel(labBoost);
     mBoostNeedle->setColor(Qt::white);
-    mBoostNeedle->setValueRange(0,30);
+    mBoostNeedle->setValueRange(-10,30);
     mBoostGauge->addBackground(7);
     mBoostGauge->addGlass(88);
 
@@ -303,12 +303,12 @@ void ObdGauge::setRpm(int rpm)
     mRpmNeedle->setCurrentValue(rpm);
 }
 
-void ObdGauge::setCoolent(int degree)
+void ObdGauge::setCoolent(float degree)
 {
     mCoolentNeedle->setCurrentValue(degree);
 }
 
-void ObdGauge::setBoost(int atm)
+void ObdGauge::setBoost(float atm)
 {
     mBoostNeedle->setCurrentValue(atm);
 }
@@ -441,7 +441,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost((value - barometric_pressure) * 0.1450377377);
+            setBoost(value * 0.1450377377 - 14.7);
             break;
         default:
             //A

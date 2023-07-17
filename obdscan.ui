@@ -33,22 +33,15 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
-       <widget class="QLabel" name="labelBaroTitle">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelSpeedTitle">
         <property name="text">
-         <string>Barometric Pres:</string>
+         <string>Speed:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="labelSpeed">
-        <property name="text">
-         <string>0 km/h</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="labelBaro">
+      <item row="2" column="1">
+       <widget class="QLabel" name="labelMap">
         <property name="text">
          <string>0 kPa</string>
         </property>
@@ -61,20 +54,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="labelCoolant">
-        <property name="text">
-         <string>0 C°</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="labelCoolantTitle">
-        <property name="text">
-         <string>Coolant Temp:</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="labelMapTitle">
         <property name="text">
@@ -82,10 +61,24 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="labelSpeedTitle">
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelCoolantTitle">
         <property name="text">
-         <string>Speed:</string>
+         <string>Coolant Temp:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="labelCoolant">
+        <property name="text">
+         <string>0 C°</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelSpeed">
+        <property name="text">
+         <string>0 km/h</string>
         </property>
        </widget>
       </item>
@@ -93,13 +86,6 @@
        <widget class="QLabel" name="labelRpmTitle">
         <property name="text">
          <string>Rpm:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="labelMap">
-        <property name="text">
-         <string>0 kPa</string>
         </property>
        </widget>
       </item>

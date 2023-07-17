@@ -61,8 +61,8 @@ private:
     void initGauges();
     void setSpeed(int);
     void setRpm(int);
-    void setCoolent(int);
-    void setBoost(int);
+    void setCoolent(float);
+    void setBoost(float);
 
 private slots:
     void dataReceived(QString);

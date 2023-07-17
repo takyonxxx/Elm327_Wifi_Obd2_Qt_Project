@@ -386,7 +386,7 @@ void QcLabelItem::draw(QPainter *painter)
     QRectF txtRect(QPointF(0,0), sz );
     txtRect.moveCenter(txtCenter);
 
-    painter->drawText( txtRect, Qt::TextSingleLine,mText );
+    painter->drawText( txtRect, Qt::TextSingleLine, mText);
 
 }
 
@@ -663,7 +663,7 @@ void QcNeedleItem::computeCurrentValue()
         }
 
         if(mLabel!=0)
-            mLabel->setText(QString::number(mCurrentValue, 'f', 0),false);
+            mLabel->setText(QString::number(mCurrentValue, 'f', 1),false);
 
         update();
     }
