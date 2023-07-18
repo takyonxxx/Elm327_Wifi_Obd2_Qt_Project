@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QLabel>
 #include "global.h"
+#include "gps.h"
 
 #include "qcgaugewidget.h"
 #include "elm.h"
@@ -33,8 +34,10 @@ private:
 
     int valueGauge{0};
     int map{0};
-    int barometric_pressure{0};
+    double barometric_pressure{0.0};
     bool mRunning{false};
+
+    Gps *m_gps{};
 
     QcGaugeWidget * mSpeedGauge{};
     QcNeedleItem *mSpeedNeedle{};

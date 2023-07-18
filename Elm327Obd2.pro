@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
-QT += bluetooth network
+QT += bluetooth network positioning
 QT += concurrent
 
 
@@ -34,6 +34,7 @@ SOURCES += \
         elmblesocket.cpp \
         elmtcpsocket.cpp \
         global.cpp \
+        gps.cpp \
         main.cpp \
         mainwindow.cpp \
         obdgauge.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
         elmblesocket.h \
         elmtcpsocket.h \
         global.h \
+        gps.h \
         mainwindow.h \
         obdgauge.h \
         obdscan.h \

@@ -2,7 +2,8 @@
 #include <QDebug>
 
 
-ElmBleSocket::ElmBleSocket(QObject *parent):localDevice(new QBluetoothLocalDevice)
+ElmBleSocket::ElmBleSocket(QObject *parent):
+    localDevice(new QBluetoothLocalDevice)
 {
 
 }

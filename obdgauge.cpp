@@ -45,7 +45,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
         QObject::connect(screen, &QScreen::orientationChanged, this, &ObdGauge::orientationChanged);
     }
 
-    startQueue();
+    runtimeCommands.clear();
 
     if(runtimeCommands.isEmpty())
     {
@@ -53,6 +53,10 @@ ObdGauge::ObdGauge(QWidget *parent) :
         runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
         //runtimeCommands.append(BAROMETRIC_PRESSURE);
     }
+
+    m_gps = new Gps(this);
+
+    startQueue();
 
 //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
 //    {
@@ -436,12 +440,20 @@ void ObdGauge::analysData(const QString &dataReceived)
         case 51://PID(33) Absolute Barometric Pressure
             //A kPa
             value = A;
-            barometric_pressure = value;
+            barometric_pressure = value * 0.1450377377; //kPa to psi
             break;
         case 11://PID(0B): Manifold Absolute Pressure
             // A
             value = A;
-            setBoost(value * 0.1450377377 - 14.7);
+            if (barometric_pressure == 0.0)
+            {
+                auto alt = m_gps->altitude();
+                barometric_pressure = Gps::barometricPressure(alt) * 0.000145037738; //pascals to psi
+            }
+
+            qDebug() << barometric_pressure;
+
+            setBoost(value * 0.1450377377 - barometric_pressure);
             break;
         default:
             //A

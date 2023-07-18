@@ -28,7 +28,7 @@ ObdScan::ObdScan(QWidget *parent) :
 
     ui->pushExit->setStyleSheet("font-size: 22pt; font-weight: bold; color: #ECF0F1; background-color: #512E5F; padding: 6px; spacing: 6px;");
 
-    startQueue();
+    runtimeCommands.clear();
 
     if(runtimeCommands.isEmpty())
     {
@@ -40,6 +40,8 @@ ObdScan::ObdScan(QWidget *parent) :
         runtimeCommands.append(COOLANT_TEMP);
         //0104, 0105, 010B, 010C, 010D, 010F, 0110, 0111, 011C
     }
+
+     startQueue();
 
     //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
     //    {
