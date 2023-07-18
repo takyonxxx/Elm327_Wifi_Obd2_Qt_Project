@@ -51,6 +51,9 @@ private:
     QcGaugeWidget * mBoostGauge{};
     QcNeedleItem *mBoostNeedle{};
 
+    QcGaugeWidget * mMapGauge{};
+    QcNeedleItem *mMapNeedle{};
+
     ELM *elm{};
 
     void startQueue();
@@ -66,6 +69,7 @@ private:
     void setRpm(int);
     void setCoolent(float);
     void setBoost(float);
+    void setMap(int);
 
 private slots:
     void dataReceived(QString);

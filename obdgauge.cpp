@@ -21,20 +21,20 @@ ObdGauge::ObdGauge(QWidget *parent) :
         if (screen->orientation() == Qt::LandscapeOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 0);
-            //ui->gridLayout_Gauges->addWidget(labelCommand, 0, 1);
+            ui->gridLayout_Gauges->addWidget(mMapGauge, 0, 1);
             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 2);
 
-            //labelCommand->setFixedWidth(100);
+            //mMapGauge->setFixedWidth(100);
 
-//            ui->gridLayout_Gauges->setColumnStretch(0, 1);
-//            ui->gridLayout_Gauges->setColumnStretch(1, 0);
-//            ui->gridLayout_Gauges->setColumnStretch(2, 1);
+            ui->gridLayout_Gauges->setColumnStretch(0, 1);
+            ui->gridLayout_Gauges->setColumnStretch(1, 1);
+            ui->gridLayout_Gauges->setColumnStretch(2, 1);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
-            //ui->gridLayout_Gauges->addWidget(labelCommand, 2, 0);
+            ui->gridLayout_Gauges->addWidget(mMapGauge, 2, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -69,6 +69,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 ObdGauge::~ObdGauge()
 {
     stopQueue();
+    delete m_gps;
     delete ui;
 }
 
@@ -199,16 +200,16 @@ void ObdGauge::initGauges()
 
     QcDegreesItem *deg = mCoolentGauge->addDegrees(65);
     deg->setStep(10);
-    deg->setValueRange(40,120);
+    deg->setValueRange(10,130);
     auto coolent_ColorBandCoolent = mCoolentGauge->addColorBand(50);
     colors.clear();
 
     pair.first = Qt::yellow;
-    pair.second = 31;
+    pair.second = 50;
     colors.append(pair);
 
     pair.first = Qt::darkGreen;
-    pair.second = 69;
+    pair.second = 70;
     colors.append(pair);
 
     pair.first = Qt::yellow;
@@ -222,7 +223,7 @@ void ObdGauge::initGauges()
 
     QcValuesItem *coolent_values = mCoolentGauge->addValues(74);
     coolent_values->setStep(10);
-    coolent_values->setValueRange(40,120);
+    coolent_values->setValueRange(10,130);
 
     mCoolentGauge->addLabel(70)->setText("C°");
     QcLabelItem *labCoolent = mCoolentGauge->addLabel(40);
@@ -232,12 +233,12 @@ void ObdGauge::initGauges()
     mCoolentNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
     mCoolentNeedle->setLabel(labCoolent);
     mCoolentNeedle->setColor(Qt::white);
-    mCoolentNeedle->setValueRange(40,120);
+    mCoolentNeedle->setValueRange(10,130);
     mCoolentGauge->addBackground(7);
     mCoolentGauge->addGlass(88);
 
     //startSim();
-    setCoolent(static_cast<int>(40));
+    setCoolent(static_cast<int>(10));
 
 
     //turbo boost
@@ -261,12 +262,16 @@ void ObdGauge::initGauges()
     auto boost_ColorBand = mBoostGauge->addColorBand(50);
     colors.clear();
 
+    pair.first = Qt::gray;
+    pair.second = 25;
+    colors.append(pair);
+
     pair.first = Qt::darkGreen;
-    pair.second = 50;
+    pair.second = 62.5;
     colors.append(pair);
 
     pair.first = Qt::yellow;
-    pair.second = 66.5;
+    pair.second = 75;
     colors.append(pair);
 
     pair.first = Qt::red;
@@ -288,8 +293,59 @@ void ObdGauge::initGauges()
     mBoostNeedle->setColor(Qt::white);
     mBoostNeedle->setValueRange(-10,30);
     mBoostGauge->addBackground(7);
-    mBoostGauge->addGlass(88);
+    mBoostGauge->addGlass(88);    
 
+    //map
+    mMapGauge = new QcGaugeWidget;
+    mMapGauge->addBackground(99);
+    QcBackgroundItem *bkgMapt1 = mMapGauge->addBackground(92);
+    bkgMapt1->clearrColors();
+    bkgMapt1->addColor(0.1,Qt::black);
+    bkgMapt1->addColor(1.0,Qt::white);
+
+    QcBackgroundItem *bkgMapt2 = mMapGauge->addBackground(88);
+    bkgMapt2->clearrColors();
+    bkgMapt2->addColor(0.1,Qt::black);
+    bkgMapt2->addColor(1.0,Qt::darkGray);
+
+    mMapGauge->addArc(55);
+
+    QcDegreesItem *map_deg = mMapGauge->addDegrees(65);
+    map_deg->setStep(25);
+    map_deg->setValueRange(0,255);
+    auto map_ColorBand = mMapGauge->addColorBand(50);
+    colors.clear();
+
+    pair.first = Qt::darkGreen;
+    pair.second = 100;
+    colors.append(pair);
+
+//    pair.first = Qt::yellow;
+//    pair.second = 66.5;
+//    colors.append(pair);
+
+//    pair.first = Qt::red;
+//    pair.second = 100;
+//    colors.append(pair);
+    map_ColorBand->setColors(colors);
+
+    QcValuesItem *map_values = mMapGauge->addValues(74);
+    map_values->setStep(25);
+    map_values->setValueRange(0,255);
+
+    mMapGauge->addLabel(70)->setText("kPa");
+    QcLabelItem *labMap = mMapGauge->addLabel(40);
+    labMap->setColor(Qt::white);
+    labMap->setText("0");
+    mMapNeedle = mMapGauge->addNeedle(60);
+    mMapNeedle->setNeedle(QcNeedleItem::DiamonNeedle);
+    mMapNeedle->setLabel(labMap);
+    mMapNeedle->setColor(Qt::white);
+    mMapNeedle->setValueRange(0,255);
+    mMapGauge->addBackground(7);
+    mMapGauge->addGlass(88);
+
+    setMap(static_cast<int>(0));
     /*engine = new QQmlApplicationEngine;
     engine->load(QUrl(QLatin1String("qrc:/GaugeScreen.qml")));
     QWindow *qmlWindow = qobject_cast<QWindow*>(engine->rootObjects().at(0));
@@ -315,6 +371,11 @@ void ObdGauge::setCoolent(float degree)
 void ObdGauge::setBoost(float atm)
 {
     mBoostNeedle->setCurrentValue(atm);
+}
+
+void ObdGauge::setMap(int kPa)
+{
+    mMapNeedle->setCurrentValue(kPa);
 }
 
 void ObdGauge::timerEvent( QTimerEvent *event )
@@ -443,7 +504,7 @@ void ObdGauge::analysData(const QString &dataReceived)
             barometric_pressure = value * 0.1450377377; //kPa to psi
             break;
         case 11://PID(0B): Manifold Absolute Pressure
-            // A
+            // A kPa
             value = A;
             if (barometric_pressure == 0.0)
             {
@@ -451,8 +512,7 @@ void ObdGauge::analysData(const QString &dataReceived)
                 barometric_pressure = Gps::barometricPressure(alt) * 0.000145037738; //pascals to psi
             }
 
-            qDebug() << barometric_pressure;
-
+            setMap(value);
             setBoost(value * 0.1450377377 - barometric_pressure);
             break;
         default:
