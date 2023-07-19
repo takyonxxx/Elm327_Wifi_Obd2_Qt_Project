@@ -30,11 +30,14 @@ private:
     float m_realTime{};
     QTime m_time{};
 
-    QLabel *labelCommand;
+    QLabel *labelGps;
 
     int valueGauge{0};
     int map{0};
     double barometric_pressure{0.0};
+    int altitude{0};
+    int groundspeed{0};
+
     bool mRunning{false};
 
     Gps *m_gps{};

@@ -43,9 +43,7 @@ public:
     explicit Gps(QObject *parent=nullptr);
     ~Gps();
 
-    double m_altitude;
-
-    bool IsNan( float value )
+    static bool IsNan( float value )
     {
         return ((*(uint*)&value) & 0x7fffffff) > 0x7f800000;
     }
@@ -89,8 +87,7 @@ public:
         }
     }
 
-    double altitude() const;
-    void setAltitude(double newAltitude);
+    QGeoPositionInfo gpsPos() const;
 
 private:
     QGeoPositionInfoSource *m_posSource;

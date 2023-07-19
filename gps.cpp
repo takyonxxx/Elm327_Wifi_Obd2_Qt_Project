@@ -1,4 +1,5 @@
 #include "gps.h"
+#include "QDebug"
 
 Gps::Gps(QObject *parent) :
     QObject(parent)
@@ -15,7 +16,10 @@ Gps::Gps(QObject *parent) :
 
         connect(m_posSource,&QGeoPositionInfoSource::positionUpdated,this, &Gps::position_changed);
         m_posSource->startUpdates();
+        qDebug() << "Gps started...";
     }
+    else
+        qDebug() << "No Gps found...";
 }
 
 Gps::~Gps()
@@ -24,33 +28,12 @@ Gps::~Gps()
     delete m_posSource;
 }
 
-double Gps::altitude() const
+QGeoPositionInfo Gps::gpsPos() const
 {
-    return m_altitude;
-}
-
-void Gps::setAltitude(double newAltitude)
-{
-    m_altitude = newAltitude;
+    return m_gpsPos;
 }
 
 void Gps::position_changed(QGeoPositionInfo gpsPos)
 {
     m_gpsPos = gpsPos;
-
-    if(m_gpsPos.isValid())
-    {
-        auto m_coord = gpsPos.coordinate();
-
-//        auto groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
-//        if(IsNan((float)groundspeed)) groundspeed = 0;
-
-//        auto heading = m_gpsPos.attribute(QGeoPositionInfo::Direction);
-//        if(IsNan((float)heading))  heading = 0;
-
-        auto altitude = m_coord.altitude();
-        if(IsNan((float)altitude))  altitude = 0;
-
-        setAltitude(altitude);
-    }
 }

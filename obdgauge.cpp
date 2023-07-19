@@ -10,9 +10,10 @@ ObdGauge::ObdGauge(QWidget *parent) :
     setWindowTitle("Elm327 Obd2");
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
-//    labelCommand = new QLabel(this);
-//    labelCommand->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
-//    labelCommand->setAlignment(Qt::AlignCenter);
+    labelGps = new QLabel(this);
+    labelGps->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    labelGps->setAlignment(Qt::AlignCenter);
+    labelGps->setText("Waiting for Gps info...");
 
     initGauges();
 
@@ -23,12 +24,15 @@ ObdGauge::ObdGauge(QWidget *parent) :
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 0, 0);
             ui->gridLayout_Gauges->addWidget(mMapGauge, 0, 1);
             ui->gridLayout_Gauges->addWidget(mCoolentGauge, 0, 2);
+            ui->gridLayout_Gauges->addWidget(labelGps, 1, 0, 1, 3);
 
             //mMapGauge->setFixedWidth(100);
 
             ui->gridLayout_Gauges->setColumnStretch(0, 1);
             ui->gridLayout_Gauges->setColumnStretch(1, 1);
             ui->gridLayout_Gauges->setColumnStretch(2, 1);
+            ui->gridLayout_Gauges->setRowStretch(0, 2);
+            ui->gridLayout_Gauges->setRowStretch(1, 0.25);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
@@ -51,7 +55,6 @@ ObdGauge::ObdGauge(QWidget *parent) :
     {
         runtimeCommands.append(COOLANT_TEMP);
         runtimeCommands.append(MAN_ABSOLUTE_PRESSURE);
-        //runtimeCommands.append(BAROMETRIC_PRESSURE);
     }
 
     m_gps = new Gps(this);
@@ -481,6 +484,24 @@ void ObdGauge::analysData(const QString &dataReceived)
             B = 0;
         }
 
+        auto m_gpsPos = m_gps->gpsPos();
+        if(m_gpsPos.isValid())
+        {
+            auto m_coord = m_gpsPos.coordinate();
+
+            groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
+            if(Gps::IsNan((float)groundspeed)) groundspeed = 0;
+
+            altitude = m_coord.altitude();
+            if(Gps::IsNan((float)altitude))  altitude = 0;
+
+            QString speedText = "Speed: " + QString::number(groundspeed) + " km/h";
+            QString altitudeText = "Altitude: " + QString::number(altitude) + " meters";
+            labelGps->setText(speedText + " " + altitudeText);
+
+            barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
+        }
+
         switch (PID)
         {        
         case 5://PID(05): Coolant Temperature
@@ -508,8 +529,7 @@ void ObdGauge::analysData(const QString &dataReceived)
             value = A;
             if (barometric_pressure == 0.0)
             {
-                auto alt = m_gps->altitude();
-                barometric_pressure = Gps::barometricPressure(alt) * 0.000145037738; //pascals to psi
+                barometric_pressure = 14.7; // psi
             }
 
             setMap(value);
@@ -537,7 +557,6 @@ void ObdGauge::dataReceived(QString dataReceived)
     if(commandOrder < runtimeCommands.size())
     {
         send(runtimeCommands[commandOrder]);
-        labelCommand->setText(runtimeCommands[commandOrder]);
         commandOrder++;
     }
 
