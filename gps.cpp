@@ -5,7 +5,7 @@ Gps::Gps(QObject *parent) :
     QObject(parent)
 {
     m_gpsMode = QGeoPositionInfoSource::AllPositioningMethods;
-    m_gpsInterval = 1000;
+    m_gpsInterval = 500;
 
     m_posSource = QGeoPositionInfoSource::createDefaultSource(this);
 

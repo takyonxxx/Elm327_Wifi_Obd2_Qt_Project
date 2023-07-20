@@ -11,7 +11,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
     labelGps = new QLabel(this);
-    labelGps->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    labelGps->setStyleSheet("font-size: 36pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
     labelGps->setAlignment(Qt::AlignCenter);
     QString speedText = QString::number(groundspeed) + " km/h";
     QString altitudeText =  QString::number(altitude) + " meters";
