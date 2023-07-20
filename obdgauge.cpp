@@ -13,7 +13,10 @@ ObdGauge::ObdGauge(QWidget *parent) :
     labelGps = new QLabel(this);
     labelGps->setStyleSheet("font-size: 32pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
     labelGps->setAlignment(Qt::AlignCenter);
-    labelGps->setText("Waiting for Gps info...");
+    QString speedText = QString::number(groundspeed) + " km/h";
+    QString altitudeText =  QString::number(altitude) + " meters";
+    QString timeText =  "00:00:00";
+    labelGps->setText(speedText + "\n" + altitudeText + "\n " + timeText);
 
     initGauges();
 
@@ -32,13 +35,14 @@ ObdGauge::ObdGauge(QWidget *parent) :
             ui->gridLayout_Gauges->setColumnStretch(1, 1);
             ui->gridLayout_Gauges->setColumnStretch(2, 1);
             ui->gridLayout_Gauges->setRowStretch(0, 2);
-            ui->gridLayout_Gauges->setRowStretch(1, 0.25);
+            ui->gridLayout_Gauges->setRowStretch(1, 1);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
         {
             ui->gridLayout_Gauges->addWidget(mSpeedGauge, 0, 0);
             ui->gridLayout_Gauges->addWidget(mBoostGauge, 1, 0);
             ui->gridLayout_Gauges->addWidget(mMapGauge, 2, 0);
+            ui->gridLayout_Gauges->addWidget(labelGps, 3, 0);
         }
 
         screen->setOrientationUpdateMask(Qt::LandscapeOrientation |
@@ -405,6 +409,29 @@ void ObdGauge::timerEvent( QTimerEvent *event )
         commandOrder++;
     }
 
+    auto m_gpsPos = m_gps->gpsPos();
+    if(m_gpsPos.isValid())
+    {
+        auto m_coord = m_gpsPos.coordinate();
+
+        groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
+        if(Gps::IsNan((float)groundspeed)) groundspeed = 0;
+
+        altitude = m_coord.altitude();
+        if(Gps::IsNan((float)altitude))  altitude = 0;
+
+        QDateTime timestamp = m_gpsPos.timestamp();
+        QDateTime local = timestamp.toLocalTime();
+        QString dateTimeString = local.toString("hh:mm:ss");
+
+        QString speedText = QString::number(groundspeed) + " km/h";
+        QString altitudeText =  QString::number(altitude) + " meters";
+        QString timeText =  dateTimeString;
+        labelGps->setText(speedText + "\n" + altitudeText + "\n " + timeText);
+
+        barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
+    }
+
 //    auto timeStep = m_time.restart();
 //    m_realTime = m_realTime + timeStep / 100.0f;
 //    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
@@ -482,25 +509,7 @@ void ObdGauge::analysData(const QString &dataReceived)
         {
             A = std::stoi(vec[0].toStdString(),nullptr,16);
             B = 0;
-        }
-
-        auto m_gpsPos = m_gps->gpsPos();
-        if(m_gpsPos.isValid())
-        {
-            auto m_coord = m_gpsPos.coordinate();
-
-            groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
-            if(Gps::IsNan((float)groundspeed)) groundspeed = 0;
-
-            altitude = m_coord.altitude();
-            if(Gps::IsNan((float)altitude))  altitude = 0;
-
-            QString speedText = "Speed: " + QString::number(groundspeed) + " km/h";
-            QString altitudeText = "Altitude: " + QString::number(altitude) + " meters";
-            labelGps->setText(speedText + " " + altitudeText);
-
-            barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
-        }
+        }       
 
         switch (PID)
         {        
