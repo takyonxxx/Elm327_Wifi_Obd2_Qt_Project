@@ -11,12 +11,14 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     this->centralWidget()->setStyleSheet("background-image: url(:/img/carbon-fiber.png); border: none;");
     labelGps = new QLabel(this);
-    labelGps->setStyleSheet("font-size: 36pt; font-weight: bold; color: yellow; background-color: #154360 ; padding: 6px; spacing: 6px;");
+    labelGps->setStyleSheet("font-size: 42pt; font-weight: bold; color: white; background-color: #154360 ; padding: 6px; spacing: 6px;");
     labelGps->setAlignment(Qt::AlignCenter);
+    labelGps->setTextFormat(Qt::RichText);
+
     QString speedText = QString::number(groundspeed) + " km/h";
-    QString altitudeText =  QString::number(altitude) + " meters";
-    QString timeText =  "00:00:00";
-    labelGps->setText(speedText + "\n" + altitudeText + "\n " + timeText);
+    QString altitudeText =  QString::number(altitude) + " m";
+    QString timeText =  "<font color='orange'>00:00:00</font>"; // Use HTML formatting for color
+    labelGps->setText(speedText + "<br>" + altitudeText + "<br>" + timeText);
 
     initGauges();
 
@@ -34,7 +36,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
             ui->gridLayout_Gauges->setColumnStretch(0, 1);
             ui->gridLayout_Gauges->setColumnStretch(1, 1);
             ui->gridLayout_Gauges->setColumnStretch(2, 1);
-            ui->gridLayout_Gauges->setRowStretch(0, 2);
+            ui->gridLayout_Gauges->setRowStretch(0, 3);
             ui->gridLayout_Gauges->setRowStretch(1, 1);
         }
         else if (screen->orientation() == Qt::PortraitOrientation)
@@ -422,12 +424,12 @@ void ObdGauge::timerEvent( QTimerEvent *event )
 
         QDateTime timestamp = m_gpsPos.timestamp();
         QDateTime local = timestamp.toLocalTime();
-        QString dateTimeString = local.toString("hh:mm:ss");
+        QString dateTimeString = local.toString("hh:mm:ss");        
 
         QString speedText = QString::number(groundspeed) + " km/h";
-        QString altitudeText =  QString::number(altitude) + " meters";
-        QString timeText =  dateTimeString;
-        labelGps->setText(speedText + "\n" + altitudeText + "\n " + timeText);
+        QString altitudeText =  QString::number(altitude) + " m";
+        QString timeText =  "<font color='orange'>" + dateTimeString + "</font>"; // Use HTML formatting for color
+        labelGps->setText(speedText + "<br>" + altitudeText + "<br>" + timeText);
 
         barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
     }
