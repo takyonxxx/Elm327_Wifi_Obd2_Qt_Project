@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
-    <height>582</height>
+    <width>809</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,12 +33,6 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="7" column="0">
          <widget class="QPushButton" name="pushReadFault">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -157,12 +151,6 @@
         </item>
         <item row="10" column="1">
          <widget class="QPushButton" name="pushSend">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -176,12 +164,6 @@
         </item>
         <item row="7" column="1" colspan="2">
          <widget class="QPushButton" name="pushClearFault">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Clear Fault</string>
           </property>
@@ -189,12 +171,6 @@
         </item>
         <item row="12" column="2">
          <widget class="QPushButton" name="pushGetProtocol">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Get Protocol</string>
           </property>
@@ -202,12 +178,6 @@
         </item>
         <item row="6" column="0">
          <widget class="QPushButton" name="pushScan">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -235,12 +205,6 @@
         </item>
         <item row="18" column="0" colspan="2">
          <widget class="QPushButton" name="pushExit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -254,12 +218,6 @@
         </item>
         <item row="12" column="1">
          <widget class="QPushButton" name="pushSetProtocol">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Set Protocol</string>
           </property>
@@ -267,12 +225,6 @@
         </item>
         <item row="18" column="2">
          <widget class="QPushButton" name="pushClear">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -311,12 +263,6 @@
         </item>
         <item row="5" column="0">
          <widget class="QPushButton" name="pushConnect">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>

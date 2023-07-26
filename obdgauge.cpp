@@ -17,7 +17,7 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     QString speedText = QString::number(groundspeed) + " km/h";
     QString altitudeText =  QString::number(altitude) + " m";
-    QString timeText =  "<font color='orange'>00:00:00</font>"; // Use HTML formatting for color
+    QString timeText =  "<font color='yellow'>00:00:00</font>"; // Use HTML formatting for color
     labelGps->setText(speedText + "<br>" + altitudeText + "<br>" + timeText);
 
     initGauges();
@@ -67,18 +67,19 @@ ObdGauge::ObdGauge(QWidget *parent) :
 
     startQueue();
 
-//    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
-//    {
-//        QObject::connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
-//        mRunning = true;
-//        send(VOLTAGE);
-//    }
+    //    if(ConnectionManager::getInstance() && ConnectionManager::getInstance()->isConnected())
+    //    {
+    //        QObject::connect(ConnectionManager::getInstance(),&ConnectionManager::dataReceived,this, &ObdGauge::dataReceived);
+    //        mRunning = true;
+    //        send(VOLTAGE);
+    //    }
 }
 
 ObdGauge::~ObdGauge()
 {
     stopQueue();
-    delete m_gps;
+    if(m_gps)
+        delete m_gps;
     delete ui;
 }
 
@@ -235,7 +236,7 @@ void ObdGauge::initGauges()
     coolent_values->setValueRange(10,130);
 
     mCoolentGauge->addLabel(70)->setText("C°");
-    QcLabelItem *labCoolent = mCoolentGauge->addLabel(40);
+        QcLabelItem *labCoolent = mCoolentGauge->addLabel(40);
     labCoolent->setColor(Qt::white);
     labCoolent->setText("0");
     mCoolentNeedle = mCoolentGauge->addNeedle(60);
@@ -329,13 +330,13 @@ void ObdGauge::initGauges()
     pair.second = 100;
     colors.append(pair);
 
-//    pair.first = Qt::yellow;
-//    pair.second = 66.5;
-//    colors.append(pair);
+    //    pair.first = Qt::yellow;
+    //    pair.second = 66.5;
+    //    colors.append(pair);
 
-//    pair.first = Qt::red;
-//    pair.second = 100;
-//    colors.append(pair);
+    //    pair.first = Qt::red;
+    //    pair.second = 100;
+    //    colors.append(pair);
     map_ColorBand->setColors(colors);
 
     QcValuesItem *map_values = mMapGauge->addValues(74);
@@ -411,34 +412,31 @@ void ObdGauge::timerEvent( QTimerEvent *event )
         commandOrder++;
     }
 
-    auto m_gpsPos = m_gps->gpsPos();
-    if(m_gpsPos.isValid())
+    if(m_gps)
     {
-        auto m_coord = m_gpsPos.coordinate();
+        auto m_gpsPos = m_gps->gpsPos();
+        if(m_gpsPos.isValid())
+        {
+            auto m_coord = m_gpsPos.coordinate();
 
-        groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
-        if(Gps::IsNan((float)groundspeed)) groundspeed = 0;
+            groundspeed = 3.6 * m_gpsPos.attribute(QGeoPositionInfo::GroundSpeed);
+            if(Gps::IsNan((float)groundspeed)) groundspeed = 0;
 
-        altitude = m_coord.altitude();
-        if(Gps::IsNan((float)altitude))  altitude = 0;
+            altitude = m_coord.altitude();
+            if(Gps::IsNan((float)altitude))  altitude = 0;
 
-        QDateTime timestamp = m_gpsPos.timestamp();
-        QDateTime local = timestamp.toLocalTime();
-        QString dateTimeString = local.toString("hh:mm:ss");        
+            QDateTime timestamp = m_gpsPos.timestamp();
+            QDateTime local = timestamp.toLocalTime();
+            QString dateTimeString = local.toString("hh:mm:ss");
 
-        QString speedText = QString::number(groundspeed) + " km/h";
-        QString altitudeText =  QString::number(altitude) + " m";
-        QString timeText =  "<font color='orange'>" + dateTimeString + "</font>"; // Use HTML formatting for color
-        labelGps->setText(speedText + "<br>" + altitudeText + "<br>" + timeText);
+            QString speedText = QString::number(groundspeed) + " km/h";
+            QString altitudeText =  QString::number(altitude) + " m";
+            QString timeText =  "<font color='yellow'>" + dateTimeString + "</font>"; // Use HTML formatting for color
+            labelGps->setText(speedText + "<br>" + altitudeText + "<br>" + timeText);
 
-        barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
+            barometric_pressure = Gps::barometricPressure(altitude) * 0.000145037738; // pascals to psi
+        }
     }
-
-//    auto timeStep = m_time.restart();
-//    m_realTime = m_realTime + timeStep / 100.0f;
-//    valueGauge  =  111.0f * std::sin( m_realTime /  5.0f ) +  111.0f;
-//    setSpeed(static_cast<int>(valueGauge));
-//    setRpm(static_cast<int>(valueGauge/2.75));
 }
 
 
@@ -562,7 +560,7 @@ void ObdGauge::dataReceived(QString dataReceived)
     {
         commandOrder = 0;
         send(runtimeCommands[commandOrder]);
-//        labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
+        //        labelCommand->setText(runtimeCommands.join(", ") + "\n" + runtimeCommands[commandOrder]);
     }
 
     if(commandOrder < runtimeCommands.size())

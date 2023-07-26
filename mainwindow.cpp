@@ -36,22 +36,22 @@ MainWindow::MainWindow(QWidget *parent) :
 //    protocols.append("C User2 CAN (11* bit ID, 50* kbaud)\n");
 
 
-    ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 12px; spacing: 12px;");
-    ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushRead->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushSetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushGetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px;");
-    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 12px; spacing: 12px");
-    ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 12px; spacing: 12px");
-    ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
-    ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 12px; spacing: 12px");
-    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 12px; spacing: 12px");
-    ui->checkSearchPids->setStyleSheet("font-size: 24pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 12px; spacing: 12px;");
+    ui->pushConnect->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color:#154360; padding: 6px; spacing: 6px;");
+    ui->pushSend->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->pushRead->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->pushSetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->pushGetProtocol->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->pushClear->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360; padding: 6px; spacing: 6px;");
+    ui->pushReadFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px;");
+    ui->pushClearFault->setStyleSheet("font-size: 24pt; font-weight: bold; color: white; background-color: #0B5345; padding: 6px; spacing: 6px;");
+    ui->pushScan->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->pushGauge->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #154360 ; padding: 6px; spacing: 6px;");
+    ui->pushExit->setStyleSheet("font-size: 24pt; font-weight: bold; color: white;background-color: #512E5F; padding: 6px; spacing: 6px;");
+    ui->checkSearchPids->setStyleSheet("font-size: 24pt; font-weight: bold; color: #ECF0F1; background-color: orange ; padding: 6px; spacing: 6px;");
 
-    ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->intervalEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
-    ui->protocolCombo->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 12px; spacing: 12px");
+    ui->sendEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 6px; spacing: 6px;");
+    ui->intervalEdit->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 6px; spacing: 6px;");
+    ui->protocolCombo->setStyleSheet("font-size: 24pt; font-weight: bold; color:white; padding: 6px; spacing: 6px;");
     ui->protocolCombo->setCurrentIndex(3);
 
     ui->sendEdit->setText("0101");
@@ -420,8 +420,8 @@ QString MainWindow::getData(const QString &command)
 
 void MainWindow::saveSettings()
 {
-    QString ip = "192.168.0.10";
-    // QString ip = "0.0.0.0";
+    //QString ip = "192.168.0.10";
+    QString ip = "0.0.0.0";
     // python3 -m elm -n 35000 -s car
     quint16 wifiPort = 35000;
     m_settingsManager->setWifiIp(ip);
